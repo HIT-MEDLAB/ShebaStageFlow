@@ -46,7 +46,7 @@ export function LoginPage() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <img
-            src="https://www.sheba.co.il/webfiles/languages/1/SHEBA_LOGO_HEB_new.png"
+            src="https://www.sheba.co.il/cms-media/media/o1npqdhe/%D7%A9%D7%99%D7%91%D7%90.svg"
             alt="Sheba Medical Center"
             className="h-16 object-contain"
           />

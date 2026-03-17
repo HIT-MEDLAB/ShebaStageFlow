@@ -11,3 +11,7 @@ export async function loginUser(data: LoginFormData): Promise<LoginResponse> {
   const response = await apiClient.post<LoginResponse>('/auth/login', data)
   return response.data
 }
+
+export async function forgotPassword(data: { email: string }): Promise<void> {
+  await apiClient.post('/auth/forgot-password', data)
+}
