@@ -1,7 +1,12 @@
 {
   "appName": "שיבא",
   "nav": {
-    "dashboard": "לוח בקרה"
+    "home": "דף הבית",
+    "assignments": "לוח שיבוצים",
+    "constraints": "אילוצים",
+    "statistics": "סטטיסטיקות",
+    "settings": "הגדרות",
+    "coordinators": "רכזים אקדמיים"
   },
   "home": {
     "welcomeBack": "!ברוך שובך, {{name}}",

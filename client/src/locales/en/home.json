@@ -1,0 +1,27 @@
+{
+  "pageTitle": "Home",
+  "cards": {
+    "activeStudents": "Active Students",
+    "morningRotations": "Morning Rotations",
+    "eveningRotations": "Evening Rotations",
+    "activeDepartments": "Active Departments"
+  },
+  "table": {
+    "title": "Weekly University Information",
+    "yearlyTitle": "Yearly University Information",
+    "institutionName": "Institution Name",
+    "totalStudents": "Total Students",
+    "morningRotations": "Morning Rotations",
+    "eveningRotations": "Evening Rotations",
+    "noData": "No data available"
+  },
+  "weekSelector": {
+    "label": "Select Week",
+    "week": "Week {{number}}",
+    "weekRange": "Week {{number}} ({{start}} - {{end}})"
+  },
+  "viewToggle": {
+    "weekly": "Weekly",
+    "yearly": "Yearly"
+  }
+}

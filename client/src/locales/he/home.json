@@ -1,0 +1,27 @@
+{
+  "pageTitle": "דף הבית",
+  "cards": {
+    "activeStudents": "סטודנטים פעילים",
+    "morningRotations": "סבבי בוקר",
+    "eveningRotations": "סבבי ערב",
+    "activeDepartments": "מחלקות פעילות"
+  },
+  "table": {
+    "title": "מידע שבועי על האוניברסיטאות",
+    "yearlyTitle": "מידע שנתי על האוניברסיטאות",
+    "institutionName": "שם המוסד",
+    "totalStudents": "סה״כ סטודנטים",
+    "morningRotations": "מספר סבבי בוקר",
+    "eveningRotations": "מספר סבבי ערב",
+    "noData": "אין נתונים להצגה"
+  },
+  "weekSelector": {
+    "label": "בחירת שבוע",
+    "week": "שבוע {{number}}",
+    "weekRange": "שבוע {{number}} ({{start}} - {{end}})"
+  },
+  "viewToggle": {
+    "weekly": "שבועי",
+    "yearly": "שנתי"
+  }
+}

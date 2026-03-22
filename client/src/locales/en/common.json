@@ -1,7 +1,12 @@
 {
   "appName": "Shiba",
   "nav": {
-    "dashboard": "Dashboard"
+    "home": "Home",
+    "assignments": "Assignments",
+    "constraints": "Constraints",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "coordinators": "Academic Coordinators"
   },
   "home": {
     "welcomeBack": "Welcome back, {{name}}!",

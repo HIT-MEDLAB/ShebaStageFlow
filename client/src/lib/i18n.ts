@@ -4,20 +4,22 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 
 import enCommon from '@/locales/en/common.json'
 import enAuth from '@/locales/en/auth.json'
+import enHome from '@/locales/en/home.json'
 import heCommon from '@/locales/he/common.json'
 import heAuth from '@/locales/he/auth.json'
+import heHome from '@/locales/he/home.json'
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, auth: enAuth },
-      he: { common: heCommon, auth: heAuth },
+      en: { common: enCommon, auth: enAuth, home: enHome },
+      he: { common: heCommon, auth: heAuth, home: heHome },
     },
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth'],
+    ns: ['common', 'auth', 'home'],
     interpolation: {
       escapeValue: false,
     },
