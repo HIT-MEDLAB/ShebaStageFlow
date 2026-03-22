@@ -36,7 +36,6 @@ export function ForgotPasswordPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-sm border border-gray-200 p-8">
 
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <img
             src="https://www.sheba.co.il/cms-media/media/o1npqdhe/%D7%A9%D7%99%D7%91%D7%90.svg"
@@ -45,7 +44,6 @@ export function ForgotPasswordPage() {
           />
         </div>
 
-        {/* Title & Description */}
         <div className="text-center mb-6">
           <h1 className="text-xl font-semibold text-slate-900">
             {t('forgotPassword.title')}
@@ -55,10 +53,8 @@ export function ForgotPasswordPage() {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
 
-          {/* Email */}
           <div className="space-y-1.5">
             <label htmlFor="email" className="block text-sm font-medium text-slate-700">
               {t('forgotPassword.emailLabel')}
@@ -77,7 +73,6 @@ export function ForgotPasswordPage() {
             )}
           </div>
 
-          {/* Submit */}
           <Button
             type="submit"
             disabled={isPending}
@@ -88,7 +83,6 @@ export function ForgotPasswordPage() {
 
         </form>
 
-        {/* Back to login */}
         <div className="mt-6 text-center">
           <Link
             to="/login"

@@ -9,19 +9,234 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─── Enums ───────────────────────────────────────────────
+
 enum Role {
+  SUPER_ADMIN
   ADMIN
-  MANAGER
-  SCEDULER
+  ACADEMIC_COORDINATOR
 }
 
+enum AssignmentType {
+  GROUP
+  ELECTIVE
+}
+
+enum ShiftType {
+  MORNING
+  EVENING
+}
+
+enum AssignmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ─── User ────────────────────────────────────────────────
+
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  name         String?
+  phone        String?
   hashPassword String
-  role Role @default(SCEDULER)
+  role         Role    @default(ACADEMIC_COORDINATOR)
+  isActive     Boolean @default(true)
+
+  createdAssignments  Assignment[] @relation("CreatedBy")
+  approvedAssignments Assignment[] @relation("ApprovedBy")
+  auditLogs           AuditLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ─── University ──────────────────────────────────────────
+
+model University {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  priority Int     @default(0)
+  isActive Boolean @default(true)
+
+  semesters   UniversitySemester[]
+  students    Student[]
+  assignments Assignment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UniversitySemester {
+  id            Int      @id @default(autoincrement())
+  universityId  Int
+  semesterStart DateTime
+  semesterEnd   DateTime
+  year          Int
+
+  university University @relation(fields: [universityId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([universityId, year])
+}
+
+// ─── Department ──────────────────────────────────────────
+
+model Department {
+  id              Int     @id @default(autoincrement())
+  name            String  @unique
+  hasMorningShift Boolean @default(true)
+  hasEveningShift Boolean @default(false)
+  isActive        Boolean @default(true)
+
+  assignments           Assignment[]
+  departmentConstraints DepartmentConstraint[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DepartmentConstraint {
+  id               Int       @id @default(autoincrement())
+  departmentId     Int
+  morningCapacity  Int       @default(1)
+  eveningCapacity  Int       @default(0)
+  electiveCapacity Int       @default(0)
+  blockedStartDate DateTime?
+  blockedEndDate   DateTime?
+
+  department Department @relation(fields: [departmentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Student ─────────────────────────────────────────────
+
+model Student {
+  id            Int     @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  nationalId    String  @unique
+  phone         String?
+  email         String?
+  universityId  Int
+  yearInProgram Int?
+
+  university  University          @relation(fields: [universityId], references: [id])
+  assignments AssignmentStudent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Assignment ──────────────────────────────────────────
+
+model Assignment {
+  id            Int              @id @default(autoincrement())
+  departmentId  Int
+  universityId  Int
+  startDate     DateTime
+  endDate       DateTime
+  studentCount  Int?
+  yearInProgram Int?
+  type          AssignmentType
+  shiftType     ShiftType
+  tutorName     String?
+  status        AssignmentStatus @default(PENDING)
+  createdById   Int
+  approvedById  Int?
+
+  department Department @relation(fields: [departmentId], references: [id])
+  university University @relation(fields: [universityId], references: [id])
+  createdBy  User       @relation("CreatedBy", fields: [createdById], references: [id])
+  approvedBy User?      @relation("ApprovedBy", fields: [approvedById], references: [id])
+  students   AssignmentStudent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentId, startDate, endDate])
+  @@index([universityId])
+  @@index([status])
+}
+
+model AssignmentStudent {
+  id           Int @id @default(autoincrement())
+  assignmentId Int
+  studentId    Int
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    Student    @relation(fields: [studentId], references: [id])
+
+  @@unique([assignmentId, studentId])
+}
+
+// ─── Constraints ─────────────────────────────────────────
+
+model IronConstraint {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DateConstraint {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SoftConstraint {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  priority    Int     @default(0)
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Holiday ─────────────────────────────────────────────
+
+model Holiday {
+  id        Int      @id @default(autoincrement())
+  name      String
+  date      DateTime
+  isFullDay Boolean  @default(true)
+  year      Int
+
+  createdAt DateTime @default(now())
+
+  @@unique([name, year])
+}
+
+// ─── Audit Log ───────────────────────────────────────────
+
+model AuditLog {
+  id         Int    @id @default(autoincrement())
+  userId     Int
+  action     String
+  entityType String
+  entityId   Int
+  details    Json?
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
 }
