@@ -7,11 +7,11 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { useLogin } from '../hooks/useLogin'
 import { createLoginSchema, type LoginFormData } from '../schemas/auth.schema'
-import { useAuthStore } from '../stores/authStore'
+import { useAuth } from '../hooks/useAuth'
 
 export function LoginPage() {
   const { t, i18n } = useTranslation('auth')
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const { isAuthenticated } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const { mutate: login, isPending } = useLogin()
 

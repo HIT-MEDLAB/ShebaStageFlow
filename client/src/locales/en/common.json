@@ -1,13 +1,24 @@
 {
   "appName": "Shiba",
   "nav": {
-    "dashboard": "Dashboard"
+    "home": "Home",
+    "assignments": "Assignments",
+    "constraints": "Constraints",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "coordinators": "Academic Coordinators"
   },
   "home": {
     "welcomeBack": "Welcome back, {{name}}!",
     "welcomeBackDefault": "Welcome back!",
     "signedIn": "You are signed in to the Shiba system.",
     "signOut": "Sign Out"
+  },
+  "logout": {
+    "title": "Sign Out",
+    "description": "Are you sure you want to sign out?",
+    "confirm": "Yes, Sign Out",
+    "cancel": "Cancel"
   },
   "comingSoon": "{{feature}} — Coming Soon",
   "forgotPassword": "Forgot Password"

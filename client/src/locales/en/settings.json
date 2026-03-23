@@ -1,0 +1,16 @@
+{
+  "title": "Settings",
+  "language": {
+    "title": "Language",
+    "description": "Choose the display language for the application.",
+    "en": "English",
+    "he": "עברית (Hebrew)"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "description": "Choose how the application looks. Select a theme or let it follow your system preference.",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}

@@ -1,10 +1,11 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute'
 import { GuestRoute } from '@/components/shared/GuestRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
-import App from '@/app/App'
+import { HomePage } from '@/features/home'
+import { SettingsPage } from '@/features/settings'
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ export const router = createBrowserRouter([
         path: '/login',
         element: <LoginPage />,
       },
+      {
+        path: '/forgot-password',
+        element: <ForgotPasswordPage />,
+      },
     ],
   },
   {
@@ -28,18 +33,13 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '/home',
-            element: <App />,
+            element: <HomePage />,
+          },
+          {
+            path: '/settings',
+            element: <SettingsPage />,
           },
         ],
-      },
-    ],
-  },
-  {
-    element: <GuestRoute />,
-    children: [
-      {
-        path: '/forgot-password',
-        element: <ForgotPasswordPage />,
       },
     ],
   },

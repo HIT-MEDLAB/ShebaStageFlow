@@ -41,92 +41,120 @@
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
 }
 
 :root {
-  /* Surface — Paper White #FDFDFC */
-  --background: 60 20% 99%;
-  /* Typography — Slate Text #475569 */
-  --foreground: 215 19% 35%;
+  /* Surface — Blue-Gray #F2F5F9 */
+  --background: 214 37% 96%;
+  /* Typography — Deep Navy #1E2A5E */
+  --foreground: 229 52% 24%;
 
-  /* Cards — Pure White #FFFFFF */
+  /* Cards — White on blue-gray bg */
   --card: 0 0% 100%;
-  --card-foreground: 215 19% 35%;
+  --card-foreground: 229 52% 24%;
   --popover: 0 0% 100%;
-  --popover-foreground: 215 19% 35%;
+  --popover-foreground: 229 52% 24%;
 
-  /* Primary — Modern Blue #4F46E5 */
-  --primary: 243 75% 59%;
+  /* Primary — Accessible Pink #BF3069 */
+  --primary: 336 60% 47%;
   --primary-foreground: 0 0% 100%;
 
-  /* Secondary — light Midnight Indigo tint */
-  --secondary: 244 40% 95%;
-  --secondary-foreground: 244 47% 20%;
+  /* Secondary — Light navy tint */
+  --secondary: 222 28% 93%;
+  --secondary-foreground: 229 52% 24%;
 
   /* Muted */
-  --muted: 220 14% 96%;
-  --muted-foreground: 215 16% 47%;
+  --muted: 223 26% 95%;
+  --muted-foreground: 220 21% 45%;
 
-  /* Accent — Serene Mint #0D9488 */
-  --accent: 174 84% 32%;
-  --accent-foreground: 0 0% 100%;
+  /* Accent — Teal #44C2A4 */
+  --accent: 166 51% 51%;
+  --accent-foreground: 229 52% 24%;
 
-  /* Destructive — Wine Red #991B1B */
-  --destructive: 0 70% 35%;
+  /* Destructive — Rose-red harmonizing with pink */
+  --destructive: 343 80% 35%;
   --destructive-foreground: 0 0% 100%;
 
-  /* Borders — Soft Border #E5E7EB */
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
-  --ring: 243 75% 59%;
+  /* Borders — Cool blue-gray */
+  --border: 219 26% 89%;
+  --input: 219 26% 89%;
+  --ring: 336 60% 47%;
 
   /* Charts */
-  --chart-1: 243 75% 59%;
-  --chart-2: 174 84% 32%;
-  --chart-3: 23 82% 31%;
-  --chart-4: 163 88% 20%;
-  --chart-5: 0 70% 35%;
+  --chart-1: 338 72% 61%;
+  --chart-2: 166 51% 51%;
+  --chart-3: 229 52% 24%;
+  --chart-4: 32 95% 44%;
+  --chart-5: 262 83% 58%;
 
   /* Radius — 24px friendly high-end */
   --radius: 1.5rem;
+
+  /* Sidebar — matches card/primary/muted palette */
+  --sidebar: hsl(0 0% 100%);
+  --sidebar-foreground: hsl(229 52% 24%);
+  --sidebar-primary: hsl(336 60% 47%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(223 26% 95%);
+  --sidebar-accent-foreground: hsl(229 52% 24%);
+  --sidebar-border: hsl(219 26% 89%);
+  --sidebar-ring: hsl(336 60% 47%);
 }
 
 .dark {
-  /* Dark surface — deep Midnight Indigo */
-  --background: 244 47% 8%;
-  --foreground: 60 20% 99%;
+  /* Dark surface — Deep navy */
+  --background: 224 46% 11%;
+  --foreground: 214 37% 96%;
 
-  --card: 244 47% 12%;
-  --card-foreground: 60 20% 99%;
-  --popover: 244 47% 12%;
-  --popover-foreground: 60 20% 99%;
+  --card: 226 42% 18%;
+  --card-foreground: 214 37% 96%;
+  --popover: 226 42% 18%;
+  --popover-foreground: 214 37% 96%;
 
-  /* Primary — slightly brighter Modern Blue */
-  --primary: 243 75% 65%;
-  --primary-foreground: 0 0% 100%;
+  /* Primary — Brightened pink */
+  --primary: 338 72% 70%;
+  --primary-foreground: 229 52% 14%;
 
-  --secondary: 244 35% 18%;
-  --secondary-foreground: 60 20% 99%;
+  --secondary: 225 39% 19%;
+  --secondary-foreground: 214 37% 96%;
 
-  --muted: 244 35% 16%;
-  --muted-foreground: 215 16% 60%;
+  --muted: 225 39% 17%;
+  --muted-foreground: 222 29% 65%;
 
-  /* Accent — brighter Serene Mint on dark */
-  --accent: 174 84% 38%;
-  --accent-foreground: 0 0% 100%;
+  /* Accent — Brightened teal */
+  --accent: 166 58% 60%;
+  --accent-foreground: 224 46% 11%;
 
-  --destructive: 0 70% 42%;
+  --destructive: 343 80% 50%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 244 35% 20%;
-  --input: 244 35% 20%;
-  --ring: 243 75% 65%;
+  --border: 227 39% 27%;
+  --input: 227 39% 27%;
+  --ring: 338 72% 70%;
 
-  --chart-1: 243 75% 65%;
-  --chart-2: 174 84% 42%;
-  --chart-3: 23 82% 45%;
-  --chart-4: 163 88% 35%;
-  --chart-5: 0 70% 50%;
+  --chart-1: 338 72% 70%;
+  --chart-2: 166 58% 60%;
+  --chart-3: 229 52% 55%;
+  --chart-4: 32 95% 55%;
+  --chart-5: 262 83% 68%;
+
+  /* Sidebar — dark mode */
+  --sidebar: hsl(226 42% 18%);
+  --sidebar-foreground: hsl(214 37% 96%);
+  --sidebar-primary: hsl(338 72% 70%);
+  --sidebar-primary-foreground: hsl(229 52% 14%);
+  --sidebar-accent: hsl(225 39% 17%);
+  --sidebar-accent-foreground: hsl(214 37% 96%);
+  --sidebar-border: hsl(227 39% 27%);
+  --sidebar-ring: hsl(338 72% 70%);
 }
 
 @layer base {

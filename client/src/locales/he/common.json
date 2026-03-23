@@ -1,13 +1,24 @@
 {
   "appName": "שיבא",
   "nav": {
-    "dashboard": "לוח בקרה"
+    "home": "דף הבית",
+    "assignments": "לוח שיבוצים",
+    "constraints": "אילוצים",
+    "statistics": "סטטיסטיקות",
+    "settings": "הגדרות",
+    "coordinators": "רכזים אקדמיים"
   },
   "home": {
     "welcomeBack": "!ברוך שובך, {{name}}",
     "welcomeBackDefault": "!ברוך שובך",
     "signedIn": "אתה מחובר למערכת שיבא.",
     "signOut": "התנתק"
+  },
+  "logout": {
+    "title": "התנתקות",
+    "description": "?האם אתה בטוח שברצונך להתנתק",
+    "confirm": "כן, התנתק",
+    "cancel": "ביטול"
   },
   "comingSoon": "{{feature}} — בקרוב",
   "forgotPassword": "שכחתי סיסמה"
