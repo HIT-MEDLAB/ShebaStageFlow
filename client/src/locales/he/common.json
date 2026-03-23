@@ -14,6 +14,12 @@
     "signedIn": "אתה מחובר למערכת שיבא.",
     "signOut": "התנתק"
   },
+  "logout": {
+    "title": "התנתקות",
+    "description": "?האם אתה בטוח שברצונך להתנתק",
+    "confirm": "כן, התנתק",
+    "cancel": "ביטול"
+  },
   "comingSoon": "{{feature}} — בקרוב",
   "forgotPassword": "שכחתי סיסמה"
 }

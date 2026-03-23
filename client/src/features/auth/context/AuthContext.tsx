@@ -1,51 +1,61 @@
 import { createContext, useState, useCallback, useEffect } from 'react'
 import type { AuthUser } from '../types/auth.types'
+import { getMe, logoutUser } from '../api/auth.api'
 
 interface AuthContextValue {
-  token: string | null
   user: AuthUser | null
   isAuthenticated: boolean
-  setAuth: (token: string, user: AuthUser) => void
-  clearAuth: () => void
+  isLoading: boolean
+  setUser: (user: AuthUser) => void
+  clearAuth: () => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
-let tokenAccessor: () => string | null = () => null
-let clearAuthAccessor: () => void = () => {}
-
-export function getToken(): string | null {
-  return tokenAccessor()
-}
-
-export function clearTokenFromInterceptor(): void {
-  clearAuthAccessor()
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null)
-  const [user, setUser] = useState<AuthUser | null>(null)
-
-  const setAuth = useCallback((newToken: string, newUser: AuthUser) => {
-    setToken(newToken)
-    setUser(newUser)
-  }, [])
-
-  const clearAuth = useCallback(() => {
-    setToken(null)
-    setUser(null)
-  }, [])
+  const [user, setUserState] = useState<AuthUser | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    tokenAccessor = () => token
-    clearAuthAccessor = clearAuth
-  }, [token, clearAuth])
+    let ignore = false
+    const controller = new AbortController()
+
+    console.log('[AuthProvider] effect fired, sending getMe')
+    getMe(controller.signal)
+      .then((user) => {
+        console.log('[AuthProvider] getMe resolved, ignore=', ignore, 'user=', user)
+        if (!ignore) setUserState(user)
+      })
+      .catch((err) => {
+        console.log('[AuthProvider] getMe rejected, ignore=', ignore, 'error=', err)
+        if (!ignore) setUserState(null)
+      })
+      .finally(() => {
+        console.log('[AuthProvider] getMe finally, ignore=', ignore)
+        if (!ignore) setIsLoading(false)
+      })
+
+    return () => {
+      console.log('[AuthProvider] cleanup, setting ignore=true')
+      ignore = true
+      controller.abort()
+    }
+  }, [])
+
+  const setUser = useCallback((newUser: AuthUser) => {
+    setUserState(newUser)
+  }, [])
+
+  const clearAuth = useCallback(async () => {
+    await logoutUser()
+    setUserState(null)
+  }, [])
 
   const value: AuthContextValue = {
-    token,
     user,
-    isAuthenticated: token !== null,
-    setAuth,
+    isAuthenticated: user !== null,
+    isLoading,
+    setUser,
     clearAuth,
   }
 

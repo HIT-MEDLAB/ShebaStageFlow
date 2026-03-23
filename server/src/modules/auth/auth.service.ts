@@ -4,14 +4,16 @@ import { AppError } from '../../shared/errors/AppError';
 import type { IAuthRepository } from './auth.repository';
 import type { LoginDto } from './auth.schema';
 
+interface UserShape {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
 interface LoginResult {
   token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-  };
+  user: UserShape;
 }
 
 export class AuthService {
@@ -47,6 +49,20 @@ export class AuthService {
         name: user.name ?? '',
         role: user.role,
       },
+    };
+  }
+
+  async getMe(userId: number): Promise<UserShape> {
+    const user = await this.repository.findById(userId);
+    if (!user || !user.isActive) {
+      throw new AppError('Authentication required', 401);
+    }
+
+    return {
+      id: String(user.id),
+      email: user.email,
+      name: user.name ?? '',
+      role: user.role,
     };
   }
 }

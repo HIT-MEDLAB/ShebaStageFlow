@@ -11,10 +11,15 @@ export interface AuthUserRecord {
 
 export interface IAuthRepository {
   findByEmail(email: string): Promise<AuthUserRecord | null>;
+  findById(id: number): Promise<AuthUserRecord | null>;
 }
 
 export class AuthRepository implements IAuthRepository {
   async findByEmail(email: string): Promise<AuthUserRecord | null> {
     return prisma.user.findUnique({ where: { email } });
+  }
+
+  async findById(id: number): Promise<AuthUserRecord | null> {
+    return prisma.user.findUnique({ where: { id } });
   }
 }

@@ -2,15 +2,15 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/features/auth/stores/authStore'
+import { useAuth } from '@/features/auth'
 
 function App() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user, clearAuth } = useAuthStore()
+  const { user, clearAuth } = useAuth()
 
-  function handleLogout() {
-    clearAuth()
+  async function handleLogout() {
+    await clearAuth()
     navigate('/login')
   }
 

@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/components/shared/ProtectedRoute'
 import { GuestRoute } from '@/components/shared/GuestRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { HomePage } from '@/features/home'
+import { SettingsPage } from '@/features/settings'
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
           {
             path: '/home',
             element: <HomePage />,
+          },
+          {
+            path: '/settings',
+            element: <SettingsPage />,
           },
         ],
       },

@@ -10,12 +10,12 @@ import type { LoginFormData } from '../schemas/auth.schema'
 export function useLogin() {
   const { t } = useTranslation('auth')
   const navigate = useNavigate()
-  const { setAuth } = useAuth()
+  const { setUser } = useAuth()
 
   return useMutation({
     mutationFn: (data: LoginFormData) => loginUser(data),
     onSuccess: (response) => {
-      setAuth(response.token, response.user)
+      setUser(response.user)
       toast.success(t('toast.welcomeBack'))
       navigate('/home')
     },

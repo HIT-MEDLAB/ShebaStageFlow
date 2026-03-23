@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Home,
@@ -8,14 +8,22 @@ import {
   Settings,
   Users,
 } from 'lucide-react'
-import { Sidebar } from '@/components/layout/Sidebar'
+import { AppSidebar } from '@/components/layout/Sidebar'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/features/auth'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import type { NavItem } from '@/components/layout/Sidebar'
 
 export function AppLayout() {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const { user, clearAuth } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleLogout() {
+    await clearAuth()
+    navigate('/login')
+  }
 
   const baseNavItems: NavItem[] = [
     { label: t('nav.home'), path: '/home', icon: Home },
@@ -36,11 +44,13 @@ export function AppLayout() {
     : baseNavItems
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar navItems={navItems} />
+    <SidebarProvider>
+      <AppSidebar navItems={navItems} onLogout={handleLogout} />
 
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center border-b border-border bg-card px-6">
+      <SidebarInset>
+        <header className="flex h-14 items-center gap-2 border-b border-border bg-card px-4">
+          <SidebarTrigger className="-ms-1" />
+          <Separator orientation="vertical" className="h-4" />
           <span className="text-sm font-medium text-foreground">
             {user?.name ?? ''}
           </span>
@@ -49,7 +59,7 @@ export function AppLayout() {
         <main className="flex-1 bg-background p-6">
           <Outlet />
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

@@ -14,6 +14,12 @@
     "signedIn": "You are signed in to the Shiba system.",
     "signOut": "Sign Out"
   },
+  "logout": {
+    "title": "Sign Out",
+    "description": "Are you sure you want to sign out?",
+    "confirm": "Yes, Sign Out",
+    "cancel": "Cancel"
+  },
   "comingSoon": "{{feature}} — Coming Soon",
   "forgotPassword": "Forgot Password"
 }
