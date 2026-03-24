@@ -128,6 +128,19 @@ async function main() {
     console.log(`Created university: ${universities[i]}`);
   }
 
+  // Seed academic years
+  console.log("Seeding academic years...");
+  await prisma.academicYear.upsert({
+    where: { name: '2025-2026' },
+    update: {},
+    create: {
+      name: '2025-2026',
+      startDate: new Date('2025-10-01'),
+      endDate: new Date('2026-06-30'),
+    },
+  });
+  console.log("Created academic year: 2025-2026");
+
   console.log("Seeding complete!");
 }
 
