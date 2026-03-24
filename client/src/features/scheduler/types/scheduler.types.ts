@@ -1,3 +1,7 @@
+export type AssignmentType = 'GROUP' | 'ELECTIVE'
+export type ShiftType = 'MORNING' | 'EVENING'
+export type AssignmentStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+
 export interface Assignment {
   id: number
   departmentId: number
@@ -5,9 +9,9 @@ export interface Assignment {
   academicYearId: number
   startDate: string
   endDate: string
-  type: 'GROUP' | 'ELECTIVE'
-  shiftType: 'MORNING' | 'EVENING'
-  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  type: AssignmentType
+  shiftType: ShiftType
+  status: AssignmentStatus
   studentCount: number | null
   yearInProgram: number
   tutorName: string | null
@@ -97,8 +101,8 @@ export interface CreateAssignmentDto {
   academicYearId: number
   startDate: string
   endDate: string
-  type: 'GROUP' | 'ELECTIVE'
-  shiftType: 'MORNING' | 'EVENING'
+  type: AssignmentType
+  shiftType: ShiftType
   studentCount?: number | null
   yearInProgram: number
   tutorName?: string | null
@@ -109,9 +113,9 @@ export interface UpdateAssignmentDto {
   universityId?: number
   startDate?: string
   endDate?: string
-  type?: 'GROUP' | 'ELECTIVE'
-  shiftType?: 'MORNING' | 'EVENING'
-  status?: 'PENDING' | 'APPROVED' | 'REJECTED'
+  type?: AssignmentType
+  shiftType?: ShiftType
+  status?: AssignmentStatus
   studentCount?: number | null
   yearInProgram?: number
   tutorName?: string | null
@@ -121,7 +125,7 @@ export interface MoveAssignmentDto {
   departmentId: number
   startDate: string
   endDate: string
-  shiftType: 'MORNING' | 'EVENING'
+  shiftType: ShiftType
 }
 
 export interface CreateStudentDto {
