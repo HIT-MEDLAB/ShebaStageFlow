@@ -2,12 +2,23 @@ import { apiClient } from '@/lib/apiClient'
 import type { AuthUser } from '../types/auth.types'
 import type { LoginFormData } from '../schemas/auth.schema'
 
-export interface LoginResponse {
+export interface LoginOtpResponse {
+  requiresOtp: true
+  otpToken: string
+  email: string
+}
+
+export interface VerifyOtpResponse {
   user: AuthUser
 }
 
-export async function loginUser(data: LoginFormData): Promise<LoginResponse> {
-  const response = await apiClient.post<LoginResponse>('/auth/login', data)
+export async function loginUser(data: LoginFormData): Promise<LoginOtpResponse> {
+  const response = await apiClient.post<LoginOtpResponse>('/auth/login', data)
+  return response.data
+}
+
+export async function verifyOtp(otpToken: string, code: string): Promise<VerifyOtpResponse> {
+  const response = await apiClient.post<VerifyOtpResponse>('/auth/verify-otp', { otpToken, code })
   return response.data
 }
 

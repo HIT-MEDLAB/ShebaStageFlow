@@ -18,3 +18,11 @@ export function createForgotPasswordSchema(t: TFunction) {
 }
 
 export type ForgotPasswordFormData = z.infer<ReturnType<typeof createForgotPasswordSchema>>
+
+export function createOtpSchema(t: TFunction) {
+  return z.object({
+    code: z.string().length(6, t('auth:validation.otpLength')),
+  })
+}
+
+export type OtpFormData = z.infer<ReturnType<typeof createOtpSchema>>

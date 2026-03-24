@@ -11,3 +11,6 @@ export const AUTH_COOKIE_OPTIONS: CookieOptions = {
   maxAge: 8 * 60 * 60 * 1000, // 8 hours
   path: '/',
 };
+
+const { maxAge: _, ...clearOptions } = AUTH_COOKIE_OPTIONS;
+export const AUTH_COOKIE_CLEAR_OPTIONS: CookieOptions = clearOptions;

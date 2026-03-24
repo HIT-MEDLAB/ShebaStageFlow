@@ -1,6 +1,7 @@
 export { LoginPage } from './pages/LoginPage'
 export { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 export { useLogin } from './hooks/useLogin'
+export { useVerifyOtp } from './hooks/useVerifyOtp'
 export { useForgotPassword } from './hooks/useForgotPassword'
 export { useAuth } from './hooks/useAuth'
 export { AuthProvider } from './context/AuthContext'

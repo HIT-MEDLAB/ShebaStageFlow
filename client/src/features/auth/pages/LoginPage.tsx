@@ -8,11 +8,18 @@ import { Button } from '@/components/ui/button'
 import { useLogin } from '../hooks/useLogin'
 import { createLoginSchema, type LoginFormData } from '../schemas/auth.schema'
 import { useAuth } from '../hooks/useAuth'
+import { OtpDialog } from '../components/OtpDialog'
+
+interface OtpState {
+  otpToken: string
+  email: string
+}
 
 export function LoginPage() {
   const { t, i18n } = useTranslation('auth')
   const { isAuthenticated } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
+  const [otpState, setOtpState] = useState<OtpState | null>(null)
   const { mutate: login, isPending } = useLogin()
 
   const loginSchema = useMemo(() => createLoginSchema(t), [i18n.language])
@@ -20,6 +27,7 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -31,7 +39,13 @@ export function LoginPage() {
   }
 
   function onSubmit(data: LoginFormData) {
-    login(data)
+    login(data, {
+      onSuccess: (response) => {
+        if (response.requiresOtp) {
+          setOtpState({ otpToken: response.otpToken, email: response.email })
+        }
+      },
+    })
   }
 
   const inputClass =
@@ -133,6 +147,18 @@ export function LoginPage() {
 
         </form>
       </div>
+
+      {/* OTP Dialog */}
+      {otpState && (
+        <OtpDialog
+          open={!!otpState}
+          email={otpState.email}
+          otpToken={otpState.otpToken}
+          loginData={getValues()}
+          onClose={() => setOtpState(null)}
+          onOtpTokenUpdate={(newToken) => setOtpState((prev) => prev ? { ...prev, otpToken: newToken } : null)}
+        />
+      )}
     </div>
   )
 }

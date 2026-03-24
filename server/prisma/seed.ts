@@ -70,6 +70,13 @@ const users: SeedUser[] = [
     role: Role.ACADEMIC_COORDINATOR,
     password: "Coordinator123!",
   },
+  {
+    email: "semdaniel1@gmail.com",
+    name: "Daniel Sem",
+    phone: "050-0000008",
+    role: Role.SUPER_ADMIN,
+    password: "SuperAdmin123!",
+  },
 ];
 
 async function main() {

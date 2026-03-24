@@ -14,7 +14,7 @@ apiClient.interceptors.response.use(
     if (
       axios.isAxiosError(error) &&
       error.response?.status === 401 &&
-      !error.config?.url?.endsWith('/auth/me')
+      !error.config?.url?.startsWith('/auth/')
     ) {
       window.location.href = '/login'
     }
