@@ -10,6 +10,7 @@ import { useConstraints } from '../hooks/useConstraints'
 import { useAcademicYearWeeks } from '../hooks/useAcademicYearWeeks'
 import { useGridData } from '../hooks/useGridData'
 import { useBlockedCells } from '../hooks/useBlockedCells'
+import { useMoveAssignment } from '../hooks/useMoveAssignment'
 import { validateDrop } from '../validators/assignmentValidator'
 import { SchedulerGrid } from '../components/grid/SchedulerGrid'
 import { GridDragOverlay } from '../components/grid/GridDragOverlay'
@@ -47,6 +48,7 @@ export default function SchedulerPage() {
     selectedYear,
   })
   const blockedCells = useBlockedCells(constraints, weeks)
+  const moveMutation = useMoveAssignment()
 
   // Find the currently dragged assignment for the drag overlay
   const draggedAssignment = activeDragId
@@ -95,18 +97,15 @@ export default function SchedulerPage() {
     const targetWeek = weeks.find((w) => w.weekNumber === weekNumber)
     if (!targetWeek) return
 
-    // TODO: Wire up move mutation from Task 11
-    // moveMutation.mutate({
-    //   id: assignment.id,
-    //   data: {
-    //     departmentId,
-    //     startDate: targetWeek.startDate.toISOString(),
-    //     endDate: targetWeek.endDate.toISOString(),
-    //     shiftType: assignment.shiftType,
-    //   },
-    // })
-    void targetWeek
-    void assignment
+    moveMutation.mutate({
+      id: assignment.id,
+      data: {
+        departmentId,
+        startDate: targetWeek.startDate.toISOString(),
+        endDate: targetWeek.endDate.toISOString(),
+        shiftType: assignment.shiftType,
+      },
+    })
   }
 
   return (
