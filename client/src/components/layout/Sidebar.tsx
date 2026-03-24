@@ -34,9 +34,10 @@ export interface NavItem {
 interface SidebarProps {
   navItems: NavItem[]
   onLogout: () => void
+  userName: string
 }
 
-export function AppSidebar({ navItems, onLogout }: SidebarProps) {
+export function AppSidebar({ navItems, onLogout, userName }: SidebarProps) {
   const { t, i18n } = useTranslation()
   const side = i18n.dir() === 'rtl' ? 'right' : 'left'
 
@@ -44,9 +45,9 @@ export function AppSidebar({ navItems, onLogout }: SidebarProps) {
     <ShadcnSidebar collapsible="icon" side={side}>
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex h-10 items-center px-2 group-data-[collapsible=icon]:hidden">
-          <h2 className="text-lg font-semibold text-sidebar-foreground">
-            {t('appName')}
-          </h2>
+          <span className="text-sm font-medium text-sidebar-foreground truncate">
+            {userName}
+          </span>
         </div>
       </SidebarHeader>
 

@@ -5,16 +5,17 @@ interface StatsCardProps {
   title: string
   value: number
   icon: LucideIcon
+  iconClassName?: string
 }
 
-export function StatsCard({ title, value, icon: Icon }: StatsCardProps) {
+export function StatsCard({ title, value, icon: Icon, iconClassName }: StatsCardProps) {
   return (
     <Card className="gap-2">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        <Icon className="h-5 w-5 text-muted-foreground" />
+        <Icon className={`h-5 w-5 ${iconClassName ?? 'text-muted-foreground'}`} />
       </CardHeader>
       <CardContent>
         <p className="text-2xl font-bold">{value.toLocaleString()}</p>

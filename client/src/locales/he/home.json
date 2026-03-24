@@ -1,11 +1,5 @@
 {
   "pageTitle": "דף הבית",
-  "universities": {
-    "telAviv": "אוניברסיטת תל אביב",
-    "reichman": "אוניברסיטת רייכמן",
-    "benGurion": "אוניברסיטת בן גוריון",
-    "technion": "הטכניון"
-  },
   "cards": {
     "activeStudents": "סטודנטים פעילים",
     "morningRotations": "סבבי בוקר",
