@@ -35,24 +35,28 @@ export function HomePage() {
       title: t('cards.activeStudents'),
       value: data.stats.activeStudents,
       icon: GraduationCap,
+      iconClassName: 'text-blue-500',
     },
     {
       key: 'morningRotations',
       title: t('cards.morningRotations'),
       value: data.stats.morningRotations,
       icon: Sun,
+      iconClassName: 'text-amber-500',
     },
     {
       key: 'eveningRotations',
       title: t('cards.eveningRotations'),
       value: data.stats.eveningRotations,
       icon: Moon,
+      iconClassName: 'text-indigo-500',
     },
     {
       key: 'activeDepartments',
       title: t('cards.activeDepartments'),
       value: data.stats.activeDepartments,
       icon: Building2,
+      iconClassName: 'text-emerald-500',
     },
   ]
 
@@ -66,6 +70,7 @@ export function HomePage() {
             title={card.title}
             value={card.value}
             icon={card.icon}
+            iconClassName={card.iconClassName}
           />
         ))}
       </div>
