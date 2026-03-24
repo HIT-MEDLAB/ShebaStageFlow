@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import prisma from './lib/prisma';
 import { authRouter } from './modules/auth/auth.routes';
+import { universityRouter } from './modules/university/university.routes';
 import { errorHandler } from './shared/middlewares/errorHandler';
 
 const app = express();
@@ -29,6 +30,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 // Module routes
 app.use('/api/auth', authRouter);
+app.use('/api/universities', universityRouter);
 
 // Error handler (must be last)
 app.use(errorHandler);

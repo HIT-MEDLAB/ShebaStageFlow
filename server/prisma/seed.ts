@@ -97,7 +97,35 @@ async function main() {
       },
     });
 
-    console.log(`  Created ${user.role}: ${user.email}`);
+    console.log(`Created ${user.role}: ${user.email}`);
+  }
+
+  // Seed universities
+  console.log("Seeding universities...");
+
+  const universities = [
+    "תל אביב",
+    "רייכמן",
+    "ויצמן",
+    "הטכניון",
+    "בן גוריון",
+    "אריאל",
+    "ניקוסיה",
+    "לימודי חול",
+  ];
+
+  for (let i = 0; i < universities.length; i++) {
+    await prisma.university.upsert({
+      where: { name: universities[i]! },
+      update: {},
+      create: {
+        name: universities[i]!,
+        priority: i,
+        isActive: true,
+      },
+    });
+
+    console.log(`Created university: ${universities[i]}`);
   }
 
   console.log("Seeding complete!");

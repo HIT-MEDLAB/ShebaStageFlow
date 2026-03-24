@@ -5,14 +5,6 @@ export interface HomeStats {
   activeDepartments: number
 }
 
-export interface UniversityRowRaw {
-  id: number
-  nameKey: string
-  totalStudents: number
-  morningRotations: number
-  eveningRotations: number
-}
-
 export interface UniversityRow {
   id: number
   name: string
@@ -28,12 +20,6 @@ export interface Week {
 }
 
 export type ViewMode = 'weekly' | 'yearly'
-
-export interface HomeDataRaw {
-  stats: HomeStats
-  universityRows: UniversityRowRaw[]
-  weeks: Week[]
-}
 
 export interface HomeData {
   stats: HomeStats

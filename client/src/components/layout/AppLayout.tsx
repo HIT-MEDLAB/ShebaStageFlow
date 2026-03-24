@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { AppSidebar } from '@/components/layout/Sidebar'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
-import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/features/auth'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import type { NavItem } from '@/components/layout/Sidebar'
@@ -45,15 +44,11 @@ export function AppLayout() {
 
   return (
     <SidebarProvider>
-      <AppSidebar navItems={navItems} onLogout={handleLogout} />
+      <AppSidebar navItems={navItems} onLogout={handleLogout} userName={user?.name ?? ''} />
 
       <SidebarInset>
         <header className="flex h-14 items-center gap-2 border-b border-border bg-card px-4">
           <SidebarTrigger className="-ms-1" />
-          <Separator orientation="vertical" className="h-4" />
-          <span className="text-sm font-medium text-foreground">
-            {user?.name ?? ''}
-          </span>
         </header>
 
         <main className="flex-1 bg-background p-6">
