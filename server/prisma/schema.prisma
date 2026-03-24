@@ -193,6 +193,7 @@ model Assignment {
   @@index([departmentId, startDate, endDate])
   @@index([universityId])
   @@index([status])
+  @@index([academicYearId])
 }
 
 model AssignmentStudent {

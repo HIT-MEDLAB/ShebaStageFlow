@@ -4,6 +4,9 @@ export const createAcademicYearSchema = z.object({
   name: z.string().min(1),
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
+}).refine((data) => data.endDate > data.startDate, {
+  message: 'endDate must be after startDate',
+  path: ['endDate'],
 });
 
 export const updateAcademicYearSchema = z.object({
