@@ -1,0 +1,127 @@
+{
+  "page": {
+    "title": "ניהול",
+    "subtitle": "הגדרת חוקי שיבוץ ואילוצים"
+  },
+  "hardConstraints": {
+    "title": "אילוצים קשיחים",
+    "subtitle": "חוקים שהאלגוריתם לא יכול לשבור",
+    "addButton": "+ הוסף חוק",
+    "columns": {
+      "ruleName": "שם החוק",
+      "description": "תיאור",
+      "status": "סטטוס",
+      "actions": "פעולות"
+    },
+    "noData": "לא הוגדרו אילוצים קשיחים"
+  },
+  "temporalConstraints": {
+    "title": "אילוצים זמניים",
+    "subtitle": "חגים, חופשות ותאריכים חסומים",
+    "addButton": "+ הוסף אירוע",
+    "columns": {
+      "eventName": "שם האירוע",
+      "description": "תיאור",
+      "startDate": "תאריך התחלה",
+      "endDate": "תאריך סיום",
+      "status": "סטטוס",
+      "actions": "פעולות"
+    },
+    "noData": "לא הוגדרו אילוצים זמניים"
+  },
+  "institutional": {
+    "title": "חוקים מוסדיים ומחלקתיים",
+    "subtitle": "הגדרת קיבולת מחלקות ותאריכי סמסטר",
+    "departments": {
+      "title": "מחלקות",
+      "description": "הגדרת קיבולת, מגבלות משמרות ומכסות בחירה למחלקה",
+      "button": "הגדר"
+    },
+    "university": {
+      "title": "סמסטרים אוניברסיטאיים",
+      "description": "הגדרת תאריכי התחלה וסיום סמסטר",
+      "button": "הגדר"
+    }
+  },
+  "dialogs": {
+    "addIronConstraint": {
+      "title": "הוסף אילוץ קשיח",
+      "nameLabel": "שם החוק",
+      "namePlaceholder": "לדוגמה: שעות מקסימליות ליום",
+      "descriptionLabel": "תיאור",
+      "descriptionPlaceholder": "תאר את החוק...",
+      "save": "שמור",
+      "cancel": "ביטול"
+    },
+    "editIronConstraint": {
+      "title": "ערוך אילוץ קשיח"
+    },
+    "addDateConstraint": {
+      "title": "הוסף אילוץ זמני",
+      "nameLabel": "שם האירוע",
+      "namePlaceholder": "לדוגמה: חופשת פסח",
+      "descriptionLabel": "תיאור",
+      "descriptionPlaceholder": "תאר את האירוע...",
+      "startDateLabel": "תאריך התחלה",
+      "endDateLabel": "תאריך סיום",
+      "save": "שמור",
+      "cancel": "ביטול"
+    },
+    "editDateConstraint": {
+      "title": "ערוך אילוץ זמני"
+    },
+    "delete": {
+      "title": "מחק אילוץ",
+      "description": "האם אתה בטוח שברצונך למחוק אילוץ זה? פעולה זו אינה ניתנת לביטול.",
+      "confirm": "מחק",
+      "cancel": "ביטול"
+    },
+    "department": {
+      "selectTitle": "בחר מחלקה",
+      "selectSubtitle": "בחר מחלקה להגדרת האילוצים שלה",
+      "selectPlaceholder": "בחר מחלקה...",
+      "continue": "המשך",
+      "back": "חזרה",
+      "settingsTitle": "{{name}} - הגדרות",
+      "settingsSubtitle": "הגדרת קיבולת ומגבלות משמרות",
+      "capacity": "קיבולת",
+      "morningCapacity": "קיבולת בוקר",
+      "eveningCapacity": "קיבולת ערב",
+      "electives": "בחירה",
+      "electiveCapacity": "קיבולת בחירה",
+      "blockedPeriod": "תקופה חסומה (אופציונלי)",
+      "blockedStart": "תאריך התחלה",
+      "blockedEnd": "תאריך סיום",
+      "save": "שמור",
+      "cancel": "ביטול"
+    },
+    "university": {
+      "title": "סמסטר אוניברסיטאי",
+      "subtitle": "הגדרת לוח הזמנים של הסמסטר עבור אלגוריתם השיבוץ",
+      "universityLabel": "אוניברסיטה",
+      "selectPlaceholder": "בחר אוניברסיטה...",
+      "semesterStart": "תחילת סמסטר",
+      "semesterEnd": "סיום סמסטר",
+      "save": "שמור",
+      "cancel": "ביטול"
+    }
+  },
+  "validation": {
+    "nameRequired": "שם הוא שדה חובה",
+    "descriptionRequired": "תיאור הוא שדה חובה",
+    "dateRequired": "תאריך הוא שדה חובה",
+    "endBeforeStart": "תאריך הסיום חייב להיות אחרי תאריך ההתחלה",
+    "capacityMin": "הקיבולת חייבת להיות 0 או יותר",
+    "universityRequired": "אנא בחר אוניברסיטה",
+    "departmentRequired": "אנא בחר מחלקה"
+  },
+  "toast": {
+    "created": "האילוץ נוצר בהצלחה",
+    "updated": "האילוץ עודכן בהצלחה",
+    "deleted": "האילוץ נמחק בהצלחה",
+    "toggledOn": "האילוץ הופעל",
+    "toggledOff": "האילוץ הושבת",
+    "departmentSaved": "הגדרות המחלקה נשמרו",
+    "semesterSaved": "הסמסטר נשמר"
+  }
+}

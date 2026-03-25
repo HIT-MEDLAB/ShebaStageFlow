@@ -128,6 +128,45 @@ async function main() {
     console.log(`Created university: ${universities[i]}`);
   }
 
+  // Seed iron constraints
+  console.log("Seeding iron constraints...");
+
+  const ironConstraints = [
+    {
+      name: "שעות מקסימליות ליום",
+      description: "סטודנטים לא יכולים לעבוד יותר מ-8 שעות ביום אחד",
+    },
+    {
+      name: "מנוחה מינימלית בין משמרות",
+      description: "לפחות 12 שעות מנוחה בין משמרות עוקבות",
+    },
+    {
+      name: "ללא שיבוצים חופפים",
+      description: "סטודנט לא יכול להיות משובץ לשתי מחלקות בו זמנית",
+    },
+    {
+      name: "עדיפות סבב ראשון",
+      description: "סטודנטים בסבב הראשון מקבלים עדיפות במחלקות מועדפות",
+    },
+    {
+      name: "ימים רצופים מקסימליים",
+      description: "סטודנטים לא יכולים להיות משובצים יותר מ-5 ימים רצופים",
+    },
+  ];
+
+  for (const constraint of ironConstraints) {
+    const existing = await prisma.ironConstraint.findFirst({
+      where: { name: constraint.name },
+    });
+
+    if (!existing) {
+      await prisma.ironConstraint.create({ data: constraint });
+      console.log(`Created iron constraint: ${constraint.name}`);
+    } else {
+      console.log(`Iron constraint already exists: ${constraint.name}`);
+    }
+  }
+
   console.log("Seeding complete!");
 }
 

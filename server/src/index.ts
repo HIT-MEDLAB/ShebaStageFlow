@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import prisma from './lib/prisma';
 import { authRouter } from './modules/auth/auth.routes';
 import { universityRouter } from './modules/university/university.routes';
+import { constraintsRouter } from './modules/constraints/constraints.routes';
 import { errorHandler } from './shared/middlewares/errorHandler';
 
 const app = express();
@@ -31,6 +32,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // Module routes
 app.use('/api/auth', authRouter);
 app.use('/api/universities', universityRouter);
+app.use('/api/constraints', constraintsRouter);
 
 // Error handler (must be last)
 app.use(errorHandler);

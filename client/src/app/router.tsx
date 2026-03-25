@@ -6,6 +6,7 @@ import { GuestRoute } from '@/components/shared/GuestRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { HomePage } from '@/features/home'
 import { SettingsPage } from '@/features/settings'
+import { ConstraintsPage } from '@/features/constraints'
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
           {
             path: '/settings',
             element: <SettingsPage />,
+          },
+          {
+            path: '/constraints',
+            element: <ConstraintsPage />,
           },
         ],
       },

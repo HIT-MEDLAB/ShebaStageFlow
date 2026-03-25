@@ -1,0 +1,127 @@
+{
+  "page": {
+    "title": "Management",
+    "subtitle": "Configure scheduling rules and constraints"
+  },
+  "hardConstraints": {
+    "title": "Hard Constraints",
+    "subtitle": "Rules the algorithm can never break",
+    "addButton": "+ Add Rule",
+    "columns": {
+      "ruleName": "Rule Name",
+      "description": "Description",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "noData": "No hard constraints configured"
+  },
+  "temporalConstraints": {
+    "title": "Temporal Constraints",
+    "subtitle": "Holidays, vacations, and blackout dates",
+    "addButton": "+ Add Event",
+    "columns": {
+      "eventName": "Event Name",
+      "description": "Description",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "noData": "No temporal constraints configured"
+  },
+  "institutional": {
+    "title": "Institutional & Departmental Rules",
+    "subtitle": "Configure department capacities and university semester dates",
+    "departments": {
+      "title": "Departments",
+      "description": "Set capacity, shift limits, and elective caps per department",
+      "button": "Configure"
+    },
+    "university": {
+      "title": "University Semesters",
+      "description": "Define semester start and end dates",
+      "button": "Configure"
+    }
+  },
+  "dialogs": {
+    "addIronConstraint": {
+      "title": "Add Hard Constraint",
+      "nameLabel": "Rule Name",
+      "namePlaceholder": "e.g., Maximum Hours Per Day",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the rule...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "editIronConstraint": {
+      "title": "Edit Hard Constraint"
+    },
+    "addDateConstraint": {
+      "title": "Add Temporal Constraint",
+      "nameLabel": "Event Name",
+      "namePlaceholder": "e.g., Passover Break",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the event...",
+      "startDateLabel": "Start Date",
+      "endDateLabel": "End Date",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "editDateConstraint": {
+      "title": "Edit Temporal Constraint"
+    },
+    "delete": {
+      "title": "Delete Constraint",
+      "description": "Are you sure you want to delete this constraint? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "department": {
+      "selectTitle": "Select Department",
+      "selectSubtitle": "Select a department to configure its constraints",
+      "selectPlaceholder": "Choose a department...",
+      "continue": "Continue",
+      "back": "Back",
+      "settingsTitle": "{{name}} - Settings",
+      "settingsSubtitle": "Configure capacity and shift limits",
+      "capacity": "Capacity",
+      "morningCapacity": "Morning Capacity",
+      "eveningCapacity": "Evening Capacity",
+      "electives": "Electives",
+      "electiveCapacity": "Elective Capacity",
+      "blockedPeriod": "Blocked Period (Optional)",
+      "blockedStart": "Start Date",
+      "blockedEnd": "End Date",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "university": {
+      "title": "University Semester",
+      "subtitle": "Define the semester timeline for the scheduling algorithm",
+      "universityLabel": "University",
+      "selectPlaceholder": "Choose a university...",
+      "semesterStart": "Semester Start",
+      "semesterEnd": "Semester End",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "descriptionRequired": "Description is required",
+    "dateRequired": "Date is required",
+    "endBeforeStart": "End date must be after start date",
+    "capacityMin": "Capacity must be 0 or greater",
+    "universityRequired": "Please select a university",
+    "departmentRequired": "Please select a department"
+  },
+  "toast": {
+    "created": "Constraint created successfully",
+    "updated": "Constraint updated successfully",
+    "deleted": "Constraint deleted successfully",
+    "toggledOn": "Constraint enabled",
+    "toggledOff": "Constraint disabled",
+    "departmentSaved": "Department settings saved",
+    "semesterSaved": "Semester saved"
+  }
+}

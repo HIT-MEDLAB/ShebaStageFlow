@@ -1,0 +1,98 @@
+<h2>Management Screen Layout</h2>
+<p class="subtitle">How should the three sections (Hard Constraints, Temporal, Department/University) be organized?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: var(--surface);">
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+        <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px; padding: 10px;">
+          <div style="font-weight: bold; margin-bottom: 4px;">Section 1: Hard Constraints</div>
+          <div style="background: var(--border); height: 40px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px;">Table with toggles + Add button</div>
+        </div>
+        <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px; padding: 10px;">
+          <div style="font-weight: bold; margin-bottom: 4px;">Section 2: Temporal Constraints</div>
+          <div style="background: var(--border); height: 40px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px;">Calendar table + Add button</div>
+        </div>
+        <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px; padding: 10px;">
+          <div style="font-weight: bold; margin-bottom: 4px;">Section 3: Department & University</div>
+          <div style="display: flex; gap: 6px;">
+            <div style="flex:1; background: var(--border); height: 30px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px;">Departments</div>
+            <div style="flex:1; background: var(--border); height: 30px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px;">University</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Scrollable Sections (Recommended)</h3>
+      <p>All 3 sections stacked vertically on one page. Each in its own Card. Matches your "Top/Middle/Bottom" layout description. Simple, scannable, no navigation needed.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: var(--surface);">
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+        <div style="display: flex; gap: 2px; background: var(--surface-alt); border-radius: 6px 6px 0 0; overflow: hidden; border: 1px solid var(--border); border-bottom: none;">
+          <div style="padding: 8px 14px; background: var(--accent); color: var(--accent-foreground); font-weight: bold; font-size: 11px;">Hard Constraints</div>
+          <div style="padding: 8px 14px; color: var(--text-muted); font-size: 11px;">Temporal</div>
+          <div style="padding: 8px 14px; color: var(--text-muted); font-size: 11px;">Rules</div>
+        </div>
+        <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 0 0 6px 6px; padding: 12px; min-height: 80px;">
+          <div style="background: var(--border); height: 60px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px;">Active tab content fills the area</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Tabbed Interface</h3>
+      <p>3 tabs at the top. Only one section visible at a time. Cleaner if tables are large, but requires switching tabs to see different sections.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: var(--surface);">
+      <div style="display: flex; flex-direction: column; gap: 4px; font-size: 12px;">
+        <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px; padding: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold;">Hard Constraints</span>
+            <span style="color: var(--text-muted);">&#9660;</span>
+          </div>
+          <div style="margin-top: 8px; background: var(--border); height: 40px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px;">Expanded content</div>
+        </div>
+        <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px; padding: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold; color: var(--text-muted);">Temporal Constraints</span>
+            <span style="color: var(--text-muted);">&#9654;</span>
+          </div>
+        </div>
+        <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px; padding: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold; color: var(--text-muted);">Department & University</span>
+            <span style="color: var(--text-muted);">&#9654;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Accordion Sections</h3>
+      <p>Collapsible panels - only one expanded at a time. Compact but requires clicking to switch between sections. Less overview.</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons" style="margin-top: 24px;">
+  <div class="pros">
+    <h4>Why I recommend A</h4>
+    <ul>
+      <li>Matches the "Top/Middle/Bottom" layout you described</li>
+      <li>Full overview - see all sections at once</li>
+      <li>Uses existing Card component pattern from Home page</li>
+      <li>No extra navigation complexity</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>Trade-off</h4>
+    <ul>
+      <li>Longer page if tables have many rows</li>
+      <li>Bottom sections require scrolling to reach</li>
+    </ul>
+  </div>
+</div>

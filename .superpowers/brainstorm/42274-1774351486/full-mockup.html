@@ -1,0 +1,156 @@
+<h2>Management Screen - Full Wireframe</h2>
+<p class="subtitle">Three vertically stacked sections. Click any section to see its detail view.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Management Page - /constraints</div>
+  <div class="mockup-body" style="padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- Page Title -->
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 20px; font-weight: bold;">Constraints Management</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Manage scheduling rules, calendar events, and institutional settings</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Hard Constraints -->
+    <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+      <div style="padding: 14px 16px; background: var(--surface-alt); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 600; font-size: 14px;">Hard Constraints</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Ironclad rules the algorithm can never break</div>
+        </div>
+        <button class="mock-button" style="font-size: 12px; padding: 6px 12px;">+ Add Rule</button>
+      </div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+        <thead>
+          <tr style="background: var(--surface); border-bottom: 1px solid var(--border);">
+            <th style="padding: 8px 16px; text-align: left; font-weight: 600; color: var(--text-muted);">Rule Name</th>
+            <th style="padding: 8px 16px; text-align: left; font-weight: 600; color: var(--text-muted);">Description</th>
+            <th style="padding: 8px 16px; text-align: center; font-weight: 600; color: var(--text-muted);">Status</th>
+            <th style="padding: 8px 16px; text-align: center; font-weight: 600; color: var(--text-muted);">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 16px; font-weight: 500;">Maximum Hours Per Day</td>
+            <td style="padding: 10px 16px; color: var(--text-muted);">Students cannot exceed 8 hours in a single day</td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="display: inline-block; width: 36px; height: 20px; background: #22c55e; border-radius: 10px; position: relative;">
+                <span style="position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; background: white; border-radius: 50%;"></span>
+              </span>
+            </td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="color: var(--accent); cursor: pointer; margin-right: 8px;">&#9998;</span>
+              <span style="color: #ef4444; cursor: pointer;">&#128465;</span>
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 16px; font-weight: 500;">Minimum Rest Time</td>
+            <td style="padding: 10px 16px; color: var(--text-muted);">At least 12 hours between consecutive shifts</td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="display: inline-block; width: 36px; height: 20px; background: #22c55e; border-radius: 10px; position: relative;">
+                <span style="position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; background: white; border-radius: 50%;"></span>
+              </span>
+            </td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="color: var(--accent); cursor: pointer; margin-right: 8px;">&#9998;</span>
+              <span style="color: #ef4444; cursor: pointer;">&#128465;</span>
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border); opacity: 0.5;">
+            <td style="padding: 10px 16px; font-weight: 500;">No Overlapping Assignments</td>
+            <td style="padding: 10px 16px; color: var(--text-muted);">A student cannot be in two departments at once</td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="display: inline-block; width: 36px; height: 20px; background: var(--border); border-radius: 10px; position: relative;">
+                <span style="position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; background: white; border-radius: 50%;"></span>
+              </span>
+            </td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="color: var(--accent); cursor: pointer; margin-right: 8px;">&#9998;</span>
+              <span style="color: #ef4444; cursor: pointer;">&#128465;</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 2: Temporal Constraints -->
+    <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+      <div style="padding: 14px 16px; background: var(--surface-alt); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 600; font-size: 14px;">Temporal Constraints</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Holidays, vacations, and date-specific events</div>
+        </div>
+        <button class="mock-button" style="font-size: 12px; padding: 6px 12px;">+ Add Event</button>
+      </div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+        <thead>
+          <tr style="background: var(--surface); border-bottom: 1px solid var(--border);">
+            <th style="padding: 8px 16px; text-align: left; font-weight: 600; color: var(--text-muted);">Event Name</th>
+            <th style="padding: 8px 16px; text-align: left; font-weight: 600; color: var(--text-muted);">Description</th>
+            <th style="padding: 8px 16px; text-align: center; font-weight: 600; color: var(--text-muted);">Start Date</th>
+            <th style="padding: 8px 16px; text-align: center; font-weight: 600; color: var(--text-muted);">End Date</th>
+            <th style="padding: 8px 16px; text-align: center; font-weight: 600; color: var(--text-muted);">Status</th>
+            <th style="padding: 8px 16px; text-align: center; font-weight: 600; color: var(--text-muted);">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 16px; font-weight: 500;">Passover Holiday</td>
+            <td style="padding: 10px 16px; color: var(--text-muted);">No assignments during Passover week</td>
+            <td style="padding: 10px 16px; text-align: center;">Apr 12, 2026</td>
+            <td style="padding: 10px 16px; text-align: center;">Apr 19, 2026</td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="display: inline-block; width: 36px; height: 20px; background: #22c55e; border-radius: 10px; position: relative;">
+                <span style="position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; background: white; border-radius: 50%;"></span>
+              </span>
+            </td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="color: var(--accent); cursor: pointer; margin-right: 8px;">&#9998;</span>
+              <span style="color: #ef4444; cursor: pointer;">&#128465;</span>
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 16px; font-weight: 500;">Building Maintenance</td>
+            <td style="padding: 10px 16px; color: var(--text-muted);">Wing B closure for renovations</td>
+            <td style="padding: 10px 16px; text-align: center;">May 01, 2026</td>
+            <td style="padding: 10px 16px; text-align: center;">May 03, 2026</td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="display: inline-block; width: 36px; height: 20px; background: #22c55e; border-radius: 10px; position: relative;">
+                <span style="position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; background: white; border-radius: 50%;"></span>
+              </span>
+            </td>
+            <td style="padding: 10px 16px; text-align: center;">
+              <span style="color: var(--accent); cursor: pointer; margin-right: 8px;">&#9998;</span>
+              <span style="color: #ef4444; cursor: pointer;">&#128465;</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 3: Institutional Rules -->
+    <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+      <div style="padding: 14px 16px; background: var(--surface-alt); border-bottom: 1px solid var(--border);">
+        <div style="font-weight: 600; font-size: 14px;">Institutional & Departmental Rules</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Configure department capacities and university semester dates</div>
+      </div>
+      <div style="padding: 16px; display: flex; gap: 16px;">
+        <div style="flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s;">
+          <div style="font-size: 28px; margin-bottom: 8px;">&#127963;</div>
+          <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Departments</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Set capacity, shift limits, and elective caps per department</div>
+          <button class="mock-button" style="margin-top: 12px; font-size: 12px; padding: 6px 16px;">Configure</button>
+        </div>
+        <div style="flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s;">
+          <div style="font-size: 28px; margin-bottom: 8px;">&#127891;</div>
+          <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">University</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Define semester start and end dates</div>
+          <button class="mock-button" style="margin-top: 12px; font-size: 12px; padding: 6px 16px;">Configure</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
