@@ -100,6 +100,18 @@ model UniversitySemester {
   @@unique([universityId, year])
 }
 
+// ─── Academic Year ──────────────────────────────────────
+
+model AcademicYear {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  assignments Assignment[]
+}
+
 // ─── Department ──────────────────────────────────────────
 
 model Department {
@@ -165,13 +177,15 @@ model Assignment {
   tutorName     String?
   status        AssignmentStatus @default(PENDING)
   createdById   Int
-  approvedById  Int?
+  approvedById   Int?
+  academicYearId Int?
 
-  department Department @relation(fields: [departmentId], references: [id])
-  university University @relation(fields: [universityId], references: [id])
-  createdBy  User       @relation("CreatedBy", fields: [createdById], references: [id])
-  approvedBy User?      @relation("ApprovedBy", fields: [approvedById], references: [id])
-  students   AssignmentStudent[]
+  department   Department    @relation(fields: [departmentId], references: [id])
+  university   University    @relation(fields: [universityId], references: [id])
+  createdBy    User          @relation("CreatedBy", fields: [createdById], references: [id])
+  approvedBy   User?         @relation("ApprovedBy", fields: [approvedById], references: [id])
+  academicYear AcademicYear? @relation(fields: [academicYearId], references: [id])
+  students     AssignmentStudent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -179,6 +193,7 @@ model Assignment {
   @@index([departmentId, startDate, endDate])
   @@index([universityId])
   @@index([status])
+  @@index([academicYearId])
 }
 
 model AssignmentStudent {

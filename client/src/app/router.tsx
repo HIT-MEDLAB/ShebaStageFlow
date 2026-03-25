@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
@@ -6,6 +7,8 @@ import { GuestRoute } from '@/components/shared/GuestRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { HomePage } from '@/features/home'
 import { SettingsPage } from '@/features/settings'
+import { SchedulerPage } from '@/features/scheduler'
+import { ConstraintsPage } from '@/features/constraints'
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +41,18 @@ export const router = createBrowserRouter([
           {
             path: '/settings',
             element: <SettingsPage />,
+          },
+          {
+            path: '/scheduler',
+            element: (
+              <Suspense fallback={null}>
+                <SchedulerPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: '/constraints',
+            element: <ConstraintsPage />,
           },
         ],
       },

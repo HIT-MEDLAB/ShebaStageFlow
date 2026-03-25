@@ -2,6 +2,7 @@
   "appName": "Shiba",
   "nav": {
     "home": "Home",
+    "scheduler": "Scheduler",
     "assignments": "Assignments",
     "constraints": "Constraints",
     "statistics": "Statistics",

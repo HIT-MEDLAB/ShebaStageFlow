@@ -2,6 +2,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Home,
+  Calendar,
   CalendarDays,
   ShieldCheck,
   BarChart3,
@@ -26,6 +27,7 @@ export function AppLayout() {
 
   const baseNavItems: NavItem[] = [
     { label: t('nav.home'), path: '/home', icon: Home },
+    { label: t('nav.scheduler'), path: '/scheduler', icon: Calendar },
     { label: t('nav.assignments'), path: '/assignments', icon: CalendarDays },
     { label: t('nav.constraints'), path: '/constraints', icon: ShieldCheck },
     { label: t('nav.statistics'), path: '/statistics', icon: BarChart3 },
@@ -36,9 +38,9 @@ export function AppLayout() {
 
   const navItems: NavItem[] = isAdmin
     ? [
-        ...baseNavItems.slice(0, 4),
+        ...baseNavItems.slice(0, 5),
         { label: t('nav.coordinators'), path: '/coordinators', icon: Users },
-        ...baseNavItems.slice(4),
+        ...baseNavItems.slice(5),
       ]
     : baseNavItems
 
@@ -51,9 +53,9 @@ export function AppLayout() {
           <SidebarTrigger className="-ms-1" />
         </header>
 
-        <main className="flex-1 bg-background p-6">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-background p-6">
           <Outlet />
-        </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

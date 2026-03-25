@@ -8,6 +8,11 @@ import cookieParser from 'cookie-parser';
 import prisma from './lib/prisma';
 import { authRouter } from './modules/auth/auth.routes';
 import { universityRouter } from './modules/university/university.routes';
+import { academicYearRouter } from './modules/academic-year/academic-year.routes';
+import { departmentRouter } from './modules/department/department.routes';
+import { assignmentRouter } from './modules/assignment/assignment.routes';
+import { constraintRouter } from './modules/constraint/constraint.routes';
+import { constraintsRouter } from './modules/constraints/constraints.routes';
 import { errorHandler } from './shared/middlewares/errorHandler';
 
 const app = express();
@@ -31,6 +36,13 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // Module routes
 app.use('/api/auth', authRouter);
 app.use('/api/universities', universityRouter);
+app.use('/api/academic-years', academicYearRouter);
+app.use('/api/departments', departmentRouter);
+app.use('/api/assignments', assignmentRouter);
+
+// Note: Mapped constraintRouter to a unique path to avoid conflict with constraintsRouter
+app.use('/api/department-constraints', constraintRouter); 
+app.use('/api/constraints', constraintsRouter);
 
 // Error handler (must be last)
 app.use(errorHandler);

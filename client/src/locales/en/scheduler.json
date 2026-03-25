@@ -1,0 +1,122 @@
+{
+  "title": "Scheduler",
+  "toolbar": {
+    "manualAssignment": "Manual Assignment",
+    "importExcel": "Import from Excel",
+    "academicYear": "Academic Year"
+  },
+  "filters": {
+    "university": "University",
+    "shift": "Shift",
+    "year": "Year in Program",
+    "allUniversities": "All Universities",
+    "allYears": "All Years",
+    "allShifts": "All",
+    "morning": "Morning",
+    "evening": "Evening"
+  },
+  "grid": {
+    "departments": "Departments",
+    "week": "Week",
+    "blocked": {
+      "holiday": "Holiday - No assignments",
+      "dateBlock": "Department blocked",
+      "capacityFull": "Capacity full"
+    }
+  },
+  "card": {
+    "group": "Group",
+    "elective": "Elective",
+    "noStudents": "-"
+  },
+  "status": {
+    "approved": "Approved",
+    "pending": "Pending",
+    "rejected": "Rejected"
+  },
+  "dialogs": {
+    "manual": {
+      "title": "New Manual Assignment",
+      "department": "Department",
+      "startDate": "Start Date (Sunday)",
+      "endDate": "End Date (Thursday)",
+      "university": "University",
+      "type": "Assignment Type",
+      "shift": "Shift",
+      "studentCount": "Number of Students",
+      "yearInProgram": "Year in Program",
+      "tutorName": "Tutor Name",
+      "save": "Save Assignment",
+      "cancel": "Cancel"
+    },
+    "import": {
+      "title": "Import from Excel",
+      "dragDrop": "Drag Excel file here",
+      "or": "or",
+      "browse": "Browse files",
+      "fileTypes": ".xlsx, .xls only",
+      "validationSuccess": "File is valid",
+      "validationError": "Columns do not match required template",
+      "assignmentsFound": "{{count}} assignments found",
+      "import": "Import Assignments"
+    },
+    "edit": {
+      "title": "Edit Assignment",
+      "editDetails": "Edit Details",
+      "saveChanges": "Save Changes",
+      "delete": "Delete Assignment",
+      "deleteConfirm": "Are you sure you want to delete this assignment?"
+    },
+    "students": {
+      "title": "Student List",
+      "count": "{{filled}}/{{total}}",
+      "addStudent": "Add Student",
+      "importExcel": "Import Excel",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "nationalId": "National ID",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "validation": {
+      "departmentRequired": "Department is required",
+      "startDateRequired": "Start date is required",
+      "endDateRequired": "End date is required",
+      "mustBeSunday": "Start date must be a Sunday",
+      "mustBeThursday": "End date must be a Thursday",
+      "endAfterStart": "End date must be after start date",
+      "universityRequired": "University is required",
+      "typeRequired": "Assignment type is required",
+      "shiftRequired": "Shift is required",
+      "yearRequired": "Year is required",
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "nationalIdRequired": "National ID is required",
+      "emailInvalid": "Invalid email address",
+      "academicYearRequired": "Please select an academic year first"
+    }
+  },
+  "toast": {
+    "assignmentCreated": "Assignment created successfully",
+    "assignmentUpdated": "Assignment updated successfully",
+    "assignmentDeleted": "Assignment deleted",
+    "assignmentMoved": "Assignment moved",
+    "moveFailed": "Move failed",
+    "createFailed": "Failed to create assignment",
+    "updateFailed": "Failed to update assignment",
+    "deleteFailed": "Failed to delete assignment",
+    "importSuccess": "{{count}} assignments imported",
+    "importFailed": "Import failed",
+    "studentAdded": "Student added",
+    "studentRemoved": "Student removed"
+  },
+  "legend": {
+    "title": "Legend",
+    "group": "Group",
+    "elective": "Elective",
+    "approved": "Approved",
+    "pending": "Pending Approval",
+    "rejected": "Rejected",
+    "blocked": "Blocked"
+  }
+}

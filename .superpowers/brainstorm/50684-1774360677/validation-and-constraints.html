@@ -1,0 +1,123 @@
+<h2>Constraint Validation & Blocked Cells</h2>
+<p class="subtitle">How constraints translate to visual blocking and drop validation</p>
+
+<div style="display:flex;flex-direction:column;gap:20px;">
+
+  <!-- Constraint Types -->
+  <div style="background:white;border-radius:12px;padding:20px;border:1px solid #e2e8f0;">
+    <h3 style="margin:0 0 16px;">Constraint Types → Visual Rules</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+      <div style="background:#fef2f2;border-radius:8px;padding:14px;border-left:4px solid #ef4444;">
+        <h4 style="margin:0 0 6px;font-size:14px;color:#ef4444;">DepartmentConstraint (Capacity)</h4>
+        <p style="font-size:12px;color:#666;margin:0;">
+          <code>morningCapacity</code>, <code>eveningCapacity</code>, <code>electiveCapacity</code><br>
+          → Cell shows as <strong>full</strong> when capacity reached for that shift type.<br>
+          → Tooltip: "קיבולת בוקר מלאה (3/3)" (Morning capacity full)
+        </p>
+      </div>
+
+      <div style="background:#fef2f2;border-radius:8px;padding:14px;border-left:4px solid #ef4444;">
+        <h4 style="margin:0 0 6px;font-size:14px;color:#ef4444;">DepartmentConstraint (Date Block)</h4>
+        <p style="font-size:12px;color:#666;margin:0;">
+          <code>blockedStartDate</code> → <code>blockedEndDate</code><br>
+          → Cell is <strong>fully blocked</strong> (grayed out).<br>
+          → Tooltip: "מחלקה חסומה בתאריכים אלה" (Dept blocked on these dates)
+        </p>
+      </div>
+
+      <div style="background:#fefce8;border-radius:8px;padding:14px;border-left:4px solid #eab308;">
+        <h4 style="margin:0 0 6px;font-size:14px;color:#eab308;">Holiday</h4>
+        <p style="font-size:12px;color:#666;margin:0;">
+          Holiday falls within a week's date range<br>
+          → Cell is <strong>fully blocked</strong> (grayed + holiday icon).<br>
+          → Tooltip: "חג פורים — אין שיבוצים" (Purim holiday — no assignments)
+        </p>
+      </div>
+
+      <div style="background:#fefce8;border-radius:8px;padding:14px;border-left:4px solid #eab308;">
+        <h4 style="margin:0 0 6px;font-size:14px;color:#eab308;">IronConstraint</h4>
+        <p style="font-size:12px;color:#666;margin:0;">
+          Hard scheduling rules (e.g., 1 group per dept per shift)<br>
+          → Not visually blocked, but <strong>enforced on drop</strong>.<br>
+          → Toast: "לא ניתן — קבוצה אחת בלבד למשמרת" (Only 1 group per shift)
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Validation Engine -->
+  <div style="background:white;border-radius:12px;padding:20px;border:1px solid #e2e8f0;">
+    <h3 style="margin:0 0 16px;">Client-Side Validation Engine</h3>
+    <pre style="background:#1E2A5E;color:#e2e8f0;padding:16px;border-radius:8px;font-size:12px;line-height:1.7;overflow-x:auto;">
+<span style="color:#94a3b8;">// validators/assignmentValidator.ts</span>
+<span style="color:#44C2A4;">type</span> ValidationResult =
+  | { valid: <span style="color:#BF3069;">true</span> }
+  | { valid: <span style="color:#BF3069;">false</span>; reason: <span style="color:#f59e0b;">string</span>; reasonKey: <span style="color:#f59e0b;">string</span> }  <span style="color:#94a3b8;">// reasonKey for i18n</span>
+
+<span style="color:#44C2A4;">function</span> <span style="color:#6366f1;">validateDrop</span>(
+  assignment: Assignment,
+  targetCell: { departmentId: string; weekNumber: number },
+  context: {
+    blockedCells: Map&lt;string, BlockReason&gt;
+    existingAssignments: Assignment[]
+    constraints: Constraint[]
+  }
+): ValidationResult {
+  <span style="color:#94a3b8;">// 1. Is cell fully blocked? (holiday, date constraint)</span>
+  <span style="color:#94a3b8;">// 2. Is shift capacity reached?</span>
+  <span style="color:#94a3b8;">// 3. Would this violate iron constraints?</span>
+  <span style="color:#94a3b8;">// 4. Time overlap check for same university</span>
+}
+    </pre>
+    <p style="font-size:13px;color:#666;margin:12px 0 0;">
+      This runs synchronously during drag hover (for visual feedback) and on drop (for final check).
+      The server re-validates on the API call as a safety net for concurrent edits.
+    </p>
+  </div>
+
+  <!-- Blocked Cell Visual -->
+  <div style="background:white;border-radius:12px;padding:20px;border:1px solid #e2e8f0;">
+    <h3 style="margin:0 0 16px;">Blocked Cell Visual States</h3>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;direction:rtl;">
+
+      <div style="text-align:center;">
+        <div style="background:white;border:2px solid #e2e8f0;border-radius:8px;height:80px;display:flex;align-items:center;justify-content:center;">
+          <span style="color:#94a3b8;font-size:12px;">ריק</span>
+        </div>
+        <p style="font-size:11px;color:#666;margin:6px 0 0;">Empty — droppable</p>
+      </div>
+
+      <div style="text-align:center;">
+        <div style="background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:8px;height:80px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;">
+          <span style="font-size:16px;">🚫</span>
+          <span style="color:#94a3b8;font-size:10px;">חג פורים</span>
+        </div>
+        <p style="font-size:11px;color:#666;margin:6px 0 0;">Holiday blocked</p>
+      </div>
+
+      <div style="text-align:center;">
+        <div style="background:#fef2f2;border:2px dashed #fca5a5;border-radius:8px;height:80px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;">
+          <span style="font-size:16px;">🔒</span>
+          <span style="color:#ef4444;font-size:10px;">מחלקה חסומה</span>
+        </div>
+        <p style="font-size:11px;color:#666;margin:6px 0 0;">Dept date-blocked</p>
+      </div>
+
+      <div style="text-align:center;">
+        <div style="background:#fffbeb;border:2px solid #fcd34d;border-radius:8px;height:80px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;">
+          <span style="font-size:16px;">⚠️</span>
+          <span style="color:#d97706;font-size:10px;">קיבולת מלאה</span>
+        </div>
+        <p style="font-size:11px;color:#666;margin:6px 0 0;">Capacity full (partial)</p>
+      </div>
+
+    </div>
+    <p style="font-size:12px;color:#888;margin:12px 0 0;">
+      <strong>Note:</strong> "Capacity full" is shift-specific — a cell can be full for morning groups but still accept evening electives.
+      The visual state depends on what's being dragged.
+    </p>
+  </div>
+
+</div>

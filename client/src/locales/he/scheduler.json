@@ -1,0 +1,122 @@
+{
+  "title": "לוח שיבוצים",
+  "toolbar": {
+    "manualAssignment": "שיבוץ ידני",
+    "importExcel": "ייבוא מאקסל",
+    "academicYear": "שנת לימודים"
+  },
+  "filters": {
+    "university": "אוניברסיטה",
+    "shift": "משמרת",
+    "year": "שנת לימוד",
+    "allUniversities": "כל האוניברסיטאות",
+    "allYears": "כל השנים",
+    "allShifts": "הכל",
+    "morning": "בוקר",
+    "evening": "ערב"
+  },
+  "grid": {
+    "departments": "מחלקות",
+    "week": "שבוע",
+    "blocked": {
+      "holiday": "חג — אין שיבוצים",
+      "dateBlock": "מחלקה חסומה",
+      "capacityFull": "קיבולת מלאה"
+    }
+  },
+  "card": {
+    "group": "קבוצתי",
+    "elective": "בחירה",
+    "noStudents": "-"
+  },
+  "status": {
+    "approved": "מאושר",
+    "pending": "ממתין לאישור",
+    "rejected": "נדחה"
+  },
+  "dialogs": {
+    "manual": {
+      "title": "שיבוץ ידני חדש",
+      "department": "מחלקה",
+      "startDate": "תאריך התחלה (יום ראשון)",
+      "endDate": "תאריך סיום (יום חמישי)",
+      "university": "מוסד אקדמי",
+      "type": "סוג שיבוץ",
+      "shift": "משמרת",
+      "studentCount": "מספר סטודנטים",
+      "yearInProgram": "שנת לימוד",
+      "tutorName": "שם מדריך",
+      "save": "שמור שיבוץ",
+      "cancel": "ביטול"
+    },
+    "import": {
+      "title": "ייבוא מקובץ אקסל",
+      "dragDrop": "גרור קובץ אקסל לכאן",
+      "or": "או",
+      "browse": "בחר קובץ",
+      "fileTypes": ".xlsx, .xls בלבד",
+      "validationSuccess": "הקובץ תקין",
+      "validationError": "העמודות בקובץ אינן תואמות את התבנית הנדרשת",
+      "assignmentsFound": "{{count}} שיבוצים נמצאו",
+      "import": "ייבא שיבוצים"
+    },
+    "edit": {
+      "title": "עריכת שיבוץ",
+      "editDetails": "ערוך פרטים",
+      "saveChanges": "שמור שינויים",
+      "delete": "מחק שיבוץ",
+      "deleteConfirm": "האם אתה בטוח שברצונך למחוק שיבוץ זה?"
+    },
+    "students": {
+      "title": "רשימת סטודנטים",
+      "count": "{{filled}}/{{total}}",
+      "addStudent": "הוסף סטודנט",
+      "importExcel": "ייבוא אקסל",
+      "firstName": "שם פרטי",
+      "lastName": "שם משפחה",
+      "nationalId": "ת.ז.",
+      "phone": "טלפון",
+      "email": "אימייל"
+    },
+    "validation": {
+      "departmentRequired": "יש לבחור מחלקה",
+      "startDateRequired": "יש לבחור תאריך התחלה",
+      "endDateRequired": "יש לבחור תאריך סיום",
+      "mustBeSunday": "תאריך התחלה חייב להיות יום ראשון",
+      "mustBeThursday": "תאריך סיום חייב להיות יום חמישי",
+      "endAfterStart": "תאריך סיום חייב להיות אחרי תאריך התחלה",
+      "universityRequired": "יש לבחור מוסד אקדמי",
+      "typeRequired": "יש לבחור סוג שיבוץ",
+      "shiftRequired": "יש לבחור משמרת",
+      "yearRequired": "יש לבחור שנת לימוד",
+      "firstNameRequired": "יש להזין שם פרטי",
+      "lastNameRequired": "יש להזין שם משפחה",
+      "nationalIdRequired": "יש להזין ת.ז.",
+      "emailInvalid": "כתובת אימייל לא תקינה",
+      "academicYearRequired": "יש לבחור שנת לימודים תחילה"
+    }
+  },
+  "toast": {
+    "assignmentCreated": "השיבוץ נוצר בהצלחה",
+    "assignmentUpdated": "השיבוץ עודכן בהצלחה",
+    "assignmentDeleted": "השיבוץ נמחק",
+    "assignmentMoved": "השיבוץ הועבר",
+    "moveFailed": "ההעברה נכשלה",
+    "createFailed": "יצירת השיבוץ נכשלה",
+    "updateFailed": "עדכון השיבוץ נכשל",
+    "deleteFailed": "מחיקת השיבוץ נכשלה",
+    "importSuccess": "{{count}} שיבוצים יובאו",
+    "importFailed": "הייבוא נכשל",
+    "studentAdded": "סטודנט נוסף",
+    "studentRemoved": "סטודנט הוסר"
+  },
+  "legend": {
+    "title": "מקרא",
+    "group": "קבוצתי",
+    "elective": "בחירה",
+    "approved": "מאושר",
+    "pending": "ממתין לאישור",
+    "rejected": "נדחה",
+    "blocked": "חסום"
+  }
+}

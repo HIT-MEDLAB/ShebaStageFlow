@@ -1,0 +1,126 @@
+<h2>Department Configuration Dialog</h2>
+<p class="subtitle">Two-step flow: Select department → Configure settings</p>
+
+<div class="split">
+  <!-- Step 1: Select Department -->
+  <div class="mockup">
+    <div class="mockup-header">Step 1: Select Department</div>
+    <div class="mockup-body" style="padding: 24px;">
+      <div style="background: rgba(0,0,0,0.4); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: inherit;">
+        <div style="background: var(--surface); border-radius: 12px; padding: 24px; width: 85%; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+          <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Department Setup</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">Select a department to configure its constraints</div>
+
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 12px; font-weight: 500; margin-bottom: 6px;">Department</div>
+            <div style="border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--text-muted);">Select a department...</span>
+              <span>&#9660;</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-size: 12px;">Cancel</button>
+            <button class="mock-button" style="padding: 8px 16px; font-size: 12px;">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Configure Settings -->
+  <div class="mockup">
+    <div class="mockup-header">Step 2: Configure (e.g., Cardiology)</div>
+    <div class="mockup-body" style="padding: 24px;">
+      <div style="background: rgba(0,0,0,0.4); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: inherit;">
+        <div style="background: var(--surface); border-radius: 12px; padding: 24px; width: 85%; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+          <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Cardiology - Settings</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">Configure capacity and shift limits</div>
+
+          <!-- Capacity Section -->
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Capacity</div>
+            <div style="display: flex; gap: 12px;">
+              <div style="flex: 1;">
+                <div style="font-size: 11px; font-weight: 500; margin-bottom: 4px;">Morning Capacity</div>
+                <input class="mock-input" style="width: 100%; box-sizing: border-box;" value="12" />
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 11px; font-weight: 500; margin-bottom: 4px;">Evening Capacity</div>
+                <input class="mock-input" style="width: 100%; box-sizing: border-box;" value="8" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Electives Section -->
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Electives</div>
+            <div>
+              <div style="font-size: 11px; font-weight: 500; margin-bottom: 4px;">Elective Capacity</div>
+              <input class="mock-input" style="width: 50%; box-sizing: border-box;" value="4" />
+            </div>
+          </div>
+
+          <!-- Blocked Dates Section -->
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Blocked Period (Optional)</div>
+            <div style="display: flex; gap: 12px;">
+              <div style="flex: 1;">
+                <div style="font-size: 11px; font-weight: 500; margin-bottom: 4px;">Start Date</div>
+                <input class="mock-input" type="text" style="width: 100%; box-sizing: border-box;" value="2026-04-01" />
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 11px; font-weight: 500; margin-bottom: 4px;">End Date</div>
+                <input class="mock-input" type="text" style="width: 100%; box-sizing: border-box;" value="2026-04-15" />
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-size: 12px;">Back</button>
+            <button class="mock-button" style="padding: 8px 16px; font-size: 12px;">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 style="margin-top: 32px;">University Semester Dialog</h2>
+<p class="subtitle">Simple dialog for setting semester boundaries</p>
+
+<div class="mockup" style="max-width: 500px;">
+  <div class="mockup-header">University Semester Setup</div>
+  <div class="mockup-body" style="padding: 24px;">
+    <div style="background: rgba(0,0,0,0.4); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: inherit;">
+      <div style="background: var(--surface); border-radius: 12px; padding: 24px; width: 80%; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+        <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">University Semester</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">Define the semester timeline for the scheduling algorithm</div>
+
+        <div style="margin-bottom: 14px;">
+          <div style="font-size: 12px; font-weight: 500; margin-bottom: 6px;">University</div>
+          <div style="border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: var(--text-muted);">Select university...</span>
+            <span>&#9660;</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <div style="font-size: 11px; font-weight: 500; margin-bottom: 4px;">Semester Start</div>
+            <input class="mock-input" type="text" style="width: 100%; box-sizing: border-box;" value="2026-03-01" />
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 11px; font-weight: 500; margin-bottom: 4px;">Semester End</div>
+            <input class="mock-input" type="text" style="width: 100%; box-sizing: border-box;" value="2026-07-15" />
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+          <button style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-size: 12px;">Cancel</button>
+          <button class="mock-button" style="padding: 8px 16px; font-size: 12px;">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
