@@ -8,6 +8,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { HomePage } from '@/features/home'
 import { SettingsPage } from '@/features/settings'
 import { SchedulerPage } from '@/features/scheduler'
+import { NotFoundPage } from '@/components/shared/NotFoundPage'
 
 export const router = createBrowserRouter([
   {
@@ -49,12 +50,16 @@ export const router = createBrowserRouter([
               </Suspense>
             ),
           },
+          {
+            path: '*',
+            element: <NotFoundPage />,
+          },
         ],
       },
     ],
   },
   {
     path: '*',
-    element: <Navigate to="/login" replace />,
+    element: <NotFoundPage />,
   },
 ])
