@@ -21,5 +21,12 @@
     "cancel": "ביטול"
   },
   "comingSoon": "{{feature}} — בקרוב",
-  "forgotPassword": "שכחתי סיסמה"
+  "forgotPassword": "שכחתי סיסמה",
+  "errors": {
+    "notFound": {
+      "title": "הדף לא נמצא",
+      "description": ".הדף שאתה מחפש אינו קיים",
+      "goHome": "חזרה לדף הבית"
+    }
+  }
 }
