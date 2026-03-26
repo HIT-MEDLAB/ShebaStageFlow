@@ -1,0 +1,118 @@
+<h2>State Management Architecture</h2>
+<p class="subtitle">How data flows through the scheduler feature</p>
+
+<div style="display:flex;flex-direction:column;gap:20px;">
+
+  <!-- Server State -->
+  <div style="background:white;border:2px solid #BF3069;border-radius:12px;padding:20px;">
+    <h3 style="color:#BF3069;margin:0 0 12px;">Server State — TanStack React Query</h3>
+    <p style="font-size:13px;color:#666;margin:0 0 16px;">All data fetched from the API. Cached, refetchable, invalidated on mutations.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="background:#fdf2f8;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#BF3069;">useAssignments(semesterId, filters)</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Fetches all assignments for the grid. Returns flat array, indexed client-side by [deptId][weekNum].</p>
+      </div>
+      <div style="background:#fdf2f8;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#BF3069;">useDepartments()</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Fetches department list for Y-axis. Cached long-term (rarely changes).</p>
+      </div>
+      <div style="background:#fdf2f8;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#BF3069;">useConstraints(semesterId)</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Fetches all constraints (iron, date, department, holidays). Used for client-side validation + blocked cells.</p>
+      </div>
+      <div style="background:#fdf2f8;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#BF3069;">useSemesterWeeks(semesterId)</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Fetches week definitions (number, startDate, endDate) for X-axis headers.</p>
+      </div>
+    </div>
+
+    <h4 style="margin:16px 0 8px;font-size:14px;">Mutations (with optimistic updates)</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div style="background:#f0fdf4;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#16a34a;">useMoveAssignment()</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Drag & drop move. Optimistic update → API call → rollback on failure + toast.</p>
+      </div>
+      <div style="background:#f0fdf4;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#16a34a;">useCreateAssignment()</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Manual dialog submit. Invalidates assignments query on success.</p>
+      </div>
+      <div style="background:#f0fdf4;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#16a34a;">useUpdateAssignment()</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Edit dialog save. Invalidates assignments query on success.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client State -->
+  <div style="background:white;border:2px solid #44C2A4;border-radius:12px;padding:20px;">
+    <h3 style="color:#44C2A4;margin:0 0 12px;">Client State — Zustand Store</h3>
+    <p style="font-size:13px;color:#666;margin:0 0 16px;">UI-only state. Filter selections, dialog open/close, active drag state.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="background:#f0fdfa;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#0d9488;">useSchedulerStore</code>
+        <pre style="font-size:11px;margin:8px 0 0;color:#555;white-space:pre-wrap;">{
+  // Filters
+  selectedUniversities: string[]
+  selectedShift: 'all' | 'morning' | 'evening'
+  selectedYear: number | null
+
+  // Dialog state
+  activeDialog: null | 'create' | 'import' | 'edit'
+  editingAssignmentId: string | null
+
+  // Drag state
+  activeDragId: string | null
+
+  // Actions
+  setFilter(key, value)
+  openDialog(type, assignmentId?)
+  closeDialog()
+}</pre>
+      </div>
+      <div style="background:#f0fdfa;border-radius:8px;padding:12px;">
+        <h4 style="font-size:13px;margin:0 0 8px;color:#0d9488;">Why Zustand (not React Query)?</h4>
+        <ul style="font-size:12px;color:#555;padding-left:16px;margin:0;">
+          <li>Filters are <strong>local UI state</strong> — not from server</li>
+          <li>Dialog open/close is ephemeral</li>
+          <li>Drag state changes rapidly during interaction</li>
+          <li>Zustand is already used in the project (themeStore)</li>
+          <li>Filters could be URL-synced later via middleware</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Derived/Computed -->
+  <div style="background:white;border:2px solid #6366f1;border-radius:12px;padding:20px;">
+    <h3 style="color:#6366f1;margin:0 0 12px;">Derived State — useMemo Hooks</h3>
+    <p style="font-size:13px;color:#666;margin:0 0 16px;">Computed from server + client state. No separate store needed.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="background:#eef2ff;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#6366f1;">useGridData()</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Combines assignments + filters → 2D map: <code>Map&lt;deptId, Map&lt;weekNum, Assignment[]&gt;&gt;</code>. Filters are applied here.</p>
+      </div>
+      <div style="background:#eef2ff;border-radius:8px;padding:12px;">
+        <code style="font-size:12px;color:#6366f1;">useBlockedCells()</code>
+        <p style="font-size:12px;margin:4px 0 0;color:#666;">Combines constraints + holidays → <code>Map&lt;cellKey, BlockReason&gt;</code>. Used for visual blocking + drop validation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Flow Diagram -->
+  <div style="background:#1E2A5E;border-radius:12px;padding:20px;color:white;">
+    <h3 style="margin:0 0 16px;">Drag & Drop Flow</h3>
+    <div style="font-family:monospace;font-size:12px;line-height:2;">
+      <div>1. User starts drag → <span style="color:#44C2A4;">DndContext.onDragStart</span> → store.setActiveDragId()</div>
+      <div>2. Card follows cursor → <span style="color:#44C2A4;">DragOverlay</span> renders ghost card</div>
+      <div>3. Hover over cell → <span style="color:#f59e0b;">GridCell highlights</span> (green = valid, red = blocked)</div>
+      <div>4. User drops card → <span style="color:#44C2A4;">DndContext.onDragEnd</span> fires</div>
+      <div>5. <span style="color:#BF3069;">Client validates</span> → check useBlockedCells + capacity</div>
+      <div>6a. ❌ Invalid → <span style="color:#BF3069;">snap back + toast error</span> with reason</div>
+      <div>6b. ✅ Valid → <span style="color:#44C2A4;">optimistic update</span> (move card in cache)</div>
+      <div>7. API call: <span style="color:#6366f1;">PATCH /assignments/:id/move</span></div>
+      <div>8a. ❌ Server rejects → <span style="color:#BF3069;">rollback optimistic update + toast</span></div>
+      <div>8b. ✅ Server confirms → <span style="color:#44C2A4;">invalidate query (re-sync)</span></div>
+    </div>
+  </div>
+
+</div>

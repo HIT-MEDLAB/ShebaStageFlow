@@ -1,0 +1,148 @@
+<h2>Grid Layout Strategy</h2>
+<p class="subtitle">How should we build the departments × weeks scheduling grid?</p>
+
+<div class="options">
+  <div class="option" data-choice="css-grid" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>CSS Grid + Sticky Headers (Recommended)</h3>
+      <p><strong>Native CSS Grid with custom scrolling</strong></p>
+      <ul style="margin:8px 0;padding-left:20px;font-size:14px;color:#666;">
+        <li>CSS <code>display: grid</code> with <code>position: sticky</code> for frozen department column</li>
+        <li>Department names stick on the right (RTL) while weeks scroll horizontally</li>
+        <li>Week headers stick on top while departments scroll vertically</li>
+        <li>Each cell is a droppable zone containing 0-N assignment cards</li>
+        <li>Tailwind classes for responsive sizing</li>
+      </ul>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Native browser performance</li><li>RTL works with CSS direction</li><li>Full control over cell rendering</li><li>Integrates naturally with dnd-kit</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Manual sticky header implementation</li><li>Need custom scroll sync</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="tanstack-table" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>TanStack Table (Virtual)</h3>
+      <p><strong>Headless table with built-in virtualization</strong></p>
+      <ul style="margin:8px 0;padding-left:20px;font-size:14px;color:#666;">
+        <li>TanStack Table for data structure + TanStack Virtual for row virtualization</li>
+        <li>Handles column pinning (for frozen department column) out of the box</li>
+        <li>Built-in sorting, filtering infrastructure</li>
+        <li>Already in the TanStack ecosystem (we use React Query)</li>
+      </ul>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Column pinning built-in</li><li>Virtualization for 50+ rows</li><li>Consistent with React Query usage</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Table paradigm doesn't fit multi-card cells well</li><li>DnD integration requires extra work</li><li>Overhead for a visual grid that isn't a data table</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="hybrid" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Hybrid: CSS Grid + Virtual Rows</h3>
+      <p><strong>CSS Grid layout with optional row virtualization</strong></p>
+      <ul style="margin:8px 0;padding-left:20px;font-size:14px;color:#666;">
+        <li>CSS Grid for the visual layout (full control)</li>
+        <li>Add <code>@tanstack/react-virtual</code> only if performance needs it (20-50 rows may not)</li>
+        <li>Start simple, add virtualization as an optimization later</li>
+        <li>Best of both worlds — clean layout with escape hatch for scale</li>
+      </ul>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Start simple, optimize later</li><li>Full visual control</li><li>No premature complexity</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>May need refactoring if virtualization is added</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:24px;">
+  <h3>Grid Mockup Preview</h3>
+  <div class="mockup" style="direction:rtl;overflow-x:auto;">
+    <div class="mockup-header">תצוגת לוח זמנים (Scheduling Grid — RTL)</div>
+    <div class="mockup-body" style="padding:0;">
+      <div style="display:grid;grid-template-columns:180px repeat(6,140px);gap:1px;background:#e2e8f0;font-size:12px;">
+        <!-- Header row -->
+        <div style="background:#1E2A5E;color:white;padding:10px;font-weight:bold;position:sticky;right:0;z-index:2;">מחלקות</div>
+        <div style="background:#1E2A5E;color:white;padding:10px;text-align:center;">שבוע 1<br><span style="font-size:10px;opacity:0.7;">2/3 - 6/3</span></div>
+        <div style="background:#1E2A5E;color:white;padding:10px;text-align:center;">שבוע 2<br><span style="font-size:10px;opacity:0.7;">9/3 - 13/3</span></div>
+        <div style="background:#1E2A5E;color:white;padding:10px;text-align:center;">שבוע 3<br><span style="font-size:10px;opacity:0.7;">16/3 - 20/3</span></div>
+        <div style="background:#1E2A5E;color:white;padding:10px;text-align:center;">שבוע 4<br><span style="font-size:10px;opacity:0.7;">23/3 - 27/3</span></div>
+        <div style="background:#1E2A5E;color:white;padding:10px;text-align:center;">שבוע 5<br><span style="font-size:10px;opacity:0.7;">30/3 - 3/4</span></div>
+        <div style="background:#1E2A5E;color:white;padding:10px;text-align:center;">שבוע 6<br><span style="font-size:10px;opacity:0.7;">6/4 - 10/4</span></div>
+
+        <!-- Row 1 - Internal Medicine -->
+        <div style="background:white;padding:10px;font-weight:600;position:sticky;right:0;border-left:1px solid #e2e8f0;">רפואה פנימית</div>
+        <div style="background:white;padding:6px;">
+          <div style="background:#BF3069;color:white;border-radius:8px;padding:6px 8px;font-size:11px;margin-bottom:4px;">
+            <div style="font-weight:600;">אונ׳ תל אביב</div>
+            <div>שנה ד׳ · קבוצתי · 8</div>
+          </div>
+          <div style="background:#44C2A4;color:white;border-radius:8px;padding:6px 8px;font-size:11px;">
+            <div style="font-weight:600;">אונ׳ רייכמן</div>
+            <div>שנה ה׳ · בחירה · 3</div>
+          </div>
+        </div>
+        <div style="background:white;padding:6px;">
+          <div style="background:#BF3069;color:white;border-radius:8px;padding:6px 8px;font-size:11px;">
+            <div style="font-weight:600;">הטכניון</div>
+            <div>שנה ד׳ · קבוצתי · 10</div>
+          </div>
+        </div>
+        <div style="background:#f1f5f9;padding:6px;position:relative;">
+          <div style="color:#94a3b8;font-size:11px;text-align:center;padding:12px 4px;">🚫 חג פורים<br>מחלקה סגורה</div>
+        </div>
+        <div style="background:white;padding:6px;"></div>
+        <div style="background:white;padding:6px;"></div>
+        <div style="background:white;padding:6px;">
+          <div style="background:#6366f1;color:white;border-radius:8px;padding:6px 8px;font-size:11px;">
+            <div style="font-weight:600;">אונ׳ בר אילן</div>
+            <div>שנה ג׳ · קבוצתי · 12</div>
+          </div>
+        </div>
+
+        <!-- Row 2 - Pediatrics -->
+        <div style="background:white;padding:10px;font-weight:600;position:sticky;right:0;border-left:1px solid #e2e8f0;">ילדים</div>
+        <div style="background:white;padding:6px;"></div>
+        <div style="background:white;padding:6px;">
+          <div style="background:#BF3069;color:white;border-radius:8px;padding:6px 8px;font-size:11px;">
+            <div style="font-weight:600;">אונ׳ תל אביב</div>
+            <div>שנה ה׳ · קבוצתי · 6</div>
+          </div>
+        </div>
+        <div style="background:white;padding:6px;"></div>
+        <div style="background:white;padding:6px;">
+          <div style="background:#44C2A4;color:white;border-radius:8px;padding:6px 8px;font-size:11px;">
+            <div style="font-weight:600;">אונ׳ עברית</div>
+            <div>שנה ד׳ · בחירה · 2</div>
+          </div>
+        </div>
+        <div style="background:#f1f5f9;padding:6px;">
+          <div style="color:#94a3b8;font-size:11px;text-align:center;padding:12px 4px;">🚫 קיבולת מלאה</div>
+        </div>
+        <div style="background:white;padding:6px;"></div>
+
+        <!-- Row 3 - Surgery -->
+        <div style="background:white;padding:10px;font-weight:600;position:sticky;right:0;border-left:1px solid #e2e8f0;">כירורגיה</div>
+        <div style="background:white;padding:6px;">
+          <div style="background:#f59e0b;color:white;border-radius:8px;padding:6px 8px;font-size:11px;">
+            <div style="font-weight:600;">אונ׳ בן גוריון</div>
+            <div>שנה ה׳ · קבוצתי · -</div>
+          </div>
+        </div>
+        <div style="background:white;padding:6px;"></div>
+        <div style="background:white;padding:6px;"></div>
+        <div style="background:white;padding:6px;">
+          <div style="background:#BF3069;color:white;border-radius:8px;padding:6px 8px;font-size:11px;">
+            <div style="font-weight:600;">אונ׳ תל אביב</div>
+            <div>שנה ד׳ · קבוצתי · 8</div>
+          </div>
+        </div>
+        <div style="background:white;padding:6px;"></div>
+        <div style="background:white;padding:6px;"></div>
+      </div>
+    </div>
+  </div>
+</div>

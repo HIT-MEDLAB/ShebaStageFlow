@@ -1,0 +1,83 @@
+{
+  "pageTitle": "Constraints Management",
+  "tabs": {
+    "hard": "Hard Constraints",
+    "soft": "Soft Constraints"
+  },
+  "table": {
+    "name": "Name",
+    "description": "Description",
+    "type": "Type",
+    "status": "Status",
+    "priority": "Priority",
+    "scope": "Scope",
+    "actions": "Actions",
+    "noConstraints": "No constraints found"
+  },
+  "types": {
+    "iron": "Iron Rule",
+    "date": "Date Range",
+    "holiday": "Holiday"
+  },
+  "holiday": {
+    "fullDay": "Full Day",
+    "partialDay": "Partial Day"
+  },
+  "actions": {
+    "addSoft": "Add Constraint",
+    "delete": "Delete"
+  },
+  "dialog": {
+    "addTitle": "Add Soft Constraint",
+    "editTitle": "Edit Soft Constraint",
+    "deleteTitle": "Delete Constraint",
+    "deleteConfirm": "Are you sure you want to delete this constraint? This action cannot be undone."
+  },
+  "form": {
+    "name": "Name",
+    "description": "Description",
+    "priority": "Priority",
+    "department": "Department",
+    "university": "University",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "allDepartments": "All Departments",
+    "allUniversities": "All Universities",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "create": "Create"
+  },
+  "department": {
+    "title": "Department Management",
+    "addNew": "Add New",
+    "editExisting": "Edit Existing",
+    "selectDepartment": "Select Department",
+    "hasMorningShift": "Morning Shift",
+    "hasEveningShift": "Evening Shift",
+    "morningCapacity": "Morning Capacity",
+    "eveningCapacity": "Evening Capacity",
+    "electiveCapacity": "Elective Capacity"
+  },
+  "university": {
+    "title": "University Management",
+    "addNew": "Add New",
+    "editExisting": "Edit Existing",
+    "selectUniversity": "Select University",
+    "priority": "Priority",
+    "semesterStart": "Semester Start",
+    "semesterEnd": "Semester End",
+    "year": "Year"
+  },
+  "toast": {
+    "constraintCreated": "Constraint created successfully",
+    "constraintUpdated": "Constraint updated successfully",
+    "constraintDeleted": "Constraint deleted successfully",
+    "departmentCreated": "Department created successfully",
+    "departmentUpdated": "Department updated successfully",
+    "universityCreated": "University created successfully",
+    "universityUpdated": "University updated successfully",
+    "createFailed": "Failed to create",
+    "updateFailed": "Failed to update",
+    "deleteFailed": "Failed to delete"
+  }
+}

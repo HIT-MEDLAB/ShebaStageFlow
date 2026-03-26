@@ -1,0 +1,185 @@
+{
+  "title": "Scheduler",
+  "toolbar": {
+    "manualAssignment": "Manual Assignment",
+    "importExcel": "Import from Excel",
+    "academicYear": "Academic Year"
+  },
+  "filters": {
+    "university": "University",
+    "shift": "Shift",
+    "year": "Year in Program",
+    "allUniversities": "All Universities",
+    "allYears": "All Years",
+    "allShifts": "All",
+    "morning": "Morning",
+    "evening": "Evening"
+  },
+  "grid": {
+    "departments": "Departments",
+    "week": "Week",
+    "morning": "Morning",
+    "evening": "Evening",
+    "blocked": {
+      "holiday": "Holiday - No assignments",
+      "dateBlock": "Department blocked",
+      "capacityFull": "Capacity full",
+      "samePriority": "Same priority — slot already taken",
+      "lowerPriority": "Lower priority — cannot replace existing assignment",
+      "crossDepartment": "Cross-department conflict — already assigned in {{name}} this shift",
+      "electiveCapacityFull": "Elective capacity full for this week",
+      "shiftUnavailable": "This shift is not available for this department",
+      "groupTooBig": "Group size ({{count}} students) exceeds department capacity ({{capacity}} max)",
+      "softConstraint": "Soft constraint — {{name}}"
+    }
+  },
+  "card": {
+    "group": "Group",
+    "elective": "Elective",
+    "noStudents": "-",
+    "pendingApproval": "Pending admin approval"
+  },
+  "status": {
+    "approved": "Approved",
+    "pending": "Pending",
+    "rejected": "Rejected"
+  },
+  "dialogs": {
+    "manual": {
+      "title": "New Manual Assignment",
+      "department": "Department",
+      "startDate": "Start Date (Sunday)",
+      "endDate": "End Date (Thursday)",
+      "university": "University",
+      "type": "Assignment Type",
+      "shift": "Shift",
+      "studentCount": "Number of Students",
+      "yearInProgram": "Year in Program",
+      "tutorName": "Tutor Name",
+      "save": "Save Assignment",
+      "cancel": "Cancel"
+    },
+    "import": {
+      "title": "Import from Excel",
+      "dragDrop": "Drag Excel file here",
+      "or": "or",
+      "browse": "Browse files",
+      "fileTypes": ".xlsx, .xls only",
+      "validationSuccess": "File is valid",
+      "validationError": "Columns do not match required template",
+      "assignmentsFound": "{{count}} assignments found",
+      "import": "Import Assignments",
+      "importAnyway": "Import Anyway (Admin)",
+      "rowError": "Row {{row}}"
+    },
+    "edit": {
+      "title": "Edit Assignment",
+      "editDetails": "Edit Details",
+      "saveChanges": "Save Changes",
+      "delete": "Delete Assignment",
+      "deleteConfirm": "Are you sure you want to delete this assignment?"
+    },
+    "students": {
+      "title": "Student List",
+      "count": "{{filled}}/{{total}}",
+      "addStudent": "Add Student",
+      "importExcel": "Import Excel",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "nationalId": "National ID",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "replacement": {
+      "title": "Replacement Required",
+      "description": "A higher priority assignment is replacing {{university}} (Year {{year}}, {{shift}}). Choose a new week for the displaced assignment.",
+      "suggestedWeeks": "Suggested Weeks",
+      "chooseManually": "Choose Manually",
+      "week": "Week {{number}}",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "adminOverride": {
+      "title": "Conflict Override",
+      "description": "This placement has a scheduling conflict.",
+      "cancel": "Cancel",
+      "force": "Force Placement"
+    },
+    "validation": {
+      "departmentRequired": "Department is required",
+      "startDateRequired": "Start date is required",
+      "endDateRequired": "End date is required",
+      "mustBeSunday": "Start date must be a Sunday",
+      "mustBeThursday": "End date must be a Thursday",
+      "endAfterStart": "End date must be after start date",
+      "universityRequired": "University is required",
+      "typeRequired": "Assignment type is required",
+      "shiftRequired": "Shift is required",
+      "yearRequired": "Year is required",
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "nationalIdRequired": "National ID is required",
+      "emailInvalid": "Invalid email address",
+      "academicYearRequired": "Please select an academic year first"
+    }
+  },
+  "toast": {
+    "assignmentCreated": "Assignment created successfully",
+    "assignmentUpdated": "Assignment updated successfully",
+    "assignmentDeleted": "Assignment deleted",
+    "assignmentMoved": "Assignment moved",
+    "moveFailed": "Move failed",
+    "createFailed": "Failed to create assignment",
+    "updateFailed": "Failed to update assignment",
+    "deleteFailed": "Failed to delete assignment",
+    "importSuccess": "{{count}} assignments imported",
+    "importFailed": "Import failed",
+    "studentAdded": "Student added",
+    "studentRemoved": "Student removed",
+    "replacementSuccess": "Assignments swapped successfully",
+    "overrideSuccess": "Assignment placed (admin override)"
+  },
+  "approval": {
+    "tab": "Approvals",
+    "filterAll": "All",
+    "filterPending": "Pending",
+    "filterRejected": "Rejected",
+    "table": {
+      "department": "Department",
+      "university": "University",
+      "dates": "Dates",
+      "shift": "Shift",
+      "type": "Type",
+      "status": "Status",
+      "createdBy": "Created By",
+      "actions": "Actions"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "revertToPending": "Revert to Pending"
+    },
+    "rejectDialog": {
+      "title": "Reject Assignment",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "Enter rejection reason...",
+      "confirm": "Reject",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "approved": "Assignment approved successfully",
+      "rejected": "Assignment rejected and removed",
+      "revertedToPending": "Assignment reverted to pending"
+    },
+    "empty": "No assignments found"
+  },
+  "legend": {
+    "title": "Legend",
+    "group": "Group",
+    "elective": "Elective",
+    "approved": "Approved",
+    "pending": "Pending Approval",
+    "rejected": "Rejected",
+    "blocked": "Blocked"
+  }
+}

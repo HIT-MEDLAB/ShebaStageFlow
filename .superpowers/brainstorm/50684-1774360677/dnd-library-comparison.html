@@ -1,0 +1,73 @@
+<h2>Drag & Drop Library for the Scheduling Grid</h2>
+<p class="subtitle">Choose the library that will power card dragging in the assignment grid</p>
+
+<div class="options">
+  <div class="option" data-choice="dnd-kit" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>@dnd-kit/core (Recommended)</h3>
+      <p><strong>Modern, lightweight, React-first DnD library</strong></p>
+      <ul style="margin:8px 0;padding-left:20px;font-size:14px;color:#666;">
+        <li>Built for React 18/19 — uses hooks, no legacy APIs</li>
+        <li>Excellent <strong>keyboard & screen reader accessibility</strong> (ARIA live regions)</li>
+        <li>Sortable, droppable, and draggable primitives compose cleanly</li>
+        <li>Custom sensors (pointer, keyboard, touch) — great for grid UX</li>
+        <li>Lightweight (~12KB gzipped) with tree-shaking</li>
+        <li>Active maintenance, good TypeScript support</li>
+        <li><strong>Snap-back animation</strong> built in for invalid drops</li>
+      </ul>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Best React integration</li><li>Accessible by default</li><li>Performant with many items</li><li>Custom drag overlays</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Need to build grid-specific logic ourselves</li><li>Smaller ecosystem than react-dnd</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="react-dnd" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>react-dnd</h3>
+      <p><strong>Battle-tested, flexible DnD library</strong></p>
+      <ul style="margin:8px 0;padding-left:20px;font-size:14px;color:#666;">
+        <li>Mature library with large ecosystem and community</li>
+        <li>Uses HTML5 backend (native drag) or touch backend</li>
+        <li>Drag source / drop target pattern is well-documented</li>
+        <li>Can handle complex multi-type drag scenarios</li>
+        <li>~15KB gzipped</li>
+      </ul>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Well-documented, lots of examples</li><li>Handles complex scenarios</li><li>Stable API</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Older API pattern (HOCs/hooks mix)</li><li>HTML5 backend has RTL issues</li><li>Less accessible out of box</li><li>Heavier setup boilerplate</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="pragmatic-dnd" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>@atlaskit/pragmatic-drag-and-drop</h3>
+      <p><strong>Atlassian's new DnD — powers Jira & Trello</strong></p>
+      <ul style="margin:8px 0;padding-left:20px;font-size:14px;color:#666;">
+        <li>Framework-agnostic core with React adapter</li>
+        <li>Built for <strong>board/grid layouts</strong> exactly like ours</li>
+        <li>Native drag events — best perceived performance</li>
+        <li>Tiny core (~4.7KB), add what you need</li>
+        <li>Production-proven at Atlassian scale</li>
+      </ul>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Purpose-built for boards/grids</li><li>Smallest bundle size</li><li>Battle-tested at scale (Jira)</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Newer, smaller community</li><li>Less React-specific documentation</li><li>More manual setup for custom UX</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:24px;padding:16px;background:#f0f4f8;border-radius:12px;">
+  <h3 style="margin:0 0 8px;">My Recommendation: <span style="color:#BF3069;">@dnd-kit/core</span></h3>
+  <p style="margin:0;font-size:14px;color:#555;">
+    Best balance of React-native API, accessibility (important for hospital software),
+    RTL support via CSS transforms (not HTML5 drag which has RTL bugs),
+    and custom drag overlays for our assignment cards. The snap-back animation
+    for invalid drops is exactly what the spec requires.
+  </p>
+</div>

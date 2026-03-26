@@ -1,0 +1,195 @@
+<h2>Dialogs & Forms Design</h2>
+<p class="subtitle">The three modal dialogs and their form structures</p>
+
+<div style="display:flex;flex-direction:column;gap:24px;">
+
+  <!-- Manual Assignment Dialog -->
+  <div style="background:white;border-radius:16px;padding:0;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.12);max-width:520px;margin:0 auto;width:100%;direction:rtl;">
+    <div style="background:#1E2A5E;color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;font-size:16px;">שיבוץ ידני חדש</h3>
+      <span style="cursor:pointer;font-size:18px;opacity:0.7;">✕</span>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">שם מחלקה *</label>
+        <div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:14px;color:#94a3b8;">בחר מחלקה...</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">תאריך התחלה (יום ראשון) *</label>
+          <div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:14px;color:#94a3b8;">📅 בחר יום ראשון</div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">תאריך סיום (יום חמישי) *</label>
+          <div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:14px;color:#94a3b8;">📅 בחר יום חמישי</div>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">מוסד אקדמי *</label>
+        <div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:14px;color:#94a3b8;">בחר אוניברסיטה...</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">סוג שיבוץ *</label>
+          <div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:14px;">
+            <span style="background:#BF3069;color:white;padding:2px 8px;border-radius:4px;font-size:12px;">קבוצתי</span>
+            <span style="color:#cbd5e1;margin:0 6px;">|</span>
+            <span style="color:#94a3b8;font-size:12px;">בחירה</span>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">מספר סטודנטים</label>
+          <div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:14px;color:#333;">8</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">שנת לימוד *</label>
+          <div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:14px;color:#94a3b8;">בחר שנה...</div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px;">שם מדריך</label>
+          <div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:14px;color:#94a3b8;">שם הרופא האחראי</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-start;margin-top:8px;">
+        <button style="background:#BF3069;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;">שמור שיבוץ</button>
+        <button style="background:transparent;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;">ביטול</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:#94a3b8;font-size:13px;">▲ Manual Assignment Dialog — RTL Hebrew layout with all required fields</div>
+
+  <!-- Excel Import Dialog -->
+  <div style="background:white;border-radius:16px;padding:0;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.12);max-width:480px;margin:0 auto;width:100%;direction:rtl;">
+    <div style="background:#1E2A5E;color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;font-size:16px;">ייבוא מקובץ אקסל</h3>
+      <span style="cursor:pointer;font-size:18px;opacity:0.7;">✕</span>
+    </div>
+    <div style="padding:24px;">
+      <div style="border:2px dashed #cbd5e1;border-radius:12px;padding:32px;text-align:center;background:#f8fafc;">
+        <div style="font-size:32px;margin-bottom:8px;">📄</div>
+        <p style="font-size:14px;color:#64748b;margin:0 0 4px;">גרור קובץ אקסל לכאן</p>
+        <p style="font-size:12px;color:#94a3b8;margin:0 0 12px;">או</p>
+        <button style="background:#44C2A4;color:white;border:none;border-radius:8px;padding:8px 20px;font-size:13px;cursor:pointer;">בחר קובץ</button>
+        <p style="font-size:11px;color:#94a3b8;margin:12px 0 0;">.xlsx, .xls בלבד</p>
+      </div>
+
+      <div style="margin-top:16px;background:#fef2f2;border-radius:8px;padding:12px;display:none;">
+        <p style="font-size:13px;color:#ef4444;margin:0;">❌ שגיאה: העמודות בקובץ אינן תואמות את התבנית הנדרשת</p>
+      </div>
+
+      <div style="margin-top:16px;background:#f0fdf4;border-radius:8px;padding:12px;">
+        <p style="font-size:13px;color:#16a34a;margin:0 0 8px;">✅ הקובץ תקין — 15 שיבוצים נמצאו</p>
+        <div style="font-size:11px;color:#666;">
+          <span style="background:#e2e8f0;padding:2px 8px;border-radius:4px;margin-left:4px;">מחלקה ✓</span>
+          <span style="background:#e2e8f0;padding:2px 8px;border-radius:4px;margin-left:4px;">תאריך ✓</span>
+          <span style="background:#e2e8f0;padding:2px 8px;border-radius:4px;margin-left:4px;">אוניברסיטה ✓</span>
+          <span style="background:#e2e8f0;padding:2px 8px;border-radius:4px;margin-left:4px;">סוג ✓</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:flex-start;margin-top:16px;">
+        <button style="background:#BF3069;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;">ייבא שיבוצים</button>
+        <button style="background:transparent;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;">ביטול</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:#94a3b8;font-size:13px;">▲ Excel Import Dialog — drag & drop + validation preview</div>
+
+  <!-- Edit Assignment Dialog -->
+  <div style="background:white;border-radius:16px;padding:0;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.12);max-width:600px;margin:0 auto;width:100%;direction:rtl;">
+    <div style="background:#1E2A5E;color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;font-size:16px;">עריכת שיבוץ — רפואה פנימית, שבוע 1</h3>
+      <span style="cursor:pointer;font-size:18px;opacity:0.7;">✕</span>
+    </div>
+    <div style="padding:20px;">
+      <!-- Assignment Details (collapsed summary) -->
+      <div style="background:#f8fafc;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <span style="font-size:14px;font-weight:600;">אונ׳ תל אביב</span>
+          <span style="color:#94a3b8;margin:0 8px;">·</span>
+          <span style="font-size:13px;color:#666;">שנה ד׳</span>
+          <span style="color:#94a3b8;margin:0 8px;">·</span>
+          <span style="background:#BF3069;color:white;padding:2px 8px;border-radius:4px;font-size:11px;">קבוצתי</span>
+          <span style="color:#94a3b8;margin:0 8px;">·</span>
+          <span style="font-size:13px;color:#666;">8 סטודנטים</span>
+        </div>
+        <button style="background:transparent;color:#BF3069;border:1px solid #BF3069;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;">ערוך פרטים</button>
+      </div>
+
+      <!-- Student List Section -->
+      <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+        <div style="background:#f8fafc;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;">
+          <h4 style="margin:0;font-size:14px;">רשימת סטודנטים (3/8)</h4>
+          <div style="display:flex;gap:8px;">
+            <button style="background:#44C2A4;color:white;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">+ הוסף סטודנט</button>
+            <button style="background:transparent;color:#64748b;border:1px solid #e2e8f0;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">📄 ייבוא אקסל</button>
+          </div>
+        </div>
+        <table style="width:100%;font-size:13px;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f1f5f9;">
+              <th style="padding:8px 12px;text-align:right;font-weight:500;color:#64748b;">שם פרטי</th>
+              <th style="padding:8px 12px;text-align:right;font-weight:500;color:#64748b;">שם משפחה</th>
+              <th style="padding:8px 12px;text-align:right;font-weight:500;color:#64748b;">ת.ז.</th>
+              <th style="padding:8px 12px;text-align:right;font-weight:500;color:#64748b;">טלפון</th>
+              <th style="padding:8px 12px;text-align:right;font-weight:500;color:#64748b;">אימייל</th>
+              <th style="padding:8px 12px;text-align:center;font-weight:500;color:#64748b;width:40px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #f1f5f9;">
+              <td style="padding:8px 12px;">דניאל</td>
+              <td style="padding:8px 12px;">כהן</td>
+              <td style="padding:8px 12px;">305678901</td>
+              <td style="padding:8px 12px;">054-1234567</td>
+              <td style="padding:8px 12px;">daniel@mail.com</td>
+              <td style="padding:8px 12px;text-align:center;"><span style="color:#ef4444;cursor:pointer;">🗑</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #f1f5f9;">
+              <td style="padding:8px 12px;">נועה</td>
+              <td style="padding:8px 12px;">לוי</td>
+              <td style="padding:8px 12px;">312345678</td>
+              <td style="padding:8px 12px;">052-9876543</td>
+              <td style="padding:8px 12px;">noa@mail.com</td>
+              <td style="padding:8px 12px;text-align:center;"><span style="color:#ef4444;cursor:pointer;">🗑</span></td>
+            </tr>
+            <tr>
+              <td style="padding:8px 12px;">יוסף</td>
+              <td style="padding:8px 12px;">אברהם</td>
+              <td style="padding:8px 12px;">318765432</td>
+              <td style="padding:8px 12px;">050-5555555</td>
+              <td style="padding:8px 12px;">yosef@mail.com</td>
+              <td style="padding:8px 12px;text-align:center;"><span style="color:#ef4444;cursor:pointer;">🗑</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:flex-start;margin-top:16px;">
+        <button style="background:#BF3069;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;">שמור שינויים</button>
+        <button style="background:transparent;color:#ef4444;border:1px solid #ef4444;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;">מחק שיבוץ</button>
+        <button style="background:transparent;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;">ביטול</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:#94a3b8;font-size:13px;">▲ Edit Assignment Dialog — summary header + student list with inline add & Excel import</div>
+
+  <!-- Technical Notes -->
+  <div style="background:#f0f4f8;border-radius:12px;padding:20px;">
+    <h3 style="margin:0 0 12px;">Technical Implementation Notes</h3>
+    <ul style="font-size:13px;color:#555;padding-left:20px;margin:0;">
+      <li><strong>All dialogs use Radix AlertDialog</strong> — matching existing OtpDialog pattern</li>
+      <li><strong>Forms use React Hook Form + Zod</strong> — schema factories accepting <code>t</code> for i18n</li>
+      <li><strong>Date pickers:</strong> Need a date picker library. Recommend adding <code>react-day-picker</code> (lightweight, Radix-compatible) with custom day filtering to enforce Sunday-only starts and Thursday-only ends</li>
+      <li><strong>Excel parsing:</strong> <code>xlsx</code> (SheetJS) library for client-side file reading + column validation</li>
+      <li><strong>Drag & drop zone:</strong> Native HTML5 drag events for file upload (separate from dnd-kit which handles card dragging)</li>
+      <li><strong>Student list in edit dialog:</strong> Inline form row for adding, same Excel import component reused for student list import</li>
+    </ul>
+  </div>
+
+</div>

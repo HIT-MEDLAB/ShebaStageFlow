@@ -6,22 +6,26 @@ import enCommon from '@/locales/en/common.json'
 import enAuth from '@/locales/en/auth.json'
 import enHome from '@/locales/en/home.json'
 import enSettings from '@/locales/en/settings.json'
+import enScheduler from '@/locales/en/scheduler.json'
+import enConstraints from '@/locales/en/constraints.json'
 import heCommon from '@/locales/he/common.json'
 import heAuth from '@/locales/he/auth.json'
 import heHome from '@/locales/he/home.json'
 import heSettings from '@/locales/he/settings.json'
+import heScheduler from '@/locales/he/scheduler.json'
+import heConstraints from '@/locales/he/constraints.json'
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, auth: enAuth, home: enHome, settings: enSettings },
-      he: { common: heCommon, auth: heAuth, home: heHome, settings: heSettings },
+      en: { common: enCommon, auth: enAuth, home: enHome, settings: enSettings, scheduler: enScheduler, constraints: enConstraints },
+      he: { common: heCommon, auth: heAuth, home: heHome, settings: heSettings, scheduler: heScheduler, constraints: heConstraints },
     },
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'home', 'settings'],
+    ns: ['common', 'auth', 'home', 'settings', 'scheduler', 'constraints'],
     interpolation: {
       escapeValue: false,
     },

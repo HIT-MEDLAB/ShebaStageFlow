@@ -1,0 +1,83 @@
+{
+  "pageTitle": "ניהול אילוצים",
+  "tabs": {
+    "hard": "אילוצים קשיחים",
+    "soft": "אילוצים רכים"
+  },
+  "table": {
+    "name": "שם",
+    "description": "תיאור",
+    "type": "סוג",
+    "status": "סטטוס",
+    "priority": "עדיפות",
+    "scope": "טווח",
+    "actions": "פעולות",
+    "noConstraints": "לא נמצאו אילוצים"
+  },
+  "types": {
+    "iron": "כלל ברזל",
+    "date": "טווח תאריכים",
+    "holiday": "חג"
+  },
+  "holiday": {
+    "fullDay": "יום מלא",
+    "partialDay": "יום חלקי"
+  },
+  "actions": {
+    "addSoft": "הוספת אילוץ",
+    "delete": "מחיקה"
+  },
+  "dialog": {
+    "addTitle": "הוספת אילוץ רך",
+    "editTitle": "עריכת אילוץ רך",
+    "deleteTitle": "מחיקת אילוץ",
+    "deleteConfirm": "האם אתה בטוח שברצונך למחוק אילוץ זה? פעולה זו אינה ניתנת לביטול."
+  },
+  "form": {
+    "name": "שם",
+    "description": "תיאור",
+    "priority": "עדיפות",
+    "department": "מחלקה",
+    "university": "אוניברסיטה",
+    "startDate": "תאריך התחלה",
+    "endDate": "תאריך סיום",
+    "allDepartments": "כל המחלקות",
+    "allUniversities": "כל האוניברסיטאות",
+    "cancel": "ביטול",
+    "save": "שמירת שינויים",
+    "create": "יצירה"
+  },
+  "department": {
+    "title": "ניהול מחלקות",
+    "addNew": "הוספה חדשה",
+    "editExisting": "עריכת קיימת",
+    "selectDepartment": "בחר מחלקה",
+    "hasMorningShift": "משמרת בוקר",
+    "hasEveningShift": "משמרת ערב",
+    "morningCapacity": "קיבולת בוקר",
+    "eveningCapacity": "קיבולת ערב",
+    "electiveCapacity": "קיבולת אלקטיב"
+  },
+  "university": {
+    "title": "ניהול אוניברסיטאות",
+    "addNew": "הוספה חדשה",
+    "editExisting": "עריכת קיימת",
+    "selectUniversity": "בחר אוניברסיטה",
+    "priority": "עדיפות",
+    "semesterStart": "תחילת סמסטר",
+    "semesterEnd": "סיום סמסטר",
+    "year": "שנה"
+  },
+  "toast": {
+    "constraintCreated": "האילוץ נוצר בהצלחה",
+    "constraintUpdated": "האילוץ עודכן בהצלחה",
+    "constraintDeleted": "האילוץ נמחק בהצלחה",
+    "departmentCreated": "המחלקה נוצרה בהצלחה",
+    "departmentUpdated": "המחלקה עודכנה בהצלחה",
+    "universityCreated": "האוניברסיטה נוצרה בהצלחה",
+    "universityUpdated": "האוניברסיטה עודכנה בהצלחה",
+    "createFailed": "היצירה נכשלה",
+    "updateFailed": "העדכון נכשל",
+    "deleteFailed": "המחיקה נכשלה"
+  }
+}

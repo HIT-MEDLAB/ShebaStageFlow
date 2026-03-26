@@ -1,0 +1,72 @@
+<h2>Component Hierarchy</h2>
+<p class="subtitle">How the scheduler feature decomposes into components</p>
+
+<div style="font-family:monospace;font-size:13px;line-height:1.8;background:#1E2A5E;color:#e2e8f0;padding:24px;border-radius:12px;overflow-x:auto;">
+<pre style="margin:0;">
+<span style="color:#BF3069;font-weight:bold;">SchedulerPage</span>                          <span style="color:#94a3b8;">← Page component (route entry)</span>
+│
+├─ <span style="color:#44C2A4;font-weight:bold;">SchedulerToolbar</span>                     <span style="color:#94a3b8;">← Top action bar</span>
+│  ├─ Button: "שיבוץ ידני" (Manual)      <span style="color:#94a3b8;">→ opens ManualAssignmentDialog</span>
+│  └─ Button: "ייבוא מאקסל" (Import)     <span style="color:#94a3b8;">→ opens ExcelImportDialog</span>
+│
+├─ <span style="color:#44C2A4;font-weight:bold;">SchedulerFilters</span>                     <span style="color:#94a3b8;">← Filter bar + legend</span>
+│  ├─ WeekRangeSelector                  <span style="color:#94a3b8;">← Semester week range picker</span>
+│  ├─ UniversityFilter                   <span style="color:#94a3b8;">← Dropdown multi-select</span>
+│  ├─ ShiftFilter                        <span style="color:#94a3b8;">← Morning / Evening toggle</span>
+│  ├─ YearFilter                         <span style="color:#94a3b8;">← Year in program dropdown</span>
+│  └─ <span style="color:#f59e0b;">AssignmentLegend</span>                 <span style="color:#94a3b8;">← Color key for card types</span>
+│
+├─ <span style="color:#BF3069;font-weight:bold;">DndContext</span> <span style="color:#94a3b8;">(from @dnd-kit/core)</span>        <span style="color:#94a3b8;">← Wraps entire grid</span>
+│  │
+│  ├─ <span style="color:#44C2A4;font-weight:bold;">SchedulerGrid</span>                    <span style="color:#94a3b8;">← CSS Grid container</span>
+│  │  │
+│  │  ├─ <span style="color:#f59e0b;">GridHeader</span>                    <span style="color:#94a3b8;">← Sticky top row</span>
+│  │  │  ├─ DepartmentColumnHeader       <span style="color:#94a3b8;">← "מחלקות" label (sticky right)</span>
+│  │  │  └─ WeekColumnHeader × N         <span style="color:#94a3b8;">← "שבוע 1 (2/3-6/3)" per week</span>
+│  │  │
+│  │  └─ <span style="color:#f59e0b;">GridRow</span> × N                   <span style="color:#94a3b8;">← One per department</span>
+│  │     ├─ DepartmentLabel              <span style="color:#94a3b8;">← Sticky right department name</span>
+│  │     └─ <span style="color:#6366f1;font-weight:bold;">GridCell</span> × N               <span style="color:#94a3b8;">← Droppable zone (dept × week)</span>
+│  │        ├─ [BlockedOverlay]          <span style="color:#94a3b8;">← If constraint blocks this slot</span>
+│  │        └─ <span style="color:#BF3069;font-weight:bold;">AssignmentCard</span> × 0-N    <span style="color:#94a3b8;">← Draggable cards</span>
+│  │           ├─ UniversityName
+│  │           ├─ YearBadge
+│  │           ├─ TypeBadge (Group/Elective)
+│  │           └─ StudentCount
+│  │
+│  └─ <span style="color:#f59e0b;">DragOverlay</span>                      <span style="color:#94a3b8;">← Floating card while dragging</span>
+│
+├─ <span style="color:#44C2A4;font-weight:bold;">ManualAssignmentDialog</span>               <span style="color:#94a3b8;">← Create new assignment form</span>
+│  ├─ DepartmentSelect
+│  ├─ DatePickers (Sunday-only start, Thursday-only end)
+│  ├─ UniversitySelect
+│  ├─ AssignmentTypeSelect (Group/Elective)
+│  ├─ NumberOfStudentsInput
+│  ├─ YearInProgramSelect
+│  └─ TutorNameInput
+│
+├─ <span style="color:#44C2A4;font-weight:bold;">ExcelImportDialog</span>                   <span style="color:#94a3b8;">← Drag & drop file upload</span>
+│  ├─ DropZone (drag file or browse)
+│  ├─ ValidationStatus
+│  └─ ColumnMappingPreview
+│
+└─ <span style="color:#44C2A4;font-weight:bold;">EditAssignmentDialog</span>                <span style="color:#94a3b8;">← Edit existing + student list</span>
+   ├─ AssignmentForm (same fields as Manual)
+   └─ <span style="color:#f59e0b;">StudentListSection</span>
+      ├─ StudentTable (name, ID, phone, email)
+      ├─ AddStudentRow (inline form)
+      └─ ImportStudentExcel (mini dropzone)
+</pre>
+</div>
+
+<div style="margin-top:20px;padding:16px;background:#f0f4f8;border-radius:12px;">
+  <h3 style="margin:0 0 12px;">Key Design Decisions</h3>
+  <ul style="font-size:14px;color:#555;padding-left:20px;">
+    <li><strong>DndContext wraps only the grid</strong> — dialogs are outside the drag scope</li>
+    <li><strong>GridCell is the droppable unit</strong> — each cell knows its departmentId + weekNumber</li>
+    <li><strong>AssignmentCard is the draggable</strong> — carries its assignmentId as data</li>
+    <li><strong>DragOverlay</strong> renders a ghost card that follows the cursor (not the original card)</li>
+    <li><strong>BlockedOverlay</strong> renders on top of cells with constraints, with tooltip explaining why</li>
+    <li><strong>All dialogs are lazy-loaded</strong> — only mount when opened</li>
+  </ul>
+</div>
