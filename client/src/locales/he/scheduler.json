@@ -18,6 +18,8 @@
   "grid": {
     "departments": "מחלקות",
     "week": "שבוע",
+    "morning": "בוקר",
+    "evening": "ערב",
     "blocked": {
       "holiday": "חג — אין שיבוצים",
       "dateBlock": "מחלקה חסומה",

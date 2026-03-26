@@ -29,12 +29,7 @@ export function SchedulerGrid({
       className="flex-1 min-h-0 w-full overflow-auto border border-border rounded-lg"
       dir={dir}
     >
-      <div
-        className="grid gap-px bg-border w-full min-w-fit"
-        style={{
-          gridTemplateColumns: `minmax(140px, 200px) repeat(${weeks.length}, minmax(200px, 1fr))`,
-        }}
-      >
+      <div className="flex flex-col gap-px bg-border w-full min-w-fit">
         <GridHeader weeks={weeks} />
         {departments.map((dept) => (
           <GridRow

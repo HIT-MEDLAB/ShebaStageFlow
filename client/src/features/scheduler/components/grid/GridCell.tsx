@@ -26,7 +26,7 @@ export function GridCell({
     <div
       ref={setNodeRef}
       className={cn(
-        'relative min-h-[120px] bg-white p-2.5 transition-colors',
+        'relative min-h-[120px] h-full bg-white p-2.5 transition-colors',
         isOver && !blockReason && 'bg-green-50 ring-2 ring-green-400 ring-inset',
         isOver && blockReason && 'bg-red-50 ring-2 ring-red-400 ring-inset',
       )}

@@ -18,6 +18,8 @@
   "grid": {
     "departments": "Departments",
     "week": "Week",
+    "morning": "Morning",
+    "evening": "Evening",
     "blocked": {
       "holiday": "Holiday - No assignments",
       "dateBlock": "Department blocked",

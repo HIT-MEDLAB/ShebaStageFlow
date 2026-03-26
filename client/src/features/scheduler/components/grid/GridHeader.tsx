@@ -17,10 +17,10 @@ export function GridHeader({ weeks }: GridHeaderProps) {
     format(date, 'dd/MM', { locale })
 
   return (
-    <>
-      {/* Corner cell: sticky top + sticky inline-end (RTL right) */}
+    <div className="flex gap-px min-w-fit sticky top-0 z-10 bg-border">
+      {/* Corner cell - sticky horizontally + vertically (via parent row) */}
       <div
-        className="sticky top-0 z-20 bg-[#1E2A5E] text-white font-semibold text-sm flex items-center justify-center p-2"
+        className="sticky z-20 bg-[#1E2A5E] text-white font-semibold text-sm flex items-center justify-center p-2 w-[200px] shrink-0"
         style={{ insetInlineStart: 0 }}
       >
         {t('grid.departments')}
@@ -30,7 +30,7 @@ export function GridHeader({ weeks }: GridHeaderProps) {
       {weeks.map((week) => (
         <div
           key={week.weekNumber}
-          className="sticky top-0 z-10 bg-[#1E2A5E] text-white text-center p-2"
+          className="bg-[#1E2A5E] text-white text-center p-2 min-w-[200px] flex-1"
         >
           <div className="text-sm font-semibold">
             {t('grid.week')} {week.weekNumber}
@@ -40,6 +40,6 @@ export function GridHeader({ weeks }: GridHeaderProps) {
           </div>
         </div>
       ))}
-    </>
+    </div>
   )
 }

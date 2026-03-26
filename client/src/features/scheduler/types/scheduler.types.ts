@@ -24,6 +24,7 @@ export interface Department {
   name: string
   hasMorningShift: boolean
   hasEveningShift: boolean
+  departmentConstraints: DepartmentConstraintData[]
 }
 
 export interface AcademicYear {

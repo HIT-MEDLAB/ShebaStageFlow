@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import { Sun, Moon } from 'lucide-react'
 import { GridCell } from './GridCell'
 import type {
   Assignment,
@@ -19,14 +21,39 @@ export function GridRow({
   gridData,
   blockedCells,
 }: GridRowProps) {
+  const { t } = useTranslation('scheduler')
+  const constraint = department.departmentConstraints?.[0]
+
   return (
-    <>
-      {/* Department name cell: sticky inline-end (RTL right) */}
+    <div className="flex gap-px min-w-fit bg-border">
+      {/* Department name cell - sticky horizontally */}
       <div
-        className="sticky z-[5] bg-white border-b border-border flex items-center p-2 text-sm font-medium text-[#1E2A5E]"
+        className="sticky z-[5] bg-white flex flex-col justify-center p-2 text-sm font-medium text-[#1E2A5E] w-[200px] shrink-0"
         style={{ insetInlineStart: 0 }}
       >
-        {department.name}
+        <span>{department.name}</span>
+        {constraint && (
+          <div className="flex items-center gap-3 mt-1">
+            {department.hasMorningShift && (
+              <span
+                className="flex items-center gap-1 text-xs text-amber-600"
+                title={t('grid.morning')}
+              >
+                <Sun className="h-3.5 w-3.5" />
+                {constraint.morningCapacity}
+              </span>
+            )}
+            {department.hasEveningShift && (
+              <span
+                className="flex items-center gap-1 text-xs text-indigo-600"
+                title={t('grid.evening')}
+              >
+                <Moon className="h-3.5 w-3.5" />
+                {constraint.eveningCapacity}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Week cells */}
@@ -40,15 +67,16 @@ export function GridRow({
           blockedCells.get(deptBlockKey) ?? blockedCells.get(holidayBlockKey)
 
         return (
-          <GridCell
-            key={week.weekNumber}
-            departmentId={department.id}
-            weekNumber={week.weekNumber}
-            assignments={assignments}
-            blockReason={blockReason}
-          />
+          <div key={week.weekNumber} className="min-w-[200px] flex-1">
+            <GridCell
+              departmentId={department.id}
+              weekNumber={week.weekNumber}
+              assignments={assignments}
+              blockReason={blockReason}
+            />
+          </div>
         )
       })}
-    </>
+    </div>
   )
 }
