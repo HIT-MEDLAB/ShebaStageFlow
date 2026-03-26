@@ -28,7 +28,7 @@
   },
   "card": {
     "group": "קבוצתי",
-    "elective": "בחירה",
+    "elective": "אלקטיב",
     "noStudents": "-"
   },
   "status": {
@@ -115,7 +115,7 @@
   "legend": {
     "title": "מקרא",
     "group": "קבוצתי",
-    "elective": "בחירה",
+    "elective": "אלקטיב",
     "approved": "מאושר",
     "pending": "ממתין לאישור",
     "rejected": "נדחה",

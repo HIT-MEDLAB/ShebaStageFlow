@@ -80,6 +80,10 @@ export class AssignmentRepository implements IAssignmentRepository {
         tutorName: data.tutorName ?? null,
         createdById,
       },
+      include: {
+        university: { select: { name: true } },
+        department: { select: { name: true } },
+      },
     });
   }
 
@@ -87,6 +91,10 @@ export class AssignmentRepository implements IAssignmentRepository {
     return prisma.assignment.update({
       where: { id },
       data,
+      include: {
+        university: { select: { name: true } },
+        department: { select: { name: true } },
+      },
     });
   }
 
@@ -94,6 +102,10 @@ export class AssignmentRepository implements IAssignmentRepository {
     return prisma.assignment.update({
       where: { id },
       data: { departmentId, startDate, endDate },
+      include: {
+        university: { select: { name: true } },
+        department: { select: { name: true } },
+      },
     });
   }
 

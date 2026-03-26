@@ -13,6 +13,21 @@ import type {
   CreateStudentDto,
 } from '../types/scheduler.types'
 
+// Raw shape from the API (Prisma includes nested relations)
+interface RawAssignment extends Omit<Assignment, 'universityName' | 'departmentName'> {
+  university: { name: string }
+  department: { name: string }
+}
+
+function mapAssignment(raw: RawAssignment): Assignment {
+  const { university, department, ...rest } = raw
+  return {
+    ...rest,
+    universityName: university.name,
+    departmentName: department.name,
+  }
+}
+
 // ── Queries ──────────────────────────────────────────────────────────
 
 export async function fetchAssignments(
@@ -25,8 +40,8 @@ export async function fetchAssignments(
   if (filters?.selectedShift && filters.selectedShift !== 'all')
     params.shiftType = filters.selectedShift.toUpperCase()
   if (filters?.selectedYear) params.yearInProgram = filters.selectedYear
-  const { data } = await apiClient.get<Assignment[]>('/assignments', { params })
-  return data
+  const { data } = await apiClient.get<RawAssignment[]>('/assignments', { params })
+  return data.map(mapAssignment)
 }
 
 export async function fetchAssignmentById(id: number) {
@@ -59,21 +74,21 @@ export async function fetchAcademicYears() {
 // ── Mutations ────────────────────────────────────────────────────────
 
 export async function createAssignment(dto: CreateAssignmentDto) {
-  const { data } = await apiClient.post<Assignment>('/assignments', dto)
-  return data
+  const { data } = await apiClient.post<RawAssignment>('/assignments', dto)
+  return mapAssignment(data)
 }
 
 export async function updateAssignment(id: number, dto: UpdateAssignmentDto) {
-  const { data } = await apiClient.patch<Assignment>(`/assignments/${id}`, dto)
-  return data
+  const { data } = await apiClient.patch<RawAssignment>(`/assignments/${id}`, dto)
+  return mapAssignment(data)
 }
 
 export async function moveAssignment(id: number, dto: MoveAssignmentDto) {
-  const { data } = await apiClient.patch<Assignment>(
+  const { data } = await apiClient.patch<RawAssignment>(
     `/assignments/${id}/move`,
     dto,
   )
-  return data
+  return mapAssignment(data)
 }
 
 export async function deleteAssignment(id: number) {
