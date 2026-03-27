@@ -35,8 +35,8 @@ export function UniversityTable({ rows }: UniversityTableProps) {
           </TableRow>
         ) : (
           rows.map((row) => (
-            <TableRow key={row.id} className="hover:bg-accent/50 transition-colors border-b border-border">
-              <TableCell className="font-medium text-foreground text-center">{row.name}</TableCell>
+            <TableRow key={row.universityId} className="hover:bg-accent/50 transition-colors border-b border-border">
+              <TableCell className="font-medium text-foreground text-center">{row.universityName}</TableCell>
               <TableCell className="text-muted-foreground text-center">{row.totalStudents.toLocaleString()}</TableCell>
               <TableCell className="text-muted-foreground text-center">{row.morningRotations}</TableCell>
               <TableCell className="text-muted-foreground text-center">{row.eveningRotations}</TableCell>

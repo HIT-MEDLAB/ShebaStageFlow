@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 import {
   Select,
   SelectContent,
@@ -6,10 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { Week } from '../types/home.types'
+import type { WeekDefinition } from '@/features/scheduler/types/scheduler.types'
 
 interface WeekSelectorProps {
-  weeks: Week[]
+  weeks: WeekDefinition[]
   selectedWeek: number
   onChange: (week: number) => void
 }
@@ -34,8 +35,8 @@ export function WeekSelector({
           <SelectItem key={week.weekNumber} value={String(week.weekNumber)}>
             {t('weekSelector.weekRange', {
               number: week.weekNumber,
-              start: week.startDate,
-              end: week.endDate,
+              start: format(week.startDate, 'yyyy-MM-dd'),
+              end: format(week.endDate, 'yyyy-MM-dd'),
             })}
           </SelectItem>
         ))}

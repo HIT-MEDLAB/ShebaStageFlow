@@ -15,6 +15,7 @@ import { constraintRouter } from './modules/constraint/constraint.routes';
 import { coordinatorRouter } from './modules/coordinator/coordinator.routes';
 import { adminRouter } from './modules/admin/admin.routes';
 import { statisticsRouter } from './modules/statistics/statistics.routes';
+import { homeRouter } from './modules/home/home.routes';
 import { errorHandler } from './shared/middlewares/errorHandler';
 
 const app = express();
@@ -45,6 +46,7 @@ app.use('/api/constraints', constraintRouter);
 app.use('/api/coordinators', coordinatorRouter);
 app.use('/api/admins', adminRouter);
 app.use('/api/statistics', statisticsRouter);
+app.use('/api/home', homeRouter);
 
 // Error handler (must be last)
 app.use(errorHandler);

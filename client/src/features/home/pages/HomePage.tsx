@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 import { GraduationCap, Sun, Moon, Building2 } from 'lucide-react'
 import {
   Card,
@@ -10,6 +11,8 @@ import {
 } from '@/components/ui/card'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
+import { useAcademicYears } from '@/features/scheduler/hooks/useAcademicYears'
+import { useAcademicYearWeeks } from '@/features/scheduler/hooks/useAcademicYearWeeks'
 import { useHomeStats } from '../hooks/useHomeStats'
 import { StatsCard } from '../components/StatsCard'
 import { WeekSelector } from '../components/WeekSelector'
@@ -23,7 +26,27 @@ export function HomePage() {
   const [selectedWeek, setSelectedWeek] = useState(1)
   const [viewMode, setViewMode] = useState<ViewMode>('weekly')
 
-  const { data, isLoading } = useHomeStats(selectedWeek, viewMode)
+  const { data: academicYears } = useAcademicYears()
+  const academicYear = academicYears?.[0]
+  const weeks = useAcademicYearWeeks(academicYear)
+
+  const currentWeek = useMemo(() => {
+    return weeks.find((w) => w.weekNumber === selectedWeek)
+  }, [weeks, selectedWeek])
+
+  const weekStart = viewMode === 'weekly' && currentWeek
+    ? format(currentWeek.startDate, 'yyyy-MM-dd')
+    : undefined
+  const weekEnd = viewMode === 'weekly' && currentWeek
+    ? format(currentWeek.endDate, 'yyyy-MM-dd')
+    : undefined
+
+  const { data, isLoading } = useHomeStats(
+    academicYear?.id,
+    viewMode,
+    weekStart,
+    weekEnd,
+  )
 
   if (isLoading || !data) {
     return null
@@ -103,7 +126,7 @@ export function HomePage() {
         <CardContent className="space-y-4">
           {viewMode === 'weekly' && (
             <WeekSelector
-              weeks={data.weeks}
+              weeks={weeks}
               selectedWeek={selectedWeek}
               onChange={setSelectedWeek}
             />
