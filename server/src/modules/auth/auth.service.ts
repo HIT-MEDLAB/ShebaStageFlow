@@ -5,12 +5,13 @@ import { AppError } from '../../shared/errors/AppError';
 import { sendOtpEmail } from '../../shared/utils/email';
 import type { IAuthRepository } from './auth.repository';
 import type { IOtpRepository } from './otp.repository';
-import type { LoginDto } from './auth.schema';
+import type { LoginDto, UpdateProfileDto } from './auth.schema';
 
 interface UserShape {
   id: string;
   email: string;
   name: string;
+  phone: string | null;
   role: string;
 }
 
@@ -105,6 +106,7 @@ export class AuthService {
         id: String(user.id),
         email: user.email,
         name: user.name ?? '',
+        phone: user.phone ?? null,
         role: user.role,
       },
     };
@@ -120,7 +122,52 @@ export class AuthService {
       id: String(user.id),
       email: user.email,
       name: user.name ?? '',
+      phone: user.phone ?? null,
       role: user.role,
+    };
+  }
+
+  async updateProfile(userId: number, dto: UpdateProfileDto): Promise<UserShape> {
+    const user = await this.repository.findById(userId);
+    if (!user || !user.isActive) {
+      throw new AppError('Authentication required', 401);
+    }
+
+    // If email is changing, check uniqueness
+    if (dto.email && dto.email !== user.email) {
+      const existing = await this.repository.findByEmail(dto.email);
+      if (existing) {
+        throw new AppError('Email is already in use', 409);
+      }
+    }
+
+    // If changing password, verify current password
+    if (dto.newPassword) {
+      if (!dto.currentPassword) {
+        throw new AppError('Current password is required', 400);
+      }
+      const isValid = await bcrypt.compare(dto.currentPassword, user.hashPassword);
+      if (!isValid) {
+        throw new AppError('Current password is incorrect', 401);
+      }
+    }
+
+    const updateData: Record<string, string> = {};
+    if (dto.name !== undefined) updateData['name'] = dto.name;
+    if (dto.email !== undefined) updateData['email'] = dto.email;
+    if (dto.phone !== undefined) updateData['phone'] = dto.phone;
+    if (dto.newPassword) {
+      updateData['hashPassword'] = await bcrypt.hash(dto.newPassword, 10);
+    }
+
+    const updated = await this.repository.updateProfile(userId, updateData);
+
+    return {
+      id: String(updated.id),
+      email: updated.email,
+      name: updated.name ?? '',
+      phone: updated.phone ?? null,
+      role: updated.role,
     };
   }
 }

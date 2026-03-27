@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validateRequest } from '../../shared/middlewares/validateRequest';
 import { authenticate } from '../../shared/middlewares/authenticate';
-import { loginSchema, verifyOtpSchema } from './auth.schema';
+import { loginSchema, verifyOtpSchema, updateProfileSchema } from './auth.schema';
 import { AuthRepository } from './auth.repository';
 import { OtpRepository } from './otp.repository';
 import { AuthService } from './auth.service';
@@ -17,4 +17,5 @@ export const authRouter = Router();
 authRouter.post('/login', validateRequest(loginSchema), controller.login);
 authRouter.post('/verify-otp', validateRequest(verifyOtpSchema), controller.verifyOtp);
 authRouter.get('/me', authenticate, controller.me);
+authRouter.patch('/profile', authenticate, validateRequest(updateProfileSchema), controller.updateProfile);
 authRouter.post('/logout', controller.logout);

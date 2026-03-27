@@ -12,5 +12,30 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Your account information.",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "editButton": "Edit Profile",
+    "dialogTitle": "Edit Profile",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "repeatPassword": "Repeat Password",
+    "save": "Save",
+    "cancel": "Cancel",
+    "success": "Profile updated successfully",
+    "errors": {
+      "updateFailed": "Failed to update profile"
+    },
+    "roles": {
+      "SUPER_ADMIN": "Super Admin",
+      "ADMIN": "Admin",
+      "ACADEMIC_COORDINATOR": "Academic Coordinator"
+    }
   }
 }

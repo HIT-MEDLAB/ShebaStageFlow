@@ -12,5 +12,30 @@
     "light": "בהיר",
     "dark": "כהה",
     "system": "מערכת"
+  },
+  "profile": {
+    "title": "פרופיל",
+    "description": ".פרטי החשבון שלך",
+    "name": "שם",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "role": "תפקיד",
+    "editButton": "עריכת פרופיל",
+    "dialogTitle": "עריכת פרופיל",
+    "changePassword": "שינוי סיסמה",
+    "currentPassword": "סיסמה נוכחית",
+    "newPassword": "סיסמה חדשה",
+    "repeatPassword": "חזור על הסיסמה",
+    "save": "שמירה",
+    "cancel": "ביטול",
+    "success": "הפרופיל עודכן בהצלחה",
+    "errors": {
+      "updateFailed": "עדכון הפרופיל נכשל"
+    },
+    "roles": {
+      "SUPER_ADMIN": "מנהל ראשי",
+      "ADMIN": "מנהל",
+      "ACADEMIC_COORDINATOR": "רכז אקדמי"
+    }
   }
 }
