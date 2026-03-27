@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient, Role, AssignmentType, ShiftType, AssignmentStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import pg from "pg";
 import "dotenv/config";
@@ -214,6 +214,60 @@ async function main() {
       },
     });
     console.log(`Created holiday: ${holiday.name}`);
+  }
+
+  // Seed assignments
+  console.log("Seeding assignments...");
+
+  const academicYear = await prisma.academicYear.findUniqueOrThrow({
+    where: { name: '2025-2026' },
+  });
+
+  const superAdmin = await prisma.user.findUniqueOrThrow({
+    where: { email: 'superadmin@shiba.health.gov.il' },
+  });
+
+  const adminOne = await prisma.user.findUniqueOrThrow({
+    where: { email: 'admin1@shiba.health.gov.il' },
+  });
+
+  const seededUniversities = await Promise.all(
+    universities.map((name) =>
+      prisma.university.findUniqueOrThrow({ where: { name } })
+    )
+  );
+
+  const assignments = [
+    { startDate: '2025-10-05', endDate: '2025-10-09', deptIdx: 0, uniIdx: 0, type: AssignmentType.GROUP,    shift: ShiftType.MORNING, students: 5, year: 4 },
+    { startDate: '2025-10-05', endDate: '2025-10-09', deptIdx: 2, uniIdx: 1, type: AssignmentType.GROUP,    shift: ShiftType.EVENING, students: 4, year: 5 },
+    { startDate: '2025-10-12', endDate: '2025-10-16', deptIdx: 1, uniIdx: 3, type: AssignmentType.GROUP,    shift: ShiftType.MORNING, students: 6, year: 4 },
+    { startDate: '2025-10-12', endDate: '2025-10-16', deptIdx: 3, uniIdx: 4, type: AssignmentType.ELECTIVE, shift: ShiftType.MORNING, students: 3, year: 5 },
+    { startDate: '2025-10-19', endDate: '2025-10-23', deptIdx: 6, uniIdx: 2, type: AssignmentType.GROUP,    shift: ShiftType.MORNING, students: 5, year: 4 },
+    { startDate: '2025-10-19', endDate: '2025-10-23', deptIdx: 5, uniIdx: 5, type: AssignmentType.ELECTIVE, shift: ShiftType.MORNING, students: 2, year: 6 },
+    { startDate: '2025-10-26', endDate: '2025-10-30', deptIdx: 0, uniIdx: 6, type: AssignmentType.GROUP,    shift: ShiftType.EVENING, students: 4, year: 5 },
+    { startDate: '2025-10-26', endDate: '2025-10-30', deptIdx: 8, uniIdx: 0, type: AssignmentType.GROUP,    shift: ShiftType.MORNING, students: 5, year: 4 },
+    { startDate: '2025-11-02', endDate: '2025-11-06', deptIdx: 4, uniIdx: 7, type: AssignmentType.ELECTIVE, shift: ShiftType.MORNING, students: 3, year: 6 },
+    { startDate: '2025-11-09', endDate: '2025-11-13', deptIdx: 2, uniIdx: 1, type: AssignmentType.GROUP,    shift: ShiftType.MORNING, students: 6, year: 4 },
+  ];
+
+  for (const a of assignments) {
+    const created = await prisma.assignment.create({
+      data: {
+        departmentId:  seededDepartments[a.deptIdx]!.id,
+        universityId:  seededUniversities[a.uniIdx]!.id,
+        startDate:     new Date(a.startDate),
+        endDate:       new Date(a.endDate),
+        studentCount:  a.students,
+        yearInProgram: a.year,
+        type:          a.type,
+        shiftType:     a.shift,
+        status:        AssignmentStatus.APPROVED,
+        createdById:   superAdmin.id,
+        approvedById:  adminOne.id,
+        academicYearId: academicYear.id,
+      },
+    });
+    console.log(`Created assignment #${created.id}: ${seededDepartments[a.deptIdx]!.name} / ${seededUniversities[a.uniIdx]!.name} (${a.startDate})`);
   }
 
   console.log("Seeding complete!");
