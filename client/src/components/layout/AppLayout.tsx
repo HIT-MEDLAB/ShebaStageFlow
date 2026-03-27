@@ -4,6 +4,7 @@ import {
   Home,
   Calendar,
   ShieldCheck,
+  ShieldAlert,
   BarChart3,
   Settings,
   Users,
@@ -12,6 +13,7 @@ import { AppSidebar } from '@/components/layout/Sidebar'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 import { useAuth } from '@/features/auth'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
+import { useIsSuperAdmin } from '@/hooks/useIsSuperAdmin'
 import type { NavItem } from '@/components/layout/Sidebar'
 
 export function AppLayout() {
@@ -33,14 +35,17 @@ export function AppLayout() {
   ]
 
   const isAdmin = useIsAdmin()
+  const isSuperAdmin = useIsSuperAdmin()
 
-  const navItems: NavItem[] = isAdmin
-    ? [
-        ...baseNavItems.slice(0, 4),
-        { label: t('nav.coordinators'), path: '/coordinators', icon: Users },
-        ...baseNavItems.slice(4),
-      ]
-    : baseNavItems
+  let navItems: NavItem[] = baseNavItems
+  if (isAdmin) {
+    navItems = [
+      ...baseNavItems.slice(0, 4),
+      { label: t('nav.coordinators'), path: '/coordinators', icon: Users },
+      ...(isSuperAdmin ? [{ label: t('nav.admins'), path: '/admins', icon: ShieldAlert }] : []),
+      ...baseNavItems.slice(4),
+    ]
+  }
 
   return (
     <SidebarProvider>

@@ -10,6 +10,7 @@ import { SettingsPage } from '@/features/settings'
 import { SchedulerPage } from '@/features/scheduler'
 import { ConstraintsPage } from '@/features/constraints'
 import { CoordinatorsPage } from '@/features/academic-coordinators'
+import { AdminsPage } from '@/features/admin-management'
 import { StatisticsPage } from '@/features/statistics'
 import { NotFoundPage } from '@/components/shared/NotFoundPage'
 
@@ -68,6 +69,10 @@ export const router = createBrowserRouter([
           {
             path: '/coordinators',
             element: <CoordinatorsPage />,
+          },
+          {
+            path: '/admins',
+            element: <AdminsPage />,
           },
           {
             path: '*',

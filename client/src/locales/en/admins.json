@@ -1,0 +1,38 @@
+{
+  "pageTitle": "Admins",
+  "table": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "actions": "Actions",
+    "empty": "No admins found"
+  },
+  "actions": {
+    "add": "Add Admin",
+    "delete": "Delete"
+  },
+  "dialog": {
+    "addTitle": "Add Admin",
+    "editTitle": "Edit Admin",
+    "deleteTitle": "Delete Admin",
+    "deleteConfirm": "Are you sure you want to delete this admin? They will be deactivated."
+  },
+  "form": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "create": "Create"
+  },
+  "toast": {
+    "created": "Admin created successfully",
+    "updated": "Admin updated successfully",
+    "deleted": "Admin deleted successfully",
+    "createFailed": "Failed to create admin",
+    "updateFailed": "Failed to update admin",
+    "deleteFailed": "Failed to delete admin"
+  }
+}

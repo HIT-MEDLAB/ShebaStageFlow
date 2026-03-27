@@ -1,0 +1,38 @@
+{
+  "pageTitle": "מנהלים",
+  "table": {
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "actions": "פעולות",
+    "empty": "לא נמצאו מנהלים"
+  },
+  "actions": {
+    "add": "הוספת מנהל",
+    "delete": "מחיקה"
+  },
+  "dialog": {
+    "addTitle": "הוספת מנהל",
+    "editTitle": "עריכת מנהל",
+    "deleteTitle": "מחיקת מנהל",
+    "deleteConfirm": "האם אתה בטוח שברצונך למחוק מנהל זה? הוא יושבת."
+  },
+  "form": {
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "cancel": "ביטול",
+    "save": "שמירת שינויים",
+    "create": "יצירה"
+  },
+  "toast": {
+    "created": "המנהל נוצר בהצלחה",
+    "updated": "המנהל עודכן בהצלחה",
+    "deleted": "המנהל נמחק בהצלחה",
+    "createFailed": "יצירת המנהל נכשלה",
+    "updateFailed": "עדכון המנהל נכשל",
+    "deleteFailed": "מחיקת המנהל נכשלה"
+  }
+}
