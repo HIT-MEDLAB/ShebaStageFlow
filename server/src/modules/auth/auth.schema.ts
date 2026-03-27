@@ -13,3 +13,16 @@ export const verifyOtpSchema = z.object({
 });
 
 export type VerifyOtpDto = z.infer<typeof verifyOtpSchema>;
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(1).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  currentPassword: z.string().optional(),
+  newPassword: z.string().min(6).optional(),
+}).refine(
+  (data) => !data.newPassword || data.currentPassword,
+  { message: 'Current password is required to set a new password', path: ['currentPassword'] },
+);
+
+export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;

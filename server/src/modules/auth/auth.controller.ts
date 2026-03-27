@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthService } from './auth.service';
-import type { LoginDto, VerifyOtpDto } from './auth.schema';
+import type { LoginDto, VerifyOtpDto, UpdateProfileDto } from './auth.schema';
 import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, AUTH_COOKIE_CLEAR_OPTIONS } from '../../shared/utils/cookie';
 
 export function createAuthController(service: AuthService) {
@@ -30,6 +30,15 @@ export function createAuthController(service: AuthService) {
     async me(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const user = await service.getMe(req.currentUser!.userId);
+        res.json({ user });
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const user = await service.updateProfile(req.currentUser!.userId, req.body as UpdateProfileDto);
         res.json({ user });
       } catch (err) {
         next(err);

@@ -1,0 +1,38 @@
+{
+  "pageTitle": "Academic Coordinators",
+  "table": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "actions": "Actions",
+    "empty": "No coordinators found"
+  },
+  "actions": {
+    "add": "Add Coordinator",
+    "delete": "Delete"
+  },
+  "dialog": {
+    "addTitle": "Add Coordinator",
+    "editTitle": "Edit Coordinator",
+    "deleteTitle": "Delete Coordinator",
+    "deleteConfirm": "Are you sure you want to delete this coordinator? They will be deactivated."
+  },
+  "form": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "create": "Create"
+  },
+  "toast": {
+    "created": "Coordinator created successfully",
+    "updated": "Coordinator updated successfully",
+    "deleted": "Coordinator deleted successfully",
+    "createFailed": "Failed to create coordinator",
+    "updateFailed": "Failed to update coordinator",
+    "deleteFailed": "Failed to delete coordinator"
+  }
+}

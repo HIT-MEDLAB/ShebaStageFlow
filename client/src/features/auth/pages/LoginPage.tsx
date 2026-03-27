@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, Navigate } from 'react-router-dom'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { useLogin } from '../hooks/useLogin'
@@ -142,6 +142,7 @@ export function LoginPage() {
             disabled={isPending}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-10"
           >
+            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {isPending ? t('login.submitting') : t('login.submit')}
           </Button>
 

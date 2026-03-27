@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   AlertDialog,
@@ -111,6 +112,7 @@ export function OtpDialog({ open, email, otpToken, loginData, onClose, onOtpToke
             disabled={!isCodeComplete || isVerifying}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
+            {isVerifying && <Loader2 className="h-4 w-4 animate-spin" />}
             {isVerifying ? t('otp.verifying') : t('otp.verify')}
           </Button>
         </AlertDialogFooter>

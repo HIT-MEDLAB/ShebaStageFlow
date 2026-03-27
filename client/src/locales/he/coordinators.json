@@ -1,0 +1,38 @@
+{
+  "pageTitle": "רכזים אקדמיים",
+  "table": {
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "actions": "פעולות",
+    "empty": "לא נמצאו רכזים"
+  },
+  "actions": {
+    "add": "הוספת רכז",
+    "delete": "מחיקה"
+  },
+  "dialog": {
+    "addTitle": "הוספת רכז",
+    "editTitle": "עריכת רכז",
+    "deleteTitle": "מחיקת רכז",
+    "deleteConfirm": "האם אתה בטוח שברצונך למחוק רכז זה? הוא יושבת."
+  },
+  "form": {
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "cancel": "ביטול",
+    "save": "שמירת שינויים",
+    "create": "יצירה"
+  },
+  "toast": {
+    "created": "הרכז נוצר בהצלחה",
+    "updated": "הרכז עודכן בהצלחה",
+    "deleted": "הרכז נמחק בהצלחה",
+    "createFailed": "יצירת הרכז נכשלה",
+    "updateFailed": "עדכון הרכז נכשל",
+    "deleteFailed": "מחיקת הרכז נכשלה"
+  }
+}

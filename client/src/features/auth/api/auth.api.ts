@@ -34,3 +34,16 @@ export async function logoutUser(): Promise<void> {
 export async function forgotPassword(data: { email: string }): Promise<void> {
   await apiClient.post('/auth/forgot-password', data)
 }
+
+export interface UpdateProfileData {
+  name?: string
+  email?: string
+  phone?: string
+  currentPassword?: string
+  newPassword?: string
+}
+
+export async function updateProfile(data: UpdateProfileData): Promise<AuthUser> {
+  const response = await apiClient.patch<{ user: AuthUser }>('/auth/profile', data)
+  return response.data.user
+}
