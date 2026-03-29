@@ -50,6 +50,9 @@ export interface IAssignmentRepository {
   reject(id: number, rejectionReason?: string): Promise<Assignment>;
   displace(incomingId: number, params: DisplaceParams, status: 'PENDING' | 'APPROVED', pendingMoveData?: PendingMoveData, approvedById?: number): Promise<Assignment>;
   rejectAndRevert(id: number, pendingMoveData: PendingMoveData): Promise<void>;
+  findOverlapping(departmentId: number, startDate: Date, endDate: Date, shiftType: 'MORNING' | 'EVENING', excludeId?: number): Promise<Assignment[]>;
+  findStudentAssignments(studentId: number, excludeAssignmentId?: number): Promise<Assignment[]>;
+  findStudentByNationalId?(nationalId: string): Promise<{ id: number } | null>;
 }
 
 export class AssignmentRepository implements IAssignmentRepository {
@@ -356,6 +359,43 @@ export class AssignmentRepository implements IAssignmentRepository {
           },
         });
       }
+    });
+  }
+
+  async findOverlapping(
+    departmentId: number,
+    startDate: Date,
+    endDate: Date,
+    shiftType: 'MORNING' | 'EVENING',
+    excludeId?: number,
+  ): Promise<Assignment[]> {
+    return prisma.assignment.findMany({
+      where: {
+        departmentId,
+        type: 'GROUP',
+        shiftType,
+        status: { in: ['APPROVED', 'PENDING'] },
+        startDate: { lte: endDate },
+        endDate: { gte: startDate },
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+    });
+  }
+
+  async findStudentAssignments(studentId: number, excludeAssignmentId?: number): Promise<Assignment[]> {
+    return prisma.assignment.findMany({
+      where: {
+        students: { some: { studentId } },
+        status: { in: ['APPROVED', 'PENDING'] },
+        ...(excludeAssignmentId ? { id: { not: excludeAssignmentId } } : {}),
+      },
+    });
+  }
+
+  async findStudentByNationalId(nationalId: string): Promise<{ id: number } | null> {
+    return prisma.student.findUnique({
+      where: { nationalId },
+      select: { id: true },
     });
   }
 }

@@ -29,6 +29,7 @@ import { ExcelImportDialog } from '../components/dialogs/ExcelImportDialog'
 import { EditAssignmentDialog } from '../components/dialogs/EditAssignmentDialog'
 import { ReplacementDialog } from '../components/dialogs/ReplacementDialog'
 import { AdminOverrideDialog } from '../components/dialogs/AdminOverrideDialog'
+import { WarningConfirmDialog } from '../components/dialogs/WarningConfirmDialog'
 import { ApprovalTab } from '../components/approval/ApprovalTab'
 import type { Assignment, WeekDefinition } from '../types/scheduler.types'
 
@@ -46,8 +47,10 @@ export default function SchedulerPage() {
     displacedAssignment,
     replacementSuggestedWeeks,
     adminOverrideReason,
+    warningReason,
     openReplacementDialog,
     openAdminOverrideDialog,
+    openWarningConfirmDialog,
     clearPendingMove,
   } = useSchedulerStore()
 
@@ -87,6 +90,12 @@ export default function SchedulerPage() {
     [universities],
   )
 
+  // Build department names map
+  const departmentNames = useMemo(
+    () => new Map((departments ?? []).map((d) => [d.id, d.name])),
+    [departments],
+  )
+
   // Build validation context (reused by drag-drop + dialogs)
   const validationContext: ValidationContext | null =
     assignments && constraints
@@ -98,6 +107,8 @@ export default function SchedulerPage() {
           weeks,
           universityPriorities,
           isAdmin,
+          universitySemesters: constraints.universitySemesters,
+          departmentNames,
         }
       : null
 
@@ -155,6 +166,14 @@ export default function SchedulerPage() {
         toast.error(t(result.reasonKey, result.reasonParams))
         break
 
+      case 'warning':
+        openWarningConfirmDialog(
+          { assignment, targetDeptId: departmentId, targetWeekNum: weekNumber },
+          result.reasonKey,
+          result.reasonParams,
+        )
+        break
+
       case 'conflict_replaceable': {
         const suggestedWeeks = findAvailableWeeks(
           result.displacedAssignment,
@@ -210,6 +229,25 @@ export default function SchedulerPage() {
         displacedDepartmentId: displacedAssignment.departmentId,
         displacedStartDate: targetWeek.startDate.toISOString(),
         displacedEndDate: targetWeek.endDate.toISOString(),
+      },
+    })
+
+    clearPendingMove()
+  }
+
+  function handleWarningConfirm() {
+    if (!pendingMove) return
+
+    const targetWeek = weeks.find((w) => w.weekNumber === pendingMove.targetWeekNum)
+    if (!targetWeek) return
+
+    moveMutation.mutate({
+      id: pendingMove.assignment.id,
+      data: {
+        departmentId: pendingMove.targetDeptId,
+        startDate: targetWeek.startDate.toISOString(),
+        endDate: targetWeek.endDate.toISOString(),
+        forceOverride: true,
       },
     })
 
@@ -285,6 +323,15 @@ export default function SchedulerPage() {
           reasonKey={adminOverrideReason.reasonKey}
           reasonParams={adminOverrideReason.reasonParams}
           onConfirm={handleAdminOverrideConfirm}
+          onCancel={clearPendingMove}
+        />
+      )}
+      {activeDialog === 'warningConfirm' && warningReason && (
+        <WarningConfirmDialog
+          open
+          reasonKey={warningReason.reasonKey}
+          reasonParams={warningReason.reasonParams}
+          onConfirm={handleWarningConfirm}
           onCancel={clearPendingMove}
         />
       )}

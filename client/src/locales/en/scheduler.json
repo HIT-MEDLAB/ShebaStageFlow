@@ -30,6 +30,14 @@
       "electiveCapacityFull": "Elective capacity full for this week",
       "shiftUnavailable": "This shift is not available for this department",
       "groupTooBig": "Group size ({{count}} students) exceeds department capacity ({{capacity}} max)",
+      "softConstraint": "Soft constraint — {{name}}",
+      "semesterBoundary": "Outside university semester dates",
+      "dateConstraint": "Date constraint — {{name}}",
+      "studentDoubleBooking": "Student already assigned to {{departmentName}} during this period",
+      "oneGroupPerShift": "Only one group allowed per department per shift per week"
+    },
+    "warning": {
+      "firstClinicalRotation": "Year-1 students are recommended for Internal Medicine or Pediatrics (not {{departmentName}})",
       "softConstraint": "Soft constraint — {{name}}"
     }
   },
@@ -104,6 +112,12 @@
       "description": "This placement has a scheduling conflict.",
       "cancel": "Cancel",
       "force": "Force Placement"
+    },
+    "warningConfirm": {
+      "title": "Scheduling Warning",
+      "description": "This placement has a scheduling advisory.",
+      "confirm": "Proceed Anyway",
+      "cancel": "Cancel"
     },
     "validation": {
       "departmentRequired": "Department is required",

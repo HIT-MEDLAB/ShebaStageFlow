@@ -22,6 +22,22 @@ export interface IConstraintRepository {
 }
 
 export class ConstraintRepository implements IConstraintRepository {
+  // ─── Date Constraints (scheduler) ──────────────────────────
+
+  async findActiveDateConstraints() {
+    return prisma.dateConstraint.findMany({
+      where: { isActive: true },
+      orderBy: { startDate: 'asc' },
+    });
+  }
+
+  async findSemestersByYears(years: number[]) {
+    return prisma.universitySemester.findMany({
+      where: { year: { in: years } },
+      include: { university: { select: { id: true, name: true } } },
+    });
+  }
+
   // ─── Existing Methods (kept for scheduler) ─────────────────
 
   async findDepartmentConstraints() {

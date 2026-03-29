@@ -70,7 +70,8 @@ export function createAssignmentController(service: AssignmentService) {
       try {
         const userId = req.currentUser!.userId;
         const userRole = req.currentUser!.role;
-        const assignment = await service.create(req.body as CreateAssignmentDto, userId, userRole);
+        const dto = req.body as CreateAssignmentDto;
+        const assignment = await service.create(dto, userId, userRole, dto.forceOverride);
         res.status(201).json(assignment);
       } catch (err) {
         next(err);
@@ -93,11 +94,13 @@ export function createAssignmentController(service: AssignmentService) {
       try {
         const userId = req.currentUser!.userId;
         const userRole = req.currentUser!.role;
+        const dto = req.body as MoveAssignmentDto;
         const assignment = await service.move(
           Number(req.params.id),
-          req.body as MoveAssignmentDto,
+          dto,
           userId,
           userRole,
+          dto.forceOverride,
         );
         res.json(assignment);
       } catch (err) {
@@ -184,11 +187,13 @@ export function createAssignmentController(service: AssignmentService) {
       try {
         const userId = req.currentUser!.userId;
         const userRole = req.currentUser!.role;
+        const dto = req.body as DisplaceAssignmentDto;
         const assignment = await service.displace(
           Number(req.params.id),
-          req.body as DisplaceAssignmentDto,
+          dto,
           userId,
           userRole,
+          dto.forceOverride,
         );
         res.json(assignment);
       } catch (err) {

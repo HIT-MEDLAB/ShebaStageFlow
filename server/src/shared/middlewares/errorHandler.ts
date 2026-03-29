@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AppError } from '../errors/AppError';
+import { ConstraintValidationError } from '../errors/ConstraintValidationError';
 
 export function errorHandler(
   err: unknown,
@@ -7,6 +8,15 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
+  if (err instanceof ConstraintValidationError) {
+    res.status(err.statusCode).json({
+      message: err.message,
+      errors: err.errors,
+      warnings: err.warnings,
+    });
+    return;
+  }
+
   if (err instanceof AppError) {
     res.status(err.statusCode).json({ message: err.message });
     return;

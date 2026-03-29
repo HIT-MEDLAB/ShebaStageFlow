@@ -13,33 +13,42 @@ interface BlockedOverlayProps {
   reason: BlockReason
 }
 
-const blockConfig = {
+const blockConfig: Record<string, {
+  icon: typeof CalendarOff
+  bgClass: string
+  textKey: string
+}> = {
   holiday: {
     icon: CalendarOff,
     bgClass: 'bg-[#f1f5f9] border-dashed border-slate-300',
-    textKey: 'grid.blocked.holiday' as const,
+    textKey: 'grid.blocked.holiday',
   },
   dateBlock: {
     icon: Lock,
     bgClass: 'bg-[#fef2f2] border-dashed border-red-200',
-    textKey: 'grid.blocked.dateBlock' as const,
+    textKey: 'grid.blocked.dateBlock',
+  },
+  dateConstraint: {
+    icon: ShieldAlert,
+    bgClass: 'bg-[#fef2f2] border-dashed border-red-300',
+    textKey: 'grid.blocked.dateConstraint',
   },
   capacityFull: {
     icon: AlertTriangle,
     bgClass: 'bg-white border-[#fcd34d] border-solid',
-    textKey: 'grid.blocked.capacityFull' as const,
+    textKey: 'grid.blocked.capacityFull',
   },
   softConstraint: {
     icon: ShieldAlert,
     bgClass: 'bg-[#fff7ed] border-dashed border-orange-300',
-    textKey: 'grid.blocked.softConstraint' as const,
+    textKey: 'grid.blocked.softConstraint',
   },
-} as const
+}
 
 export function BlockedOverlay({ reason }: BlockedOverlayProps) {
   const { t } = useTranslation('scheduler')
 
-  const config = blockConfig[reason.type]
+  const config = blockConfig[reason.type] ?? blockConfig.dateBlock
   const Icon = config.icon
   const label = t(config.textKey)
   const tooltipText = reason.description || label
@@ -56,9 +65,11 @@ export function BlockedOverlay({ reason }: BlockedOverlayProps) {
           >
             <Icon className="size-4 text-muted-foreground" />
             <span className="text-[10px] text-muted-foreground text-center px-1 leading-tight">
-              {(reason.type === 'holiday' || reason.type === 'softConstraint') && reason.constraintName
+              {reason.constraintName
                 ? reason.constraintName
-                : label}
+                : reason.type === 'holiday'
+                  ? reason.description
+                  : label}
             </span>
           </div>
         </TooltipTrigger>

@@ -11,6 +11,7 @@ export const createAssignmentSchema = z.object({
   studentCount: z.number().int().positive().optional().nullable(),
   yearInProgram: z.number().int().min(1).max(7),
   tutorName: z.string().optional().nullable(),
+  forceOverride: z.boolean().optional(),
 }).refine((data) => data.endDate > data.startDate, {
   message: 'End date must be after start date',
   path: ['endDate'],
@@ -33,6 +34,7 @@ export const moveAssignmentSchema = z.object({
   departmentId: z.number().int().positive(),
   startDate: z.coerce.date().refine((d) => d.getDay() === 0, { message: 'Start date must be a Sunday' }),
   endDate: z.coerce.date().refine((d) => d.getDay() === 4, { message: 'End date must be a Thursday' }),
+  forceOverride: z.boolean().optional(),
 });
 
 export const importAssignmentsSchema = z.object({
@@ -80,6 +82,7 @@ export const displaceAssignmentSchema = z.object({
   displacedDepartmentId: z.number().int().positive(),
   displacedStartDate: z.coerce.date(),
   displacedEndDate: z.coerce.date(),
+  forceOverride: z.boolean().optional(),
 });
 
 // Export inferred types

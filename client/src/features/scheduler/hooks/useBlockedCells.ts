@@ -47,7 +47,27 @@ export function useBlockedCells(
       }
     }
 
-    // Soft constraint blocking
+    // Date constraint blocking (global blocks, like holidays)
+    if (constraints.dateConstraints) {
+      for (const dc of constraints.dateConstraints) {
+        const dcStart = new Date(dc.startDate)
+        const dcEnd = new Date(dc.endDate)
+        for (const week of weeks) {
+          if (week.startDate <= dcEnd && week.endDate >= dcStart) {
+            const key = `dateConstraint:week:${week.weekNumber}`
+            if (!blocked.has(key)) {
+              blocked.set(key, {
+                type: 'dateConstraint',
+                description: dc.description,
+                constraintName: dc.name,
+              })
+            }
+          }
+        }
+      }
+    }
+
+    // Soft constraint warnings (not hard blocks — these allow drops)
     if (constraints.softConstraints) {
       for (const sc of constraints.softConstraints) {
         const scStart = new Date(sc.startDate)
@@ -58,7 +78,7 @@ export function useBlockedCells(
               const key = `soft:dept:${sc.departmentId}:week:${week.weekNumber}`
               if (!blocked.has(key)) {
                 blocked.set(key, {
-                  type: 'softConstraint',
+                  type: 'warning',
                   description: sc.description,
                   constraintName: sc.name,
                 })
@@ -67,7 +87,7 @@ export function useBlockedCells(
               const key = `soft:week:${week.weekNumber}`
               if (!blocked.has(key)) {
                 blocked.set(key, {
-                  type: 'softConstraint',
+                  type: 'warning',
                   description: sc.description,
                   constraintName: sc.name,
                 })

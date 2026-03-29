@@ -54,7 +54,7 @@ export interface WeekDefinition {
 }
 
 export interface BlockReason {
-  type: 'holiday' | 'dateBlock' | 'capacityFull' | 'softConstraint'
+  type: 'holiday' | 'dateBlock' | 'capacityFull' | 'softConstraint' | 'dateConstraint' | 'warning'
   description: string
   constraintName?: string
 }
@@ -102,11 +102,31 @@ export interface SoftConstraintData {
   endDate: string
 }
 
+export interface DateConstraintData {
+  id: number
+  name: string
+  description: string
+  startDate: string
+  endDate: string
+  isActive: boolean
+}
+
+export interface UniversitySemesterData {
+  id: number
+  universityId: number
+  semesterStart: string
+  semesterEnd: string
+  year: number
+  university: { id: number; name: string }
+}
+
 export interface ConstraintsResponse {
   departmentConstraints: DepartmentConstraintData[]
   ironConstraints: IronConstraintData[]
   holidays: Holiday[]
   softConstraints: SoftConstraintData[]
+  dateConstraints: DateConstraintData[]
+  universitySemesters: UniversitySemesterData[]
 }
 
 export interface SchedulerFilters {
@@ -151,6 +171,7 @@ export interface MoveAssignmentDto {
   departmentId: number
   startDate: string
   endDate: string
+  forceOverride?: boolean
 }
 
 export interface AssignmentStudent {
@@ -176,6 +197,7 @@ export interface DisplaceAssignmentDto {
   displacedDepartmentId: number
   displacedStartDate: string
   displacedEndDate: string
+  forceOverride?: boolean
 }
 
 export interface CreateStudentDto {
@@ -191,6 +213,7 @@ export interface CreateStudentDto {
 export type ValidationResult =
   | { type: 'valid' }
   | { type: 'blocked'; reasonKey: string; reasonParams?: Record<string, string> }
+  | { type: 'warning'; reasonKey: string; reasonParams?: Record<string, string> }
   | {
       type: 'conflict_replaceable'
       displacedAssignment: Assignment

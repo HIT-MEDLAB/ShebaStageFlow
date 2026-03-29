@@ -4,6 +4,7 @@ import type {
   BlockReason,
   DepartmentConstraintData,
   IronConstraintData,
+  UniversitySemesterData,
   ValidationResult,
   WeekDefinition,
 } from '../types/scheduler.types'
@@ -16,6 +17,8 @@ export interface ValidationContext {
   weeks: WeekDefinition[]
   universityPriorities: Map<number, number>
   isAdmin: boolean
+  universitySemesters?: UniversitySemesterData[]
+  departmentNames?: Map<number, string>
 }
 
 /**
@@ -66,33 +69,47 @@ export function validateDrop(
     }
   }
 
-  // 2.5. Soft constraint blocks (always blocked, no admin override)
+  // 2.25. Date constraint blocks (global, like holidays)
+  const dateConstraintKey = `dateConstraint:week:${targetWeekNum}`
+  if (context.blockedCells.has(dateConstraintKey)) {
+    const reason = context.blockedCells.get(dateConstraintKey)!
+    return {
+      type: 'blocked',
+      reasonKey: 'grid.blocked.dateConstraint',
+      reasonParams: { name: reason.constraintName ?? reason.description },
+    }
+  }
+
+  // 2.5. Soft constraint checks (warnings only, not hard blocks)
   const softDeptKey = `soft:dept:${targetDeptId}:week:${targetWeekNum}`
   const softGlobalKey = `soft:week:${targetWeekNum}`
   const softReason = context.blockedCells.get(softDeptKey) ?? context.blockedCells.get(softGlobalKey)
   if (softReason) {
     return {
-      type: 'blocked',
-      reasonKey: 'grid.blocked.softConstraint',
+      type: 'warning',
+      reasonKey: 'grid.warning.softConstraint',
       reasonParams: { name: softReason.constraintName ?? softReason.description },
     }
   }
 
   // 3. Cross-department conflict: same university + yearInProgram + same shiftType + same week but different dept
-  const crossDeptConflict = context.existingAssignments.find(
-    (a) =>
-      a.id !== assignment.id &&
-      a.universityId === assignment.universityId &&
-      a.yearInProgram === assignment.yearInProgram &&
-      a.shiftType === assignment.shiftType &&
-      a.departmentId !== targetDeptId &&
-      getAssignmentWeekNumber(a, context.weeks) === targetWeekNum,
-  )
-  if (crossDeptConflict) {
-    return {
-      type: 'blocked',
-      reasonKey: 'grid.blocked.crossDepartment',
-      reasonParams: { name: crossDeptConflict.departmentName },
+  //    Skip for ELECTIVE assignments (they can be placed across departments freely)
+  if (assignment.type !== 'ELECTIVE') {
+    const crossDeptConflict = context.existingAssignments.find(
+      (a) =>
+        a.id !== assignment.id &&
+        a.universityId === assignment.universityId &&
+        a.yearInProgram === assignment.yearInProgram &&
+        a.shiftType === assignment.shiftType &&
+        a.departmentId !== targetDeptId &&
+        getAssignmentWeekNumber(a, context.weeks) === targetWeekNum,
+    )
+    if (crossDeptConflict) {
+      return {
+        type: 'blocked',
+        reasonKey: 'grid.blocked.crossDepartment',
+        reasonParams: { name: crossDeptConflict.departmentName },
+      }
     }
   }
 
@@ -186,6 +203,12 @@ export function validateDrop(
         }
       }
 
+      if (context.isAdmin) {
+        return {
+          type: 'conflict_admin_override',
+          reasonKey: 'grid.blocked.lowerPriority',
+        }
+      }
       return {
         type: 'blocked',
         reasonKey: 'grid.blocked.lowerPriority',
@@ -213,9 +236,40 @@ export function validateDrop(
   }
 
   // 6. Iron constraints (dynamic from DB)
+  const targetWeek = context.weeks.find((w) => w.weekNumber === targetWeekNum)
+
   for (const ic of context.ironConstraints) {
     if (!ic.isActive) continue
-    void ic
+
+    // SEMESTER_BOUNDARY: assignment dates must fall within university semester
+    if (ic.name === 'SEMESTER_BOUNDARY' && targetWeek && context.universitySemesters) {
+      const semester = context.universitySemesters.find(
+        (s) => s.universityId === assignment.universityId,
+      )
+      if (semester) {
+        const semStart = new Date(semester.semesterStart)
+        const semEnd = new Date(semester.semesterEnd)
+        if (targetWeek.startDate < semStart || targetWeek.endDate > semEnd) {
+          return {
+            type: 'blocked',
+            reasonKey: 'grid.blocked.semesterBoundary',
+          }
+        }
+      }
+    }
+
+    // FIRST_CLINICAL_ROTATION: year-1 students should go to Internal Medicine or Pediatrics
+    if (ic.name === 'FIRST_CLINICAL_ROTATION' && assignment.yearInProgram === 1) {
+      const deptName = context.departmentNames?.get(targetDeptId) ?? ''
+      const allowedDepts = ['רפואה פנימית', 'ילדים']
+      if (deptName && !allowedDepts.includes(deptName)) {
+        return {
+          type: 'warning',
+          reasonKey: 'grid.warning.firstClinicalRotation',
+          reasonParams: { departmentName: deptName },
+        }
+      }
+    }
   }
 
   return { type: 'valid' }

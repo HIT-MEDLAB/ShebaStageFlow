@@ -9,10 +9,14 @@ import type {
   ImportStudentsDto,
   DisplaceAssignmentDto,
 } from './assignment.schema';
+import { ConstraintEngine, validateStudentLink } from './validation/constraintEngine';
+import { ConstraintValidationError } from '../../shared/errors/ConstraintValidationError';
 
 type Role = 'SUPER_ADMIN' | 'ADMIN' | 'ACADEMIC_COORDINATOR';
 
 export class AssignmentService {
+  private readonly engine = new ConstraintEngine();
+
   constructor(private readonly repository: IAssignmentRepository) {}
 
   private isAdmin(role: string): boolean {
@@ -35,10 +39,23 @@ export class AssignmentService {
     return assignment;
   }
 
-  async create(dto: CreateAssignmentDto, userId: number, userRole: string) {
+  async create(dto: CreateAssignmentDto, userId: number, userRole: string, forceOverride?: boolean) {
+    const canForce = this.isAdmin(userRole) && forceOverride;
+    const warnings = await this.engine.validate({
+      departmentId: dto.departmentId,
+      universityId: dto.universityId,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
+      type: dto.type,
+      shiftType: dto.shiftType,
+      studentCount: dto.studentCount,
+      yearInProgram: dto.yearInProgram,
+    }, canForce);
+
     const status = this.determineStatus(userRole);
     const approvedById = this.isAdmin(userRole) ? userId : undefined;
-    return this.repository.create(dto, userId, status, approvedById);
+    const result = await this.repository.create(dto, userId, status, approvedById);
+    return { ...result, warnings };
   }
 
   async update(id: number, dto: UpdateAssignmentDto) {
@@ -46,8 +63,21 @@ export class AssignmentService {
     return this.repository.update(id, dto);
   }
 
-  async move(id: number, dto: MoveAssignmentDto, userId: number, userRole: string) {
-    await this.getById(id);
+  async move(id: number, dto: MoveAssignmentDto, userId: number, userRole: string, forceOverride?: boolean) {
+    const existing = await this.getById(id) as { universityId: number; type: 'GROUP' | 'ELECTIVE'; shiftType: 'MORNING' | 'EVENING'; studentCount?: number | null; yearInProgram?: number | null };
+    const canForce = this.isAdmin(userRole) && forceOverride;
+    await this.engine.validate({
+      departmentId: dto.departmentId,
+      universityId: existing.universityId,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
+      type: existing.type,
+      shiftType: existing.shiftType,
+      studentCount: existing.studentCount,
+      yearInProgram: existing.yearInProgram,
+      excludeAssignmentId: id,
+    }, canForce);
+
     const status = this.isAdmin(userRole) ? 'APPROVED' as const : undefined;
     const approvedById = this.isAdmin(userRole) ? userId : undefined;
     return this.repository.move(id, dto.departmentId, dto.startDate, dto.endDate, status, approvedById);
@@ -63,7 +93,19 @@ export class AssignmentService {
   }
 
   async addStudent(assignmentId: number, dto: AddStudentDto) {
-    await this.getById(assignmentId);
+    const assignment = await this.getById(assignmentId) as { startDate: Date; endDate: Date; shiftType: 'MORNING' | 'EVENING' };
+
+    // Check for double-booking if the student already exists
+    const existingStudent = await this.repository.findStudentByNationalId?.(dto.nationalId);
+    if (existingStudent) {
+      const violations = await validateStudentLink(
+        existingStudent.id, assignmentId, assignment.startDate, assignment.endDate, assignment.shiftType,
+      );
+      if (violations.length > 0) {
+        throw new ConstraintValidationError(violations);
+      }
+    }
+
     return this.repository.addStudent(assignmentId, dto);
   }
 
@@ -100,15 +142,27 @@ export class AssignmentService {
     await this.repository.remove(id);
   }
 
-  async displace(id: number, dto: DisplaceAssignmentDto, userId: number, userRole: string) {
+  async displace(id: number, dto: DisplaceAssignmentDto, userId: number, userRole: string, forceOverride?: boolean) {
     await this.getById(id);
 
     // Get the incoming assignment's current position (for pendingMoveData)
-    const incoming = await this.getById(id) as { departmentId: number; startDate: string; endDate: string };
+    const incoming = await this.getById(id) as { departmentId: number; startDate: string; endDate: string; universityId: number; type: 'GROUP' | 'ELECTIVE'; shiftType: 'MORNING' | 'EVENING'; studentCount?: number | null; yearInProgram?: number | null };
     // Get displaced assignment's current position
     const displaced = await this.getById(dto.displacedAssignmentId) as { departmentId: number; startDate: string; endDate: string };
 
     const isAdminRole = this.isAdmin(userRole);
+    const canForce = isAdminRole && forceOverride;
+    await this.engine.validate({
+      departmentId: dto.departmentId,
+      universityId: incoming.universityId,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
+      type: incoming.type,
+      shiftType: incoming.shiftType,
+      studentCount: incoming.studentCount,
+      yearInProgram: incoming.yearInProgram,
+      excludeAssignmentId: id,
+    }, canForce);
     const status = isAdminRole ? 'APPROVED' as const : 'PENDING' as const;
 
     const pendingMoveData: PendingMoveData | undefined = isAdminRole

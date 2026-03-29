@@ -30,6 +30,14 @@
       "electiveCapacityFull": "קיבולת אלקטיבים מלאה לשבוע זה",
       "shiftUnavailable": "משמרת זו אינה זמינה למחלקה זו",
       "groupTooBig": "גודל הקבוצה ({{count}} סטודנטים) חורג מקיבולת המחלקה (מקסימום {{capacity}})",
+      "softConstraint": "אילוץ רך — {{name}}",
+      "semesterBoundary": "מחוץ לתאריכי הסמסטר של האוניברסיטה",
+      "dateConstraint": "אילוץ תאריך — {{name}}",
+      "studentDoubleBooking": "הסטודנט כבר משובץ ב{{departmentName}} בתקופה זו",
+      "oneGroupPerShift": "ניתן לשבץ רק קבוצה אחת למחלקה למשמרת לשבוע"
+    },
+    "warning": {
+      "firstClinicalRotation": "מומלץ שסטודנטים בשנה א׳ ישובצו ברפואה פנימית או ילדים (לא ב{{departmentName}})",
       "softConstraint": "אילוץ רך — {{name}}"
     }
   },
@@ -104,6 +112,12 @@
       "description": "לשיבוץ זה יש התנגשות בלוח.",
       "cancel": "ביטול",
       "force": "שבץ בכוח"
+    },
+    "warningConfirm": {
+      "title": "אזהרת שיבוץ",
+      "description": "לשיבוץ זה יש הנחיה מייעצת.",
+      "confirm": "המשך בכל זאת",
+      "cancel": "ביטול"
     },
     "validation": {
       "departmentRequired": "יש לבחור מחלקה",

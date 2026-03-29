@@ -13,6 +13,7 @@ interface SchedulerStore {
     | 'edit'
     | 'replacement'
     | 'adminOverride'
+    | 'warningConfirm'
   editingAssignmentId: number | null
   activeDragId: number | null
 
@@ -25,6 +26,10 @@ interface SchedulerStore {
   displacedAssignment: Assignment | null
   replacementSuggestedWeeks: WeekDefinition[] | null
   adminOverrideReason: {
+    reasonKey: string
+    reasonParams?: Record<string, string>
+  } | null
+  warningReason: {
     reasonKey: string
     reasonParams?: Record<string, string>
   } | null
@@ -50,6 +55,11 @@ interface SchedulerStore {
     reasonKey: string,
     reasonParams?: Record<string, string>,
   ) => void
+  openWarningConfirmDialog: (
+    pendingMove: SchedulerStore['pendingMove'],
+    reasonKey: string,
+    reasonParams?: Record<string, string>,
+  ) => void
   clearPendingMove: () => void
 }
 
@@ -66,6 +76,7 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
   displacedAssignment: null,
   replacementSuggestedWeeks: null,
   adminOverrideReason: null,
+  warningReason: null,
 
   setAcademicYear: (yearId) => set({ academicYearId: yearId }),
   setUniversityFilter: (ids) => set({ selectedUniversities: ids }),
@@ -81,6 +92,7 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
       displacedAssignment: null,
       replacementSuggestedWeeks: null,
       adminOverrideReason: null,
+      warningReason: null,
     }),
   setActiveDragId: (id) => set({ activeDragId: id }),
 
@@ -99,6 +111,13 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
       adminOverrideReason: { reasonKey, reasonParams },
     }),
 
+  openWarningConfirmDialog: (pendingMove, reasonKey, reasonParams) =>
+    set({
+      activeDialog: 'warningConfirm',
+      pendingMove,
+      warningReason: { reasonKey, reasonParams },
+    }),
+
   clearPendingMove: () =>
     set({
       activeDialog: null,
@@ -106,5 +125,6 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
       displacedAssignment: null,
       replacementSuggestedWeeks: null,
       adminOverrideReason: null,
+      warningReason: null,
     }),
 }))
