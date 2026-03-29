@@ -22,7 +22,7 @@ interface SeedUser {
 
 const users: SeedUser[] = [
   {
-    email: "superadmin@shiba.health.gov.il",
+    email: "semdaniel1@gmail.com",
     name: "Super Admin",
     phone: "050-0000001",
     role: Role.SUPER_ADMIN,
@@ -104,28 +104,51 @@ async function main() {
   console.log("Seeding universities...");
 
   const universities = [
-    "תל אביב",
-    "רייכמן",
-    "ויצמן",
-    "הטכניון",
-    "בן גוריון",
-    "אריאל",
-    "ניקוסיה",
-    "לימודי חול",
+    { name: "תל אביב", priority: 2 },
+    { name: "רייכמן", priority: 1 },
+    { name: "ויצמן", priority: 0 },
+    { name: "הטכניון", priority: 0 },
+    { name: "בן גוריון", priority: 0 },
+    { name: "אריאל", priority: 0 },
+    { name: "ניקוסיה", priority: 0 },
+    { name: "לימודי חול", priority: 0 },
   ];
 
-  for (let i = 0; i < universities.length; i++) {
+  for (const u of universities) {
     await prisma.university.upsert({
-      where: { name: universities[i]! },
-      update: {},
+      where: { name: u.name },
+      update: { priority: u.priority },
       create: {
-        name: universities[i]!,
-        priority: i,
+        name: u.name,
+        priority: u.priority,
         isActive: true,
       },
     });
 
-    console.log(`Created university: ${universities[i]}`);
+    console.log(`Created university: ${u.name}`);
+  }
+
+  // Fetch seeded universities for later use
+  const seededUniversities = await Promise.all(
+    universities.map((u) =>
+      prisma.university.findUniqueOrThrow({ where: { name: u.name } })
+    )
+  );
+
+  // Seed university semesters
+  console.log("Seeding university semesters...");
+  for (const uni of seededUniversities) {
+    await prisma.universitySemester.upsert({
+      where: { universityId_year: { universityId: uni.id, year: 2026 } },
+      update: {},
+      create: {
+        universityId: uni.id,
+        semesterStart: new Date('2025-10-01'),
+        semesterEnd: new Date('2026-06-30'),
+        year: 2026,
+      },
+    });
+    console.log(`Created semester for university: ${uni.name}`);
   }
 
   // Seed academic years
@@ -152,7 +175,7 @@ async function main() {
     { name: 'עור ומין', hasMorningShift: true, hasEveningShift: false },
     { name: 'עיניים', hasMorningShift: true, hasEveningShift: false },
     { name: 'אורתופדיה', hasMorningShift: true, hasEveningShift: true },
-    { name: 'אף אוזן גרון', hasMorningShift: true, hasEveningShift: false },
+    { name: 'אף אוזן גרון', hasMorningShift: false, hasEveningShift: true },
     { name: 'נוירולוגיה', hasMorningShift: true, hasEveningShift: false },
     { name: 'פסיכיאטריה', hasMorningShift: true, hasEveningShift: false },
   ];
@@ -173,13 +196,20 @@ async function main() {
     console.log(`Created department: ${dept.name}`);
   }
 
-  // Seed department constraints for first 3 departments
+  // Seed department constraints for all departments
   console.log("Seeding department constraints...");
 
   const constraintsData = [
-    { departmentId: seededDepartments[0]!.id, morningCapacity: 2, eveningCapacity: 1, electiveCapacity: 1 },
-    { departmentId: seededDepartments[1]!.id, morningCapacity: 2, eveningCapacity: 0, electiveCapacity: 1 },
-    { departmentId: seededDepartments[2]!.id, morningCapacity: 2, eveningCapacity: 1, electiveCapacity: 1 },
+    { departmentId: seededDepartments[0]!.id, morningCapacity: 2, eveningCapacity: 8, electiveCapacity: 2 },
+    { departmentId: seededDepartments[1]!.id, morningCapacity: 5, eveningCapacity: 3, electiveCapacity: 1 },
+    { departmentId: seededDepartments[2]!.id, morningCapacity: 5, eveningCapacity: 4, electiveCapacity: 3 },
+    { departmentId: seededDepartments[3]!.id, morningCapacity: 4, eveningCapacity: 4, electiveCapacity: 3 },
+    { departmentId: seededDepartments[4]!.id, morningCapacity: 6, eveningCapacity: 3, electiveCapacity: 1 },
+    { departmentId: seededDepartments[5]!.id, morningCapacity: 5, eveningCapacity: 0, electiveCapacity: 2 },
+    { departmentId: seededDepartments[6]!.id, morningCapacity: 8, eveningCapacity: 6, electiveCapacity: 1 },
+    { departmentId: seededDepartments[7]!.id, morningCapacity: 0, eveningCapacity: 10, electiveCapacity: 1 },
+    { departmentId: seededDepartments[8]!.id, morningCapacity: 7, eveningCapacity: 0, electiveCapacity: 0 },
+    { departmentId: seededDepartments[9]!.id, morningCapacity: 5, eveningCapacity: 0, electiveCapacity: 0 },
   ];
 
   for (const constraint of constraintsData) {
@@ -224,18 +254,12 @@ async function main() {
   });
 
   const superAdmin = await prisma.user.findUniqueOrThrow({
-    where: { email: 'superadmin@shiba.health.gov.il' },
+    where: { email: 'semdaniel1@gmail.com' },
   });
 
   const adminOne = await prisma.user.findUniqueOrThrow({
     where: { email: 'admin1@shiba.health.gov.il' },
   });
-
-  const seededUniversities = await Promise.all(
-    universities.map((name) =>
-      prisma.university.findUniqueOrThrow({ where: { name } })
-    )
-  );
 
   const assignments = [
     { startDate: '2025-10-05', endDate: '2025-10-09', deptIdx: 0, uniIdx: 0, type: AssignmentType.GROUP,    shift: ShiftType.MORNING, students: 5, year: 4 },

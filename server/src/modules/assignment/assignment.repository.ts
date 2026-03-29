@@ -148,7 +148,33 @@ export class AssignmentRepository implements IAssignmentRepository {
   }
 
   async remove(id: number): Promise<Assignment> {
-    return prisma.assignment.delete({ where: { id } });
+    return prisma.$transaction(async (tx) => {
+      // Collect student IDs before deleting
+      const links = await tx.assignmentStudent.findMany({
+        where: { assignmentId: id },
+        select: { studentId: true },
+      });
+      const studentIds = links.map((l) => l.studentId);
+
+      // Delete the assignment (cascades to assignmentStudent junction)
+      const deleted = await tx.assignment.delete({ where: { id } });
+
+      // Clean up orphaned students
+      await this.deleteOrphanedStudents(tx, studentIds);
+
+      return deleted;
+    });
+  }
+
+  private async deleteOrphanedStudents(tx: Prisma.TransactionClient, studentIds: number[]) {
+    if (studentIds.length === 0) return;
+    const orphaned = await tx.student.findMany({
+      where: { id: { in: studentIds }, assignments: { none: {} } },
+      select: { id: true },
+    });
+    if (orphaned.length > 0) {
+      await tx.student.deleteMany({ where: { id: { in: orphaned.map((s) => s.id) } } });
+    }
   }
 
   async bulkCreate(data: CreateAssignmentDto[], createdById: number): Promise<{ count: number }> {
@@ -212,13 +238,20 @@ export class AssignmentRepository implements IAssignmentRepository {
   }
 
   async removeStudent(assignmentId: number, studentId: number) {
-    return prisma.assignmentStudent.delete({
-      where: {
-        assignmentId_studentId: {
-          assignmentId,
-          studentId,
+    return prisma.$transaction(async (tx) => {
+      const deleted = await tx.assignmentStudent.delete({
+        where: {
+          assignmentId_studentId: {
+            assignmentId,
+            studentId,
+          },
         },
-      },
+      });
+
+      // Delete student if no remaining assignments
+      await this.deleteOrphanedStudents(tx, [studentId]);
+
+      return deleted;
     });
   }
 
@@ -292,19 +325,28 @@ export class AssignmentRepository implements IAssignmentRepository {
   }
 
   async rejectAndRevert(id: number, moveData: PendingMoveData): Promise<void> {
-    const displaced = await prisma.assignment.findUnique({
-      where: { id: moveData.displacedId },
-      select: { id: true },
-    });
+    await prisma.$transaction(async (tx) => {
+      // Collect student IDs before deleting
+      const links = await tx.assignmentStudent.findMany({
+        where: { assignmentId: id },
+        select: { studentId: true },
+      });
+      const studentIds = links.map((l) => l.studentId);
 
-    const operations: Prisma.PrismaPromise<unknown>[] = [
-      prisma.assignment.delete({ where: { id } }),
-    ];
+      // Delete the rejected assignment
+      await tx.assignment.delete({ where: { id } });
 
-    // Revert displaced assignment to original position if it still exists
-    if (displaced) {
-      operations.push(
-        prisma.assignment.update({
+      // Clean up orphaned students
+      await this.deleteOrphanedStudents(tx, studentIds);
+
+      // Revert displaced assignment to original position if it still exists
+      const displaced = await tx.assignment.findUnique({
+        where: { id: moveData.displacedId },
+        select: { id: true },
+      });
+
+      if (displaced) {
+        await tx.assignment.update({
           where: { id: moveData.displacedId },
           data: {
             departmentId: moveData.displacedOrigDeptId,
@@ -312,10 +354,8 @@ export class AssignmentRepository implements IAssignmentRepository {
             endDate: new Date(moveData.displacedOrigEnd),
             status: 'APPROVED',
           },
-        }),
-      );
-    }
-
-    await prisma.$transaction(operations);
+        });
+      }
+    });
   }
 }
