@@ -75,7 +75,7 @@ export class AssignmentService {
       shiftType: existing.shiftType,
       studentCount: existing.studentCount,
       yearInProgram: existing.yearInProgram,
-      excludeAssignmentId: id,
+      excludeAssignmentIds: [id],
     }, canForce);
 
     const status = this.isAdmin(userRole) ? 'APPROVED' as const : undefined;
@@ -161,7 +161,7 @@ export class AssignmentService {
       shiftType: incoming.shiftType,
       studentCount: incoming.studentCount,
       yearInProgram: incoming.yearInProgram,
-      excludeAssignmentId: id,
+      excludeAssignmentIds: [id, dto.displacedAssignmentId],
     }, canForce);
     const status = isAdminRole ? 'APPROVED' as const : 'PENDING' as const;
 

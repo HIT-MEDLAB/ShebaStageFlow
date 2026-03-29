@@ -105,10 +105,15 @@ export function validateDrop(
         getAssignmentWeekNumber(a, context.weeks) === targetWeekNum,
     )
     if (crossDeptConflict) {
+      const incomingPriority =
+        context.universityPriorities.get(assignment.universityId) ?? 0
+      const displacedPriority =
+        context.universityPriorities.get(crossDeptConflict.universityId) ?? 0
       return {
-        type: 'blocked',
-        reasonKey: 'grid.blocked.crossDepartment',
-        reasonParams: { name: crossDeptConflict.departmentName },
+        type: 'conflict_replaceable',
+        displacedAssignment: crossDeptConflict,
+        incomingPriority,
+        displacedPriority,
       }
     }
   }

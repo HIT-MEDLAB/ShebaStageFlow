@@ -10,7 +10,7 @@ export interface ValidationContext {
   shiftType: 'MORNING' | 'EVENING';
   studentCount?: number | null;
   yearInProgram?: number | null;
-  excludeAssignmentId?: number;
+  excludeAssignmentIds?: number[];
 }
 
 type RuleFunction = (ctx: ValidationContext) => Promise<ConstraintViolation[]>;
@@ -53,7 +53,7 @@ ruleRegistry.set('ONE_GROUP_PER_SHIFT', async (ctx) => {
       status: { in: ['APPROVED', 'PENDING'] },
       startDate: { lte: ctx.endDate },
       endDate: { gte: ctx.startDate },
-      ...(ctx.excludeAssignmentId ? { id: { not: ctx.excludeAssignmentId } } : {}),
+      ...(ctx.excludeAssignmentIds?.length ? { id: { notIn: ctx.excludeAssignmentIds } } : {}),
     },
   });
 
@@ -97,7 +97,7 @@ ruleRegistry.set('CAPACITY_LIMIT', async (ctx) => {
         status: { in: ['APPROVED', 'PENDING'] },
         startDate: { lte: ctx.endDate },
         endDate: { gte: ctx.startDate },
-        ...(ctx.excludeAssignmentId ? { id: { not: ctx.excludeAssignmentId } } : {}),
+        ...(ctx.excludeAssignmentIds?.length ? { id: { notIn: ctx.excludeAssignmentIds } } : {}),
       },
     });
 
