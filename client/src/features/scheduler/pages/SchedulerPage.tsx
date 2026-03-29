@@ -26,6 +26,7 @@ import { SchedulerFilters } from '../components/SchedulerFilters'
 import { AssignmentLegend } from '../components/AssignmentLegend'
 import { ManualAssignmentDialog } from '../components/dialogs/ManualAssignmentDialog'
 import { ExcelImportDialog } from '../components/dialogs/ExcelImportDialog'
+import { SmartImportWizard } from '../components/dialogs/SmartImportWizard'
 import { EditAssignmentDialog } from '../components/dialogs/EditAssignmentDialog'
 import { ReplacementDialog } from '../components/dialogs/ReplacementDialog'
 import { AdminOverrideDialog } from '../components/dialogs/AdminOverrideDialog'
@@ -306,6 +307,7 @@ export default function SchedulerPage() {
 
       {activeDialog === 'create' && <ManualAssignmentDialog />}
       {activeDialog === 'import' && <ExcelImportDialog />}
+      {activeDialog === 'smartImport' && <SmartImportWizard />}
       {activeDialog === 'edit' && <EditAssignmentDialog />}
       {activeDialog === 'replacement' && displacedAssignment && replacementSuggestedWeeks && (
         <ReplacementDialog

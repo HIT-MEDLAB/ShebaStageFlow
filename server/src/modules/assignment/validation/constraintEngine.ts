@@ -24,7 +24,13 @@ ruleRegistry.set('SEMESTER_BOUNDARY', async (ctx) => {
     orderBy: { year: 'desc' },
   });
 
-  if (!semester) return [];
+  if (!semester) {
+    return [{
+      code: 'SEMESTER_BOUNDARY',
+      type: 'warning',
+      messageKey: 'grid.warning.noSemesterDefined',
+    }];
+  }
 
   const start = new Date(ctx.startDate);
   const end = new Date(ctx.endDate);
@@ -73,7 +79,13 @@ ruleRegistry.set('CAPACITY_LIMIT', async (ctx) => {
     where: { departmentId: ctx.departmentId },
   });
 
-  if (!deptConstraint) return [];
+  if (!deptConstraint) {
+    return [{
+      code: 'CAPACITY_LIMIT',
+      type: 'warning',
+      messageKey: 'grid.warning.noCapacityDefined',
+    }];
+  }
 
   if (ctx.type === 'GROUP') {
     const capacity = ctx.shiftType === 'MORNING'

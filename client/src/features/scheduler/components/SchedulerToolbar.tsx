@@ -43,9 +43,9 @@ export function SchedulerToolbar() {
       </Select>
 
       <div className="flex items-center gap-2 ms-auto">
-        <Button variant="outline" onClick={() => openDialog('import')}>
+        <Button variant="outline" onClick={() => openDialog('smartImport')}>
           <Upload />
-          {t('toolbar.importExcel')}
+          {t('toolbar.smartImport')}
         </Button>
 
         <Button onClick={() => openDialog('create')}>

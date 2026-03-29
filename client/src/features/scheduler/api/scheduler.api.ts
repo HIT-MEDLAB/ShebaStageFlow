@@ -14,6 +14,9 @@ import type {
   CreateStudentDto,
   RejectAssignmentDto,
   DisplaceAssignmentDto,
+  SmartImportRow,
+  ImportValidationResult,
+  ImportAction,
 } from '../types/scheduler.types'
 
 // Raw shape from the API (Prisma includes nested relations)
@@ -114,6 +117,28 @@ export async function rejectAssignment(id: number, dto?: RejectAssignmentDto) {
 export async function displaceAssignment(id: number, dto: DisplaceAssignmentDto) {
   const { data } = await apiClient.patch<RawAssignment>(`/assignments/${id}/displace`, dto)
   return mapAssignment(data)
+}
+
+export async function smartImportValidate(
+  academicYearId: number,
+  rows: SmartImportRow[],
+): Promise<ImportValidationResult> {
+  const { data } = await apiClient.post<ImportValidationResult>(
+    '/assignments/import/validate',
+    { academicYearId, rows },
+  )
+  return data
+}
+
+export async function smartImportExecute(
+  academicYearId: number,
+  actions: ImportAction[],
+): Promise<{ created: number; displaced: number }> {
+  const { data } = await apiClient.post<{ created: number; displaced: number }>(
+    '/assignments/import/execute',
+    { academicYearId, actions },
+  )
+  return data
 }
 
 export async function importAssignments(assignments: CreateAssignmentDto[]) {

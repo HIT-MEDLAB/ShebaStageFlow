@@ -11,6 +11,8 @@ import {
   importStudentsSchema,
   rejectAssignmentSchema,
   displaceAssignmentSchema,
+  smartImportValidateSchema,
+  smartImportExecuteSchema,
 } from './assignment.schema';
 import { AssignmentRepository } from './assignment.repository';
 import { AssignmentService } from './assignment.service';
@@ -29,6 +31,8 @@ const adminOnly = authorize('SUPER_ADMIN', 'ADMIN');
 // Static paths must be registered before dynamic /:id paths
 assignmentRouter.get('/', controller.getByAcademicYear);
 assignmentRouter.post('/', validateRequest(createAssignmentSchema), controller.create);
+assignmentRouter.post('/import/validate', validateRequest(smartImportValidateSchema), controller.smartImportValidate);
+assignmentRouter.post('/import/execute', validateRequest(smartImportExecuteSchema), controller.smartImportExecute);
 assignmentRouter.post('/import', validateRequest(importAssignmentsSchema), controller.importAssignments);
 
 // Dynamic :id paths

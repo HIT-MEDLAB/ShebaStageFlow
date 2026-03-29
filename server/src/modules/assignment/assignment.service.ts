@@ -8,9 +8,14 @@ import type {
   AddStudentDto,
   ImportStudentsDto,
   DisplaceAssignmentDto,
+  SmartImportValidateDto,
+  SmartImportExecuteDto,
 } from './assignment.schema';
 import { ConstraintEngine, validateStudentLink } from './validation/constraintEngine';
 import { ConstraintValidationError } from '../../shared/errors/ConstraintValidationError';
+import { ImportValidationService } from './import/importService';
+import type { ImportValidationResult } from './import/importTypes';
+import prisma from '../../lib/prisma';
 
 type Role = 'SUPER_ADMIN' | 'ADMIN' | 'ACADEMIC_COORDINATOR';
 
@@ -140,6 +145,138 @@ export class AssignmentService {
 
     // Simple delete for assignments without displacement data
     await this.repository.remove(id);
+  }
+
+  async validateSmartImport(dto: SmartImportValidateDto): Promise<ImportValidationResult> {
+    const importService = new ImportValidationService();
+    return importService.validate(dto.rows, dto.academicYearId);
+  }
+
+  async executeSmartImport(
+    dto: SmartImportExecuteDto,
+    userId: number,
+    userRole: string,
+  ): Promise<{ created: number; displaced: number }> {
+    const isAdminRole = this.isAdmin(userRole);
+    // Validate force_create permission upfront
+    const hasForceCreate = dto.actions.some((a) => a.type === 'force_create');
+    if (hasForceCreate && !isAdminRole) {
+      throw new AppError('Only admins can use force_create', 403);
+    }
+
+    let created = 0;
+    let displaced = 0;
+
+    await prisma.$transaction(async (tx) => {
+      for (const action of dto.actions) {
+        const actionDto = action.dto;
+
+        if (action.type === 'create') {
+          // Re-validate within transaction
+          await this.engine.validate({
+            departmentId: actionDto.departmentId,
+            universityId: actionDto.universityId,
+            startDate: actionDto.startDate,
+            endDate: actionDto.endDate,
+            type: actionDto.type,
+            shiftType: actionDto.shiftType,
+            studentCount: actionDto.studentCount,
+            yearInProgram: actionDto.yearInProgram,
+          });
+
+          await tx.assignment.create({
+            data: {
+              departmentId: actionDto.departmentId,
+              universityId: actionDto.universityId,
+              academicYearId: dto.academicYearId,
+              startDate: actionDto.startDate,
+              endDate: actionDto.endDate,
+              type: actionDto.type,
+              shiftType: actionDto.shiftType,
+              studentCount: actionDto.studentCount ?? null,
+              yearInProgram: actionDto.yearInProgram,
+              tutorName: actionDto.tutorName ?? null,
+              createdById: userId,
+              status: 'APPROVED',
+              ...(isAdminRole ? { approvedById: userId } : {}),
+            },
+          });
+          created++;
+        } else if (action.type === 'displace') {
+          // Re-validate the displaced assignment's new location
+          const displacedRecord = await tx.assignment.findUnique({
+            where: { id: action.displacedAssignmentId },
+            select: { universityId: true, type: true, shiftType: true, studentCount: true, yearInProgram: true },
+          });
+          if (displacedRecord) {
+            await this.engine.validate({
+              departmentId: action.displacedDepartmentId,
+              universityId: displacedRecord.universityId,
+              startDate: action.displacedStartDate,
+              endDate: action.displacedEndDate,
+              type: displacedRecord.type,
+              shiftType: displacedRecord.shiftType,
+              studentCount: displacedRecord.studentCount,
+              yearInProgram: displacedRecord.yearInProgram,
+              excludeAssignmentIds: [action.displacedAssignmentId],
+            });
+          }
+
+          // Move displaced assignment to new location
+          await tx.assignment.update({
+            where: { id: action.displacedAssignmentId },
+            data: {
+              departmentId: action.displacedDepartmentId,
+              startDate: action.displacedStartDate,
+              endDate: action.displacedEndDate,
+              status: 'APPROVED',
+            },
+          });
+
+          // Create the new incoming assignment
+          await tx.assignment.create({
+            data: {
+              departmentId: actionDto.departmentId,
+              universityId: actionDto.universityId,
+              academicYearId: dto.academicYearId,
+              startDate: actionDto.startDate,
+              endDate: actionDto.endDate,
+              type: actionDto.type,
+              shiftType: actionDto.shiftType,
+              studentCount: actionDto.studentCount ?? null,
+              yearInProgram: actionDto.yearInProgram,
+              tutorName: actionDto.tutorName ?? null,
+              createdById: userId,
+              status: 'APPROVED',
+              ...(isAdminRole ? { approvedById: userId } : {}),
+            },
+          });
+          created++;
+          displaced++;
+        } else if (action.type === 'force_create') {
+          await tx.assignment.create({
+            data: {
+              departmentId: actionDto.departmentId,
+              universityId: actionDto.universityId,
+              academicYearId: dto.academicYearId,
+              startDate: actionDto.startDate,
+              endDate: actionDto.endDate,
+              type: actionDto.type,
+              shiftType: actionDto.shiftType,
+              studentCount: actionDto.studentCount ?? null,
+              yearInProgram: actionDto.yearInProgram,
+              tutorName: actionDto.tutorName ?? null,
+              createdById: userId,
+              status: 'APPROVED',
+              approvedById: userId,
+            },
+          });
+          created++;
+        }
+      }
+    });
+
+    return { created, displaced };
   }
 
   async displace(id: number, dto: DisplaceAssignmentDto, userId: number, userRole: string, forceOverride?: boolean) {

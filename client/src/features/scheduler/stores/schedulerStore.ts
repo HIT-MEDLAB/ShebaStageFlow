@@ -10,6 +10,7 @@ interface SchedulerStore {
     | null
     | 'create'
     | 'import'
+    | 'smartImport'
     | 'edit'
     | 'replacement'
     | 'adminOverride'
@@ -39,7 +40,7 @@ interface SchedulerStore {
   setShiftFilter: (shift: 'all' | 'morning' | 'evening') => void
   setYearFilter: (year: number | null) => void
   openDialog: (
-    type: 'create' | 'import' | 'edit',
+    type: 'create' | 'import' | 'smartImport' | 'edit',
     assignmentId?: number,
   ) => void
   closeDialog: () => void

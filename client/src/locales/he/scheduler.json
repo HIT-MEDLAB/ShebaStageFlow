@@ -3,6 +3,7 @@
   "toolbar": {
     "manualAssignment": "שיבוץ ידני",
     "importExcel": "ייבוא מאקסל",
+    "smartImport": "ייבוא חכם מאקסל",
     "academicYear": "שנת לימודים"
   },
   "filters": {
@@ -34,11 +35,15 @@
       "semesterBoundary": "מחוץ לתאריכי הסמסטר של האוניברסיטה",
       "dateConstraint": "אילוץ תאריך — {{name}}",
       "studentDoubleBooking": "הסטודנט כבר משובץ ב{{departmentName}} בתקופה זו",
-      "oneGroupPerShift": "ניתן לשבץ רק קבוצה אחת למחלקה למשמרת לשבוע"
+      "oneGroupPerShift": "ניתן לשבץ רק קבוצה אחת למחלקה למשמרת לשבוע",
+      "duplicateAssignment": "כפילות — שיבוץ זה כבר קיים במערכת"
     },
     "warning": {
       "firstClinicalRotation": "מומלץ שסטודנטים בשנה א׳ ישובצו ברפואה פנימית או ילדים (לא ב{{departmentName}})",
-      "softConstraint": "אילוץ רך — {{name}}"
+      "softConstraint": "אילוץ רך — {{name}}",
+      "noSemesterDefined": "לא הוגדר סמסטר לאוניברסיטה זו",
+      "noCapacityDefined": "לא הוגדרה מגבלת קיבולת למחלקה זו",
+      "noConstraintsConfigured": "לא הוגדרו אילוצים פעילים במערכת"
     }
   },
   "card": {
@@ -118,6 +123,44 @@
       "description": "לשיבוץ זה יש הנחיה מייעצת.",
       "confirm": "המשך בכל זאת",
       "cancel": "ביטול"
+    },
+    "smartImport": {
+      "title": "ייבוא חכם מאקסל",
+      "columnError": "העמודות בקובץ אינן תואמות. נדרש: מחלקה, מוסד אקדמי, תאריך התחלה, תאריך סיום, שנת לימוד, סוג שיבוץ, משמרת",
+      "expectedColumns": "עמודות נדרשות:",
+      "validating": "מאמת שיבוצים מול האילוצים...",
+      "executing": "מבצע שיבוצים...",
+      "complete": "{{created}} שיבוצים נוצרו, {{displaced}} הוחלפו",
+      "row": "שורה {{num}}",
+      "status": {
+        "success": "תקין",
+        "bumped": "מחליף",
+        "failed": "נכשל",
+        "parse_error": "שגיאת קריאה"
+      },
+      "bumpsAssignment": "מחליף שיבוץ של {{university}} ב{{department}}",
+      "suggestedWeeks": "שבועות מוצעים",
+      "pickManually": "בחר ידנית",
+      "confirm": "אישור",
+      "resolved": "נפתר",
+      "skipped": "דולג",
+      "skip": "דלג",
+      "force": "כפה שיבוץ",
+      "forceOverride": "נכפה (מנהל)",
+      "undo": "בטל",
+      "noActions": "לא נבחרו שיבוצים לביצוע",
+      "execute": "בצע {{count}} שיבוצים",
+      "close": "סגור",
+      "summarySuccess": "{{count}} תקינים",
+      "summaryBumped": "{{count}} מחליפים",
+      "summaryFailed": "{{count}} נכשלו",
+      "summaryParseError": "{{count}} שגיאות קריאה",
+      "summaryDeleted": "{{count}} הוסרו",
+      "edit": "ערוך",
+      "delete": "הסר",
+      "save": "שמור",
+      "cancel": "ביטול",
+      "revalidating": "מאמת מחדש..."
     },
     "validation": {
       "departmentRequired": "יש לבחור מחלקה",

@@ -10,6 +10,8 @@ import type {
   ImportStudentsDto,
   RejectAssignmentDto,
   DisplaceAssignmentDto,
+  SmartImportValidateDto,
+  SmartImportExecuteDto,
 } from './assignment.schema';
 
 export function createAssignmentController(service: AssignmentService) {
@@ -178,6 +180,28 @@ export function createAssignmentController(service: AssignmentService) {
         const { rejectionReason } = req.body as RejectAssignmentDto;
         await service.reject(Number(req.params.id), rejectionReason);
         res.status(204).send();
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async smartImportValidate(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const dto = req.body as SmartImportValidateDto;
+        const result = await service.validateSmartImport(dto);
+        res.json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async smartImportExecute(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const userId = req.currentUser!.userId;
+        const userRole = req.currentUser!.role;
+        const dto = req.body as SmartImportExecuteDto;
+        const result = await service.executeSmartImport(dto, userId, userRole);
+        res.json(result);
       } catch (err) {
         next(err);
       }
