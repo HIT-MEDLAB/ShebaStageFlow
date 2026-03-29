@@ -250,7 +250,85 @@ async function main() {
     { startDate: '2025-11-09', endDate: '2025-11-13', deptIdx: 2, uniIdx: 1, type: AssignmentType.GROUP,    shift: ShiftType.MORNING, students: 6, year: 4 },
   ];
 
-  for (const a of assignments) {
+  // Students per assignment — each sub-array has exactly the number of students for that assignment
+  const studentsPerAssignment: { firstName: string; lastName: string; nationalId: string; phone: string; email: string }[][] = [
+    // Assignment 0: תל אביב (uniIdx 0) — 5 students
+    [
+      { firstName: 'דניאל', lastName: 'כהן',   nationalId: '200000001', phone: '050-1000001', email: 'daniel.cohen@mail.com' },
+      { firstName: 'שרה',   lastName: 'לוי',   nationalId: '200000002', phone: '050-1000002', email: 'sara.levi@mail.com' },
+      { firstName: 'יוסף',  lastName: 'מזרחי', nationalId: '200000003', phone: '050-1000003', email: 'yosef.mizrahi@mail.com' },
+      { firstName: 'רבקה',  lastName: 'פרץ',   nationalId: '200000004', phone: '050-1000004', email: 'rivka.peretz@mail.com' },
+      { firstName: 'אברהם', lastName: 'ביטון', nationalId: '200000005', phone: '050-1000005', email: 'avraham.biton@mail.com' },
+    ],
+    // Assignment 1: רייכמן (uniIdx 1) — 4 students
+    [
+      { firstName: 'רחל',  lastName: 'דהן',   nationalId: '200000006', phone: '050-1000006', email: 'rachel.dahan@mail.com' },
+      { firstName: 'יעקב', lastName: 'אזולאי', nationalId: '200000007', phone: '050-1000007', email: 'yaakov.azulay@mail.com' },
+      { firstName: 'נועה',  lastName: 'שלום',  nationalId: '200000008', phone: '050-1000008', email: 'noa.shalom@mail.com' },
+      { firstName: 'משה',  lastName: 'חדד',   nationalId: '200000009', phone: '050-1000009', email: 'moshe.hadad@mail.com' },
+    ],
+    // Assignment 2: הטכניון (uniIdx 3) — 6 students
+    [
+      { firstName: 'תמר',  lastName: 'עמר',     nationalId: '200000010', phone: '050-1000010', email: 'tamar.amar@mail.com' },
+      { firstName: 'דוד',  lastName: 'גולן',    nationalId: '200000011', phone: '050-1000011', email: 'david.golan@mail.com' },
+      { firstName: 'שירה', lastName: 'ברק',     nationalId: '200000012', phone: '050-1000012', email: 'shira.barak@mail.com' },
+      { firstName: 'שלמה', lastName: 'שפירא',   nationalId: '200000013', phone: '050-1000013', email: 'shlomo.shapira@mail.com' },
+      { firstName: 'מיכל', lastName: 'רוזנברג', nationalId: '200000014', phone: '050-1000014', email: 'michal.rosenberg@mail.com' },
+      { firstName: 'יצחק', lastName: 'פרידמן', nationalId: '200000015', phone: '050-1000015', email: 'yitzhak.friedman@mail.com' },
+    ],
+    // Assignment 3: בן גוריון (uniIdx 4) — 3 students
+    [
+      { firstName: 'ליאת',  lastName: 'גרינברג', nationalId: '200000016', phone: '050-1000016', email: 'liat.greenberg@mail.com' },
+      { firstName: 'אהרון', lastName: 'וייס',    nationalId: '200000017', phone: '050-1000017', email: 'aharon.weiss@mail.com' },
+      { firstName: 'הדר',   lastName: 'בלום',    nationalId: '200000018', phone: '050-1000018', email: 'hadar.blum@mail.com' },
+    ],
+    // Assignment 4: ויצמן (uniIdx 2) — 5 students
+    [
+      { firstName: 'נועם',  lastName: 'קפלן',      nationalId: '200000019', phone: '050-1000019', email: 'noam.kaplan@mail.com' },
+      { firstName: 'עדי',   lastName: 'שטרן',      nationalId: '200000020', phone: '050-1000020', email: 'adi.stern@mail.com' },
+      { firstName: 'עידו',  lastName: 'הרשקוביץ', nationalId: '200000021', phone: '050-1000021', email: 'ido.hershkovitz@mail.com' },
+      { firstName: 'דנה',   lastName: 'לנדאו',     nationalId: '200000022', phone: '050-1000022', email: 'dana.landau@mail.com' },
+      { firstName: 'אורי',  lastName: 'ברגר',      nationalId: '200000023', phone: '050-1000023', email: 'uri.berger@mail.com' },
+    ],
+    // Assignment 5: אריאל (uniIdx 5) — 2 students
+    [
+      { firstName: 'מאיה', lastName: 'כהן', nationalId: '200000024', phone: '050-1000024', email: 'maya.cohen@mail.com' },
+      { firstName: 'רועי', lastName: 'לוי', nationalId: '200000025', phone: '050-1000025', email: 'roei.levi@mail.com' },
+    ],
+    // Assignment 6: ניקוסיה (uniIdx 6) — 4 students
+    [
+      { firstName: 'גלי',  lastName: 'מזרחי', nationalId: '200000026', phone: '050-1000026', email: 'gali.mizrahi@mail.com' },
+      { firstName: 'תומר', lastName: 'פרץ',   nationalId: '200000027', phone: '050-1000027', email: 'tomer.peretz@mail.com' },
+      { firstName: 'יעל',  lastName: 'ביטון', nationalId: '200000028', phone: '050-1000028', email: 'yael.biton@mail.com' },
+      { firstName: 'גיל',  lastName: 'דהן',   nationalId: '200000029', phone: '050-1000029', email: 'gil.dahan@mail.com' },
+    ],
+    // Assignment 7: תל אביב (uniIdx 0) — 5 students
+    [
+      { firstName: 'עמית',  lastName: 'אזולאי', nationalId: '200000030', phone: '050-1000030', email: 'amit.azulay@mail.com' },
+      { firstName: 'לאה',   lastName: 'שלום',   nationalId: '200000031', phone: '050-1000031', email: 'leah.shalom@mail.com' },
+      { firstName: 'איתי',  lastName: 'חדד',    nationalId: '200000032', phone: '050-1000032', email: 'itay.hadad@mail.com' },
+      { firstName: 'מרים',  lastName: 'עמר',    nationalId: '200000033', phone: '050-1000033', email: 'miriam.amar@mail.com' },
+      { firstName: 'ליאור', lastName: 'גולן',   nationalId: '200000034', phone: '050-1000034', email: 'lior.golan@mail.com' },
+    ],
+    // Assignment 8: לימודי חול (uniIdx 7) — 3 students
+    [
+      { firstName: 'חנה',   lastName: 'ברק',     nationalId: '200000035', phone: '050-1000035', email: 'hana.barak@mail.com' },
+      { firstName: 'אלון',  lastName: 'שפירא',   nationalId: '200000036', phone: '050-1000036', email: 'alon.shapira@mail.com' },
+      { firstName: 'דבורה', lastName: 'רוזנברג', nationalId: '200000037', phone: '050-1000037', email: 'dvora.rosenberg@mail.com' },
+    ],
+    // Assignment 9: רייכמן (uniIdx 1) — 6 students
+    [
+      { firstName: 'יונתן', lastName: 'פרידמן',  nationalId: '200000038', phone: '050-1000038', email: 'yonatan.friedman@mail.com' },
+      { firstName: 'אסתר', lastName: 'גרינברג', nationalId: '200000039', phone: '050-1000039', email: 'ester.greenberg@mail.com' },
+      { firstName: 'עומר',  lastName: 'וייס',    nationalId: '200000040', phone: '050-1000040', email: 'omer.weiss@mail.com' },
+      { firstName: 'רות',   lastName: 'בלום',    nationalId: '200000041', phone: '050-1000041', email: 'ruth.blum@mail.com' },
+      { firstName: 'ניר',   lastName: 'קפלן',    nationalId: '200000042', phone: '050-1000042', email: 'nir.kaplan@mail.com' },
+      { firstName: 'טלי',   lastName: 'שטרן',    nationalId: '200000043', phone: '050-1000043', email: 'tali.stern@mail.com' },
+    ],
+  ];
+
+  for (let i = 0; i < assignments.length; i++) {
+    const a = assignments[i]!;
     const created = await prisma.assignment.create({
       data: {
         departmentId:  seededDepartments[a.deptIdx]!.id,
@@ -268,6 +346,38 @@ async function main() {
       },
     });
     console.log(`Created assignment #${created.id}: ${seededDepartments[a.deptIdx]!.name} / ${seededUniversities[a.uniIdx]!.name} (${a.startDate})`);
+
+    // Create students and link them to this assignment
+    const studentDefs = studentsPerAssignment[i]!;
+    for (const s of studentDefs) {
+      const student = await prisma.student.upsert({
+        where: { nationalId: s.nationalId },
+        update: {},
+        create: {
+          firstName: s.firstName,
+          lastName: s.lastName,
+          nationalId: s.nationalId,
+          phone: s.phone,
+          email: s.email,
+          universityId: seededUniversities[a.uniIdx]!.id,
+        },
+      });
+
+      await prisma.assignmentStudent.upsert({
+        where: {
+          assignmentId_studentId: {
+            assignmentId: created.id,
+            studentId: student.id,
+          },
+        },
+        update: {},
+        create: {
+          assignmentId: created.id,
+          studentId: student.id,
+        },
+      });
+    }
+    console.log(`  Linked ${studentDefs.length} students`);
   }
 
   console.log("Seeding complete!");
