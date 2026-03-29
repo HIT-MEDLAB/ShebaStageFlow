@@ -184,7 +184,10 @@ async function main() {
   for (const dept of departments) {
     const created = await prisma.department.upsert({
       where: { name: dept.name },
-      update: {},
+      update: {
+        hasMorningShift: dept.hasMorningShift,
+        hasEveningShift: dept.hasEveningShift,
+      },
       create: {
         name: dept.name,
         hasMorningShift: dept.hasMorningShift,

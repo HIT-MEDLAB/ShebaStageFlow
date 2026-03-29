@@ -34,24 +34,20 @@ export function GridRow({
         <span>{department.name}</span>
         {constraint && (
           <div className="flex items-center gap-3 mt-1">
-            {department.hasMorningShift && (
-              <span
-                className="flex items-center gap-1 text-xs text-amber-600"
-                title={t('grid.morning')}
-              >
-                <Sun className="h-3.5 w-3.5" />
-                {constraint.morningCapacity}
-              </span>
-            )}
-            {department.hasEveningShift && (
-              <span
-                className="flex items-center gap-1 text-xs text-indigo-600"
-                title={t('grid.evening')}
-              >
-                <Moon className="h-3.5 w-3.5" />
-                {constraint.eveningCapacity}
-              </span>
-            )}
+            <span
+              className="flex items-center gap-1 text-xs text-amber-600"
+              title={t('grid.morning')}
+            >
+              <Sun className="h-3.5 w-3.5" />
+              {constraint.morningCapacity}
+            </span>
+            <span
+              className="flex items-center gap-1 text-xs text-indigo-600"
+              title={t('grid.evening')}
+            >
+              <Moon className="h-3.5 w-3.5" />
+              {constraint.eveningCapacity}
+            </span>
           </div>
         )}
       </div>
