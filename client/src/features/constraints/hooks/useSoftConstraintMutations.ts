@@ -16,6 +16,7 @@ export function useSoftConstraintMutations() {
     mutationFn: (data: CreateSoftConstraintData) => createSoftConstraint(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.constraintCreated'))
     },
     onError: () => {
@@ -28,6 +29,7 @@ export function useSoftConstraintMutations() {
       updateSoftConstraint(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.constraintUpdated'))
     },
     onError: () => {
@@ -39,6 +41,7 @@ export function useSoftConstraintMutations() {
     mutationFn: (id: number) => deleteSoftConstraint(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.constraintDeleted'))
     },
     onError: () => {

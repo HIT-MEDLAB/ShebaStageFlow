@@ -11,6 +11,7 @@ export interface ValidationContext {
   studentCount?: number | null;
   yearInProgram?: number | null;
   excludeAssignmentIds?: number[];
+  academicYearId?: number | null;
 }
 
 type RuleFunction = (ctx: ValidationContext) => Promise<ConstraintViolation[]>;
@@ -60,6 +61,7 @@ ruleRegistry.set('ONE_GROUP_PER_SHIFT', async (ctx) => {
       startDate: { lte: ctx.endDate },
       endDate: { gte: ctx.startDate },
       ...(ctx.excludeAssignmentIds?.length ? { id: { notIn: ctx.excludeAssignmentIds } } : {}),
+      ...(ctx.academicYearId ? { academicYearId: ctx.academicYearId } : {}),
     },
   });
 
@@ -110,6 +112,7 @@ ruleRegistry.set('CAPACITY_LIMIT', async (ctx) => {
         startDate: { lte: ctx.endDate },
         endDate: { gte: ctx.startDate },
         ...(ctx.excludeAssignmentIds?.length ? { id: { notIn: ctx.excludeAssignmentIds } } : {}),
+        ...(ctx.academicYearId ? { academicYearId: ctx.academicYearId } : {}),
       },
     });
 
@@ -210,12 +213,11 @@ export class ConstraintEngine {
     const errors = allViolations.filter((v) => v.type === 'error');
     const warnings = allViolations.filter((v) => v.type === 'warning');
 
-    // Hard errors always block — forceOverride only bypasses warnings
-    if (errors.length > 0) {
+    if (errors.length > 0 && !forceOverride) {
       throw new ConstraintValidationError(errors, warnings);
     }
 
-    // Return warnings so they can be included in successful responses
-    return warnings;
+    // When forceOverride is true, return all violations as warnings
+    return forceOverride ? allViolations : warnings;
   }
 }

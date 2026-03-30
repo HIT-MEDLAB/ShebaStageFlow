@@ -13,7 +13,7 @@ import type {
   SmartImportExecuteDto,
 } from './assignment.schema';
 import { ConstraintEngine, validateStudentLink } from './validation/constraintEngine';
-import { ConstraintValidationError } from '../../shared/errors/ConstraintValidationError';
+import { ConstraintValidationError, type ConstraintViolation } from '../../shared/errors/ConstraintValidationError';
 import { ImportValidationService } from './import/importService';
 import type { ImportValidationResult } from './import/importTypes';
 import prisma from '../../lib/prisma';
@@ -60,6 +60,7 @@ export class AssignmentService {
       shiftType: dto.shiftType,
       studentCount: dto.studentCount,
       yearInProgram: dto.yearInProgram,
+      academicYearId: dto.academicYearId,
     }, canForce);
 
     const status = this.determineStatus(userRole);
@@ -74,7 +75,7 @@ export class AssignmentService {
   }
 
   async move(id: number, dto: MoveAssignmentDto, userId: number, userRole: string, forceOverride?: boolean) {
-    const existing = await this.getById(id) as { universityId: number; type: 'GROUP' | 'ELECTIVE'; shiftType: 'MORNING' | 'EVENING'; studentCount?: number | null; yearInProgram?: number | null };
+    const existing = await this.getById(id) as { universityId: number; type: 'GROUP' | 'ELECTIVE'; shiftType: 'MORNING' | 'EVENING'; studentCount?: number | null; yearInProgram?: number | null; academicYearId?: number | null };
     const canForce = this.isAdmin(userRole) && forceOverride;
     await this.engine.validate({
       departmentId: dto.departmentId,
@@ -86,6 +87,7 @@ export class AssignmentService {
       studentCount: existing.studentCount,
       yearInProgram: existing.yearInProgram,
       excludeAssignmentIds: [id],
+      academicYearId: existing.academicYearId,
     }, canForce);
 
     const status = this.isAdmin(userRole) ? 'APPROVED' as const : undefined;
@@ -125,7 +127,31 @@ export class AssignmentService {
   }
 
   async importStudents(assignmentId: number, dto: ImportStudentsDto) {
-    await this.getById(assignmentId);
+    const assignment = await this.getById(assignmentId) as {
+      startDate: Date; endDate: Date; shiftType: 'MORNING' | 'EVENING';
+    };
+
+    // Validate all students for double-booking before adding any
+    const allViolations: ConstraintViolation[] = [];
+    for (const studentData of dto.students) {
+      const existing = await this.repository.findStudentByNationalId?.(studentData.nationalId);
+      if (existing) {
+        const violations = await validateStudentLink(
+          existing.id, assignmentId, assignment.startDate, assignment.endDate, assignment.shiftType,
+        );
+        allViolations.push(
+          ...violations.map(v => ({
+            ...v,
+            params: { ...v.params, studentName: `${studentData.firstName} ${studentData.lastName}` },
+          })),
+        );
+      }
+    }
+
+    if (allViolations.length > 0) {
+      throw new ConstraintValidationError(allViolations);
+    }
+
     return this.repository.bulkAddStudents(assignmentId, dto.students);
   }
 
@@ -187,6 +213,7 @@ export class AssignmentService {
             shiftType: actionDto.shiftType,
             studentCount: actionDto.studentCount,
             yearInProgram: actionDto.yearInProgram,
+            academicYearId: dto.academicYearId,
           });
 
           await tx.assignment.create({
@@ -224,6 +251,7 @@ export class AssignmentService {
               studentCount: displacedRecord.studentCount,
               yearInProgram: displacedRecord.yearInProgram,
               excludeAssignmentIds: [action.displacedAssignmentId],
+              academicYearId: dto.academicYearId,
             });
           }
 
@@ -288,12 +316,17 @@ export class AssignmentService {
     await this.getById(id);
 
     // Get the incoming assignment's current position (for pendingMoveData)
-    const incoming = await this.getById(id) as { departmentId: number; startDate: string; endDate: string; universityId: number; type: 'GROUP' | 'ELECTIVE'; shiftType: 'MORNING' | 'EVENING'; studentCount?: number | null; yearInProgram?: number | null };
+    const incoming = await this.getById(id) as { departmentId: number; startDate: string; endDate: string; universityId: number; type: 'GROUP' | 'ELECTIVE'; shiftType: 'MORNING' | 'EVENING'; studentCount?: number | null; yearInProgram?: number | null; academicYearId?: number | null };
     // Get displaced assignment's current position
-    const displaced = await this.getById(dto.displacedAssignmentId) as { departmentId: number; startDate: string; endDate: string };
+    const displaced = await this.getById(dto.displacedAssignmentId) as {
+      departmentId: number; startDate: string; endDate: string;
+      universityId: number; type: 'GROUP' | 'ELECTIVE'; shiftType: 'MORNING' | 'EVENING';
+      studentCount?: number | null; yearInProgram?: number | null;
+    };
 
     const isAdminRole = this.isAdmin(userRole);
     const canForce = isAdminRole && forceOverride;
+    // Validate incoming assignment at its new position
     await this.engine.validate({
       departmentId: dto.departmentId,
       universityId: incoming.universityId,
@@ -304,6 +337,20 @@ export class AssignmentService {
       studentCount: incoming.studentCount,
       yearInProgram: incoming.yearInProgram,
       excludeAssignmentIds: [id, dto.displacedAssignmentId],
+      academicYearId: incoming.academicYearId,
+    }, canForce);
+    // Also validate displaced assignment at its new position
+    await this.engine.validate({
+      departmentId: dto.displacedDepartmentId,
+      universityId: displaced.universityId,
+      startDate: dto.displacedStartDate,
+      endDate: dto.displacedEndDate,
+      type: displaced.type,
+      shiftType: displaced.shiftType,
+      studentCount: displaced.studentCount,
+      yearInProgram: displaced.yearInProgram,
+      excludeAssignmentIds: [id, dto.displacedAssignmentId],
+      academicYearId: incoming.academicYearId,
     }, canForce);
     const status = isAdminRole ? 'APPROVED' as const : 'PENDING' as const;
 

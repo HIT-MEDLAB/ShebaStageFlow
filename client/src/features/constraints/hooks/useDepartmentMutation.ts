@@ -15,6 +15,7 @@ export function useDepartmentMutation() {
     mutationFn: (data: CreateDepartmentData) => createDepartmentWithConstraint(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.departmentCreated'))
     },
     onError: () => {
@@ -27,6 +28,7 @@ export function useDepartmentMutation() {
       updateDepartmentWithConstraint(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.departmentUpdated'))
     },
     onError: () => {

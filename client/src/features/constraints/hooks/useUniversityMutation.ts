@@ -15,6 +15,7 @@ export function useUniversityMutation() {
     mutationFn: (data: CreateUniversityData) => createUniversityWithSemester(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.universityCreated'))
     },
     onError: () => {
@@ -27,6 +28,7 @@ export function useUniversityMutation() {
       updateUniversityWithSemester(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.universityUpdated'))
     },
     onError: () => {

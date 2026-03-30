@@ -17,6 +17,7 @@ export function useToggleConstraint() {
       toggleIronConstraint(id, isActive),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.constraintUpdated'))
     },
     onError: () => {
@@ -29,6 +30,7 @@ export function useToggleConstraint() {
       toggleDateConstraint(id, isActive),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.constraintUpdated'))
     },
     onError: () => {
@@ -41,6 +43,7 @@ export function useToggleConstraint() {
       toggleSoftConstraint(id, isActive),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.constraintUpdated'))
     },
     onError: () => {
@@ -53,6 +56,7 @@ export function useToggleConstraint() {
       toggleHoliday(id, isActive),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
       toast.success(t('toast.constraintUpdated'))
     },
     onError: () => {

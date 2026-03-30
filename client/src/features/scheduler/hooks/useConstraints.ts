@@ -6,6 +6,6 @@ export function useConstraints(years: number[] | null) {
     queryKey: ['scheduler', 'constraints', years],
     queryFn: () => fetchConstraints(years!),
     enabled: !!years && years.length > 0,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 60 * 1000, // 1 minute
   })
 }

@@ -4,6 +4,7 @@ import { moveAssignment } from '../api/scheduler.api'
 import type { Assignment, MoveAssignmentDto } from '../types/scheduler.types'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { invalidateConstraintsOn422 } from '../utils/invalidateOnConstraintError'
 
 export function useMoveAssignment() {
   const queryClient = useQueryClient()
@@ -46,6 +47,7 @@ export function useMoveAssignment() {
       context?.previousEntries.forEach(([key, data]) => {
         queryClient.setQueryData(key, data)
       })
+      invalidateConstraintsOn422(queryClient, err)
       if (axios.isAxiosError(err) && err.response?.status === 422) {
         const violations = err.response.data?.errors as { messageKey: string; params?: Record<string, string> }[] | undefined
         if (violations?.length) {
