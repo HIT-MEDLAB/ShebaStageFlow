@@ -9,7 +9,7 @@ export const createAssignmentSchema = z.object({
   type: z.enum(['GROUP', 'ELECTIVE']),
   shiftType: z.enum(['MORNING', 'EVENING']),
   studentCount: z.number().int().positive().optional().nullable(),
-  yearInProgram: z.number().int().min(1).max(7),
+  yearInProgram: z.number().int().min(1).max(6),
   tutorName: z.string().optional().nullable(),
   forceOverride: z.boolean().optional(),
 }).refine((data) => data.endDate > data.startDate, {
@@ -26,7 +26,7 @@ export const updateAssignmentSchema = z.object({
   shiftType: z.enum(['MORNING', 'EVENING']).optional(),
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
   studentCount: z.number().int().positive().optional().nullable(),
-  yearInProgram: z.number().int().min(1).max(7).optional(),
+  yearInProgram: z.number().int().min(1).max(6).optional(),
   tutorName: z.string().optional().nullable(),
 });
 
@@ -47,7 +47,7 @@ export const importAssignmentsSchema = z.object({
     type: z.enum(['GROUP', 'ELECTIVE']),
     shiftType: z.enum(['MORNING', 'EVENING']),
     studentCount: z.number().int().positive().optional().nullable(),
-    yearInProgram: z.number().int().min(1).max(7),
+    yearInProgram: z.number().int().min(1).max(6),
     tutorName: z.string().optional().nullable(),
   })),
 });
@@ -95,7 +95,7 @@ export const smartImportValidateSchema = z.object({
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
     studentCount: z.number().int().positive().optional().nullable(),
-    yearInProgram: z.number().int().min(1).max(7),
+    yearInProgram: z.number().int().min(1).max(6),
     placementType: z.string().min(1),
     tutorName: z.string().optional().nullable(),
     shiftType: z.string().min(1),
@@ -111,7 +111,7 @@ const createAssignmentInnerSchema = z.object({
   type: z.enum(['GROUP', 'ELECTIVE']),
   shiftType: z.enum(['MORNING', 'EVENING']),
   studentCount: z.number().int().positive().optional().nullable(),
-  yearInProgram: z.number().int().min(1).max(7),
+  yearInProgram: z.number().int().min(1).max(6),
   tutorName: z.string().optional().nullable(),
 });
 

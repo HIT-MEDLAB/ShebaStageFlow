@@ -115,6 +115,7 @@ export function ImportRowEditForm({ initialData, onSave, onCancel, isLoading }: 
           disabled={isLoading}
           className="h-7 text-xs"
           min={1}
+          max={6}
         />
       </div>
       <div className="space-y-1">

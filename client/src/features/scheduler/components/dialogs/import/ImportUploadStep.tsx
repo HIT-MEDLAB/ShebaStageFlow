@@ -31,14 +31,14 @@ const HE_TO_KEY_MAP: Record<string, keyof SmartImportRow> = {
 }
 
 const HEBREW_YEAR_MAP: Record<string, number> = {
-  'א': 1, 'ב': 2, 'ג': 3, 'ד': 4, 'ה': 5, 'ו': 6, 'ז': 7,
+  'א': 1, 'ב': 2, 'ג': 3, 'ד': 4, 'ה': 5, 'ו': 6,
 }
 
 function parseYearInProgram(value: unknown): number {
   if (typeof value === 'number') return value
   const str = String(value ?? '').trim()
   // Match Hebrew letter (possibly followed by ׳ or ')
-  const match = str.match(/([אבגדהוז])/)
+  const match = str.match(/([אבגדהו])/)
   if (match) {
     return HEBREW_YEAR_MAP[match[1]] ?? 1
   }
