@@ -1,4 +1,5 @@
 import { AppError } from '../../shared/errors/AppError';
+import { AssignmentRepository } from './assignment.repository';
 import type { IAssignmentRepository, AssignmentFilters, PendingMoveData } from './assignment.repository';
 import type {
   CreateAssignmentDto,
@@ -34,6 +35,10 @@ export class AssignmentService {
 
   async getByAcademicYear(academicYearId: number, filters?: AssignmentFilters) {
     return this.repository.findByAcademicYear(academicYearId, filters);
+  }
+
+  async getForExport(academicYearId: number, filters?: AssignmentFilters) {
+    return (this.repository as AssignmentRepository).findForExport(academicYearId, filters);
   }
 
   async getById(id: number) {

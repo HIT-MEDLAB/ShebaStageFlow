@@ -4,6 +4,7 @@
     "manualAssignment": "Manual Assignment",
     "importExcel": "Import from Excel",
     "smartImport": "Smart Import from Excel",
+    "exportExcel": "Export to Excel",
     "academicYear": "Academic Year"
   },
   "filters": {

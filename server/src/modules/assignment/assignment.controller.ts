@@ -16,6 +16,49 @@ import type {
 
 export function createAssignmentController(service: AssignmentService) {
   return {
+    async exportAssignments(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const academicYearId = Number(req.query.academicYearId);
+        if (!academicYearId || isNaN(academicYearId)) {
+          res.status(400).json({ message: 'academicYearId query parameter is required' });
+          return;
+        }
+
+        const filters: AssignmentFilters = {};
+
+        if (req.query.universityId) {
+          const raw = req.query.universityId;
+          if (Array.isArray(raw)) {
+            filters.universityId = raw.map((v) => Number(v));
+          } else {
+            filters.universityId = [Number(raw)];
+          }
+        }
+
+        if (req.query.shiftType) {
+          filters.shiftType = req.query.shiftType as 'MORNING' | 'EVENING';
+        }
+
+        if (req.query.yearInProgram) {
+          filters.yearInProgram = Number(req.query.yearInProgram);
+        }
+
+        if (req.query.status) {
+          const raw = req.query.status;
+          if (Array.isArray(raw)) {
+            filters.status = raw as ('PENDING' | 'APPROVED' | 'REJECTED')[];
+          } else {
+            filters.status = raw as 'PENDING' | 'APPROVED' | 'REJECTED';
+          }
+        }
+
+        const assignments = await service.getForExport(academicYearId, filters);
+        res.json(assignments);
+      } catch (err) {
+        next(err);
+      }
+    },
+
     async getByAcademicYear(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const academicYearId = Number(req.query.academicYearId);

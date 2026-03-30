@@ -398,4 +398,39 @@ export class AssignmentRepository implements IAssignmentRepository {
       select: { id: true },
     });
   }
+
+  async findForExport(academicYearId: number, filters?: AssignmentFilters) {
+    const where: Record<string, unknown> = { academicYearId };
+
+    if (filters?.universityId && filters.universityId.length > 0) {
+      where.universityId = { in: filters.universityId };
+    }
+    if (filters?.shiftType) {
+      where.shiftType = filters.shiftType;
+    }
+    if (filters?.yearInProgram) {
+      where.yearInProgram = filters.yearInProgram;
+    }
+    if (filters?.status) {
+      where.status = Array.isArray(filters.status) ? { in: filters.status } : filters.status;
+    }
+
+    return prisma.assignment.findMany({
+      where,
+      include: {
+        university: { select: { name: true } },
+        department: { select: { name: true } },
+        students: {
+          include: {
+            student: {
+              include: {
+                university: { select: { name: true } },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { startDate: 'asc' },
+    });
+  }
 }

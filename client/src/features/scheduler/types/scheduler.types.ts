@@ -185,6 +185,14 @@ export interface AssignmentDetail extends Assignment {
   students: AssignmentStudent[]
 }
 
+export interface ExportAssignment extends Omit<Assignment, 'universityName' | 'departmentName' | 'createdByName'> {
+  university: { name: string }
+  department: { name: string }
+  students: Array<{
+    student: Student & { university?: { name: string } | null }
+  }>
+}
+
 export interface RejectAssignmentDto {
   rejectionReason?: string
 }

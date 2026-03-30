@@ -30,6 +30,7 @@ const adminOnly = authorize('SUPER_ADMIN', 'ADMIN');
 
 // Static paths must be registered before dynamic /:id paths
 assignmentRouter.get('/', controller.getByAcademicYear);
+assignmentRouter.get('/export', controller.exportAssignments);
 assignmentRouter.post('/', validateRequest(createAssignmentSchema), controller.create);
 assignmentRouter.post('/import/validate', validateRequest(smartImportValidateSchema), controller.smartImportValidate);
 assignmentRouter.post('/import/execute', validateRequest(smartImportExecuteSchema), controller.smartImportExecute);
