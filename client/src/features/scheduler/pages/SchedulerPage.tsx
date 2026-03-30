@@ -26,9 +26,11 @@ import { SchedulerFilters } from '../components/SchedulerFilters'
 import { AssignmentLegend } from '../components/AssignmentLegend'
 import { ManualAssignmentDialog } from '../components/dialogs/ManualAssignmentDialog'
 import { ExcelImportDialog } from '../components/dialogs/ExcelImportDialog'
+import { SmartImportWizard } from '../components/dialogs/SmartImportWizard'
 import { EditAssignmentDialog } from '../components/dialogs/EditAssignmentDialog'
 import { ReplacementDialog } from '../components/dialogs/ReplacementDialog'
 import { AdminOverrideDialog } from '../components/dialogs/AdminOverrideDialog'
+import { WarningConfirmDialog } from '../components/dialogs/WarningConfirmDialog'
 import { ApprovalTab } from '../components/approval/ApprovalTab'
 import type { Assignment, WeekDefinition } from '../types/scheduler.types'
 
@@ -46,8 +48,10 @@ export default function SchedulerPage() {
     displacedAssignment,
     replacementSuggestedWeeks,
     adminOverrideReason,
+    warningReason,
     openReplacementDialog,
     openAdminOverrideDialog,
+    openWarningConfirmDialog,
     clearPendingMove,
   } = useSchedulerStore()
 
@@ -87,6 +91,12 @@ export default function SchedulerPage() {
     [universities],
   )
 
+  // Build department names map
+  const departmentNames = useMemo(
+    () => new Map((departments ?? []).map((d) => [d.id, d.name])),
+    [departments],
+  )
+
   // Build validation context (reused by drag-drop + dialogs)
   const validationContext: ValidationContext | null =
     assignments && constraints
@@ -98,6 +108,8 @@ export default function SchedulerPage() {
           weeks,
           universityPriorities,
           isAdmin,
+          universitySemesters: constraints.universitySemesters,
+          departmentNames,
         }
       : null
 
@@ -153,6 +165,14 @@ export default function SchedulerPage() {
 
       case 'blocked':
         toast.error(t(result.reasonKey, result.reasonParams))
+        break
+
+      case 'warning':
+        openWarningConfirmDialog(
+          { assignment, targetDeptId: departmentId, targetWeekNum: weekNumber },
+          result.reasonKey,
+          result.reasonParams,
+        )
         break
 
       case 'conflict_replaceable': {
@@ -216,6 +236,25 @@ export default function SchedulerPage() {
     clearPendingMove()
   }
 
+  function handleWarningConfirm() {
+    if (!pendingMove) return
+
+    const targetWeek = weeks.find((w) => w.weekNumber === pendingMove.targetWeekNum)
+    if (!targetWeek) return
+
+    moveMutation.mutate({
+      id: pendingMove.assignment.id,
+      data: {
+        departmentId: pendingMove.targetDeptId,
+        startDate: targetWeek.startDate.toISOString(),
+        endDate: targetWeek.endDate.toISOString(),
+        forceOverride: true,
+      },
+    })
+
+    clearPendingMove()
+  }
+
   function handleAdminOverrideConfirm() {
     if (!pendingMove) return
 
@@ -268,6 +307,7 @@ export default function SchedulerPage() {
 
       {activeDialog === 'create' && <ManualAssignmentDialog />}
       {activeDialog === 'import' && <ExcelImportDialog />}
+      {activeDialog === 'smartImport' && <SmartImportWizard />}
       {activeDialog === 'edit' && <EditAssignmentDialog />}
       {activeDialog === 'replacement' && displacedAssignment && replacementSuggestedWeeks && (
         <ReplacementDialog
@@ -285,6 +325,15 @@ export default function SchedulerPage() {
           reasonKey={adminOverrideReason.reasonKey}
           reasonParams={adminOverrideReason.reasonParams}
           onConfirm={handleAdminOverrideConfirm}
+          onCancel={clearPendingMove}
+        />
+      )}
+      {activeDialog === 'warningConfirm' && warningReason && (
+        <WarningConfirmDialog
+          open
+          reasonKey={warningReason.reasonKey}
+          reasonParams={warningReason.reasonParams}
+          onConfirm={handleWarningConfirm}
           onCancel={clearPendingMove}
         />
       )}

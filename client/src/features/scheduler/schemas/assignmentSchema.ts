@@ -29,7 +29,7 @@ export function createAssignmentSchema(t: TFunction) {
       studentCount: z.number().positive().optional(),
       yearInProgram: z
         .number({ required_error: t('scheduler:dialogs.validation.yearRequired') })
-        .min(3)
+        .min(1)
         .max(6),
       tutorName: z.string().optional(),
     })

@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
+import { CalendarDropdown } from '@/components/ui/calendar-dropdown'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 
@@ -285,6 +286,10 @@ export function ManualAssignmentDialog() {
                           setStartDateOpen(false)
                         }}
                         disabled={(date) => date.getDay() !== 0}
+                        captionLayout="dropdown"
+                        startMonth={currentYear ? new Date(currentYear.startDate) : undefined}
+                        endMonth={currentYear ? new Date(currentYear.endDate) : undefined}
+                        components={{ Dropdown: CalendarDropdown }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -322,6 +327,10 @@ export function ManualAssignmentDialog() {
                           setEndDateOpen(false)
                         }}
                         disabled={(date) => date.getDay() !== 4}
+                        captionLayout="dropdown"
+                        startMonth={currentYear ? new Date(currentYear.startDate) : undefined}
+                        endMonth={currentYear ? new Date(currentYear.endDate) : undefined}
+                        components={{ Dropdown: CalendarDropdown }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -462,7 +471,7 @@ export function ManualAssignmentDialog() {
                       <SelectValue placeholder={t('dialogs.manual.yearInProgram')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {[3, 4, 5, 6].map((year) => (
+                      {[1, 2, 3, 4, 5, 6].map((year) => (
                         <SelectItem key={year} value={year.toString()}>
                           {year}
                         </SelectItem>

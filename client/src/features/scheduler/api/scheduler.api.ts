@@ -14,6 +14,10 @@ import type {
   CreateStudentDto,
   RejectAssignmentDto,
   DisplaceAssignmentDto,
+  SmartImportRow,
+  ImportValidationResult,
+  ImportAction,
+  ExportAssignment,
 } from '../types/scheduler.types'
 
 // Raw shape from the API (Prisma includes nested relations)
@@ -49,6 +53,20 @@ export async function fetchAssignments(
   if (status) params.status = status
   const { data } = await apiClient.get<RawAssignment[]>('/assignments', { params })
   return data.map(mapAssignment)
+}
+
+export async function fetchAssignmentsForExport(
+  academicYearId: number,
+  filters?: Partial<SchedulerFilters>,
+) {
+  const params: Record<string, unknown> = { academicYearId }
+  if (filters?.selectedUniversities?.length)
+    params.universityId = filters.selectedUniversities
+  if (filters?.selectedShift && filters.selectedShift !== 'all')
+    params.shiftType = filters.selectedShift.toUpperCase()
+  if (filters?.selectedYear) params.yearInProgram = filters.selectedYear
+  const { data } = await apiClient.get<ExportAssignment[]>('/assignments/export', { params })
+  return data
 }
 
 export async function fetchAssignmentById(id: number) {
@@ -114,6 +132,28 @@ export async function rejectAssignment(id: number, dto?: RejectAssignmentDto) {
 export async function displaceAssignment(id: number, dto: DisplaceAssignmentDto) {
   const { data } = await apiClient.patch<RawAssignment>(`/assignments/${id}/displace`, dto)
   return mapAssignment(data)
+}
+
+export async function smartImportValidate(
+  academicYearId: number,
+  rows: SmartImportRow[],
+): Promise<ImportValidationResult> {
+  const { data } = await apiClient.post<ImportValidationResult>(
+    '/assignments/import/validate',
+    { academicYearId, rows },
+  )
+  return data
+}
+
+export async function smartImportExecute(
+  academicYearId: number,
+  actions: ImportAction[],
+): Promise<{ created: number; displaced: number }> {
+  const { data } = await apiClient.post<{ created: number; displaced: number }>(
+    '/assignments/import/execute',
+    { academicYearId, actions },
+  )
+  return data
 }
 
 export async function importAssignments(assignments: CreateAssignmentDto[]) {

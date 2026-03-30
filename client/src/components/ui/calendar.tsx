@@ -21,6 +21,7 @@ function Calendar({
         months: "flex flex-col sm:flex-row gap-2",
         month: "flex flex-col gap-4",
         month_caption: "flex justify-center pt-1 relative items-center w-full",
+        dropdowns: "flex items-center gap-2",
         caption_label: "text-sm font-medium",
         nav: "flex items-center gap-1 absolute inset-x-0 justify-between",
         button_previous: cn(

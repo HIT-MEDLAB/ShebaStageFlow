@@ -3,6 +3,8 @@
   "toolbar": {
     "manualAssignment": "Manual Assignment",
     "importExcel": "Import from Excel",
+    "smartImport": "Smart Import from Excel",
+    "exportExcel": "Export to Excel",
     "academicYear": "Academic Year"
   },
   "filters": {
@@ -30,7 +32,19 @@
       "electiveCapacityFull": "Elective capacity full for this week",
       "shiftUnavailable": "This shift is not available for this department",
       "groupTooBig": "Group size ({{count}} students) exceeds department capacity ({{capacity}} max)",
-      "softConstraint": "Soft constraint — {{name}}"
+      "softConstraint": "Soft constraint — {{name}}",
+      "semesterBoundary": "Outside university semester dates",
+      "dateConstraint": "Date constraint — {{name}}",
+      "studentDoubleBooking": "Student already assigned to {{departmentName}} during this period",
+      "oneGroupPerShift": "Only one group allowed per department per shift per week",
+      "duplicateAssignment": "Duplicate — this assignment already exists in the system"
+    },
+    "warning": {
+      "firstClinicalRotation": "Year-1 students are recommended for Internal Medicine or Pediatrics (not {{departmentName}})",
+      "softConstraint": "Soft constraint — {{name}}",
+      "noSemesterDefined": "No semester defined for this university",
+      "noCapacityDefined": "No capacity limit defined for this department",
+      "noConstraintsConfigured": "No active constraints configured in the system"
     }
   },
   "card": {
@@ -104,6 +118,50 @@
       "description": "This placement has a scheduling conflict.",
       "cancel": "Cancel",
       "force": "Force Placement"
+    },
+    "warningConfirm": {
+      "title": "Scheduling Warning",
+      "description": "This placement has a scheduling advisory.",
+      "confirm": "Proceed Anyway",
+      "cancel": "Cancel"
+    },
+    "smartImport": {
+      "title": "Smart Import from Excel",
+      "columnError": "Columns do not match. Required: מחלקה, מוסד אקדמי, תאריך התחלה, תאריך סיום, שנת לימוד, סוג שיבוץ, משמרת",
+      "expectedColumns": "Expected columns:",
+      "validating": "Validating assignments against constraints...",
+      "executing": "Executing assignments...",
+      "complete": "{{created}} assignments created, {{displaced}} displaced",
+      "row": "Row {{num}}",
+      "status": {
+        "success": "OK",
+        "bumped": "Bumped",
+        "failed": "Failed",
+        "parse_error": "Parse Error"
+      },
+      "bumpsAssignment": "Displaces {{university}} in {{department}}",
+      "suggestedWeeks": "Suggested weeks",
+      "pickManually": "Pick manually",
+      "confirm": "Confirm",
+      "resolved": "Resolved",
+      "skipped": "Skipped",
+      "skip": "Skip",
+      "force": "Force Create",
+      "forceOverride": "Force override (admin)",
+      "undo": "Undo",
+      "noActions": "No assignments selected for execution",
+      "execute": "Execute {{count}} assignments",
+      "close": "Close",
+      "summarySuccess": "{{count}} OK",
+      "summaryBumped": "{{count}} need resolution",
+      "summaryFailed": "{{count}} failed",
+      "summaryParseError": "{{count}} parse errors",
+      "summaryDeleted": "{{count}} removed",
+      "edit": "Edit",
+      "delete": "Remove",
+      "save": "Save",
+      "cancel": "Cancel",
+      "revalidating": "Re-validating..."
     },
     "validation": {
       "departmentRequired": "Department is required",

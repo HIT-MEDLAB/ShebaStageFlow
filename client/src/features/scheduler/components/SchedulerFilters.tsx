@@ -10,7 +10,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useSchedulerStore } from '../stores/schedulerStore'
 import { useUniversities } from '../hooks/useUniversities'
 
-const YEAR_OPTIONS = [3, 4, 5, 6] as const
+const YEAR_OPTIONS = [1, 2, 3, 4, 5, 6] as const
 
 export function SchedulerFilters() {
   const { t } = useTranslation('scheduler')

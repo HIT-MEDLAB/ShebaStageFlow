@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
 import { moveAssignment } from '../api/scheduler.api'
 import type { Assignment, MoveAssignmentDto } from '../types/scheduler.types'
 import { toast } from 'sonner'
@@ -40,11 +41,18 @@ export function useMoveAssignment() {
       )
       return { previousEntries }
     },
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       // Rollback all caches
       context?.previousEntries.forEach(([key, data]) => {
         queryClient.setQueryData(key, data)
       })
+      if (axios.isAxiosError(err) && err.response?.status === 422) {
+        const violations = err.response.data?.errors as { messageKey: string; params?: Record<string, string> }[] | undefined
+        if (violations?.length) {
+          violations.forEach((v) => toast.error(t(v.messageKey, v.params)))
+          return
+        }
+      }
       toast.error(t('toast.moveFailed'))
     },
     onSettled: () => {

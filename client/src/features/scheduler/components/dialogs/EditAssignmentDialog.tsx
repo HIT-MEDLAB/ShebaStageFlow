@@ -447,7 +447,7 @@ export function EditAssignmentDialog() {
                           <SelectValue placeholder={t('dialogs.manual.yearInProgram')} />
                         </SelectTrigger>
                         <SelectContent>
-                          {[3, 4, 5, 6].map((year) => (
+                          {[1, 2, 3, 4, 5, 6].map((year) => (
                             <SelectItem key={year} value={year.toString()}>
                               {year}
                             </SelectItem>

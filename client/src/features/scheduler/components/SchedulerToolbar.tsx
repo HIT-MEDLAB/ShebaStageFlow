@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, Upload } from 'lucide-react'
+import { Plus, Upload, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -11,11 +11,36 @@ import {
 } from '@/components/ui/select'
 import { useSchedulerStore } from '../stores/schedulerStore'
 import { useAcademicYears } from '../hooks/useAcademicYears'
+import { fetchAssignmentsForExport } from '../api/scheduler.api'
+import { exportSchedulerToExcel } from '../utils/exportSchedulerToExcel'
 
 export function SchedulerToolbar() {
   const { t } = useTranslation('scheduler')
-  const { academicYearId, setAcademicYear, openDialog } = useSchedulerStore()
+  const {
+    academicYearId,
+    setAcademicYear,
+    openDialog,
+    selectedUniversities,
+    selectedShift,
+    selectedYear,
+  } = useSchedulerStore()
   const { data: academicYears } = useAcademicYears()
+  const [exporting, setExporting] = useState(false)
+
+  const handleExport = async () => {
+    if (!academicYearId) return
+    setExporting(true)
+    try {
+      const data = await fetchAssignmentsForExport(academicYearId, {
+        selectedUniversities,
+        selectedShift,
+        selectedYear,
+      })
+      exportSchedulerToExcel(data)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   // Auto-select first academic year when data loads and none is selected
   useEffect(() => {
@@ -43,9 +68,18 @@ export function SchedulerToolbar() {
       </Select>
 
       <div className="flex items-center gap-2 ms-auto">
-        <Button variant="outline" onClick={() => openDialog('import')}>
+        <Button
+          variant="outline"
+          onClick={handleExport}
+          disabled={!academicYearId || exporting}
+        >
+          <Download />
+          {t('toolbar.exportExcel')}
+        </Button>
+
+        <Button variant="outline" onClick={() => openDialog('smartImport')}>
           <Upload />
-          {t('toolbar.importExcel')}
+          {t('toolbar.smartImport')}
         </Button>
 
         <Button onClick={() => openDialog('create')}>

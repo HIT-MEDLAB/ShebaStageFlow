@@ -34,24 +34,20 @@ export function GridRow({
         <span>{department.name}</span>
         {constraint && (
           <div className="flex items-center gap-3 mt-1">
-            {department.hasMorningShift && (
-              <span
-                className="flex items-center gap-1 text-xs text-amber-600"
-                title={t('grid.morning')}
-              >
-                <Sun className="h-3.5 w-3.5" />
-                {constraint.morningCapacity}
-              </span>
-            )}
-            {department.hasEveningShift && (
-              <span
-                className="flex items-center gap-1 text-xs text-indigo-600"
-                title={t('grid.evening')}
-              >
-                <Moon className="h-3.5 w-3.5" />
-                {constraint.eveningCapacity}
-              </span>
-            )}
+            <span
+              className="flex items-center gap-1 text-xs text-amber-600"
+              title={t('grid.morning')}
+            >
+              <Sun className="h-3.5 w-3.5" />
+              {constraint.morningCapacity}
+            </span>
+            <span
+              className="flex items-center gap-1 text-xs text-indigo-600"
+              title={t('grid.evening')}
+            >
+              <Moon className="h-3.5 w-3.5" />
+              {constraint.eveningCapacity}
+            </span>
           </div>
         )}
       </div>
@@ -60,14 +56,16 @@ export function GridRow({
       {weeks.map((week) => {
         const assignments =
           gridData.get(department.id)?.get(week.weekNumber) ?? []
-        // Check department-specific blocks first, then hospital-wide holiday blocks
+        // Check department-specific blocks first, then hospital-wide blocks
         const deptBlockKey = `dept:${department.id}:week:${week.weekNumber}`
         const holidayBlockKey = `holiday:week:${week.weekNumber}`
+        const dateConstraintKey = `dateConstraint:week:${week.weekNumber}`
         const softDeptKey = `soft:dept:${department.id}:week:${week.weekNumber}`
         const softGlobalKey = `soft:week:${week.weekNumber}`
         const blockReason =
           blockedCells.get(deptBlockKey) ??
           blockedCells.get(holidayBlockKey) ??
+          blockedCells.get(dateConstraintKey) ??
           blockedCells.get(softDeptKey) ??
           blockedCells.get(softGlobalKey)
 

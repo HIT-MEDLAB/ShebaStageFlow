@@ -47,7 +47,27 @@ export function useBlockedCells(
       }
     }
 
-    // Soft constraint blocking
+    // Date constraint blocking (global blocks, like holidays)
+    if (constraints.dateConstraints) {
+      for (const dc of constraints.dateConstraints) {
+        const dcStart = new Date(dc.startDate)
+        const dcEnd = new Date(dc.endDate)
+        for (const week of weeks) {
+          if (week.startDate <= dcEnd && week.endDate >= dcStart) {
+            const key = `dateConstraint:week:${week.weekNumber}`
+            if (!blocked.has(key)) {
+              blocked.set(key, {
+                type: 'dateConstraint',
+                description: dc.description,
+                constraintName: dc.name,
+              })
+            }
+          }
+        }
+      }
+    }
+
+    // Soft constraint blocks (treated as hard blocks — cells are disabled)
     if (constraints.softConstraints) {
       for (const sc of constraints.softConstraints) {
         const scStart = new Date(sc.startDate)

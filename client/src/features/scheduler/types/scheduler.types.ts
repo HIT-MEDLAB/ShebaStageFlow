@@ -54,7 +54,7 @@ export interface WeekDefinition {
 }
 
 export interface BlockReason {
-  type: 'holiday' | 'dateBlock' | 'capacityFull' | 'softConstraint'
+  type: 'holiday' | 'dateBlock' | 'capacityFull' | 'softConstraint' | 'dateConstraint' | 'warning'
   description: string
   constraintName?: string
 }
@@ -102,11 +102,31 @@ export interface SoftConstraintData {
   endDate: string
 }
 
+export interface DateConstraintData {
+  id: number
+  name: string
+  description: string
+  startDate: string
+  endDate: string
+  isActive: boolean
+}
+
+export interface UniversitySemesterData {
+  id: number
+  universityId: number
+  semesterStart: string
+  semesterEnd: string
+  year: number
+  university: { id: number; name: string }
+}
+
 export interface ConstraintsResponse {
   departmentConstraints: DepartmentConstraintData[]
   ironConstraints: IronConstraintData[]
   holidays: Holiday[]
   softConstraints: SoftConstraintData[]
+  dateConstraints: DateConstraintData[]
+  universitySemesters: UniversitySemesterData[]
 }
 
 export interface SchedulerFilters {
@@ -151,6 +171,7 @@ export interface MoveAssignmentDto {
   departmentId: number
   startDate: string
   endDate: string
+  forceOverride?: boolean
 }
 
 export interface AssignmentStudent {
@@ -162,6 +183,14 @@ export interface AssignmentStudent {
 
 export interface AssignmentDetail extends Assignment {
   students: AssignmentStudent[]
+}
+
+export interface ExportAssignment extends Omit<Assignment, 'universityName' | 'departmentName' | 'createdByName'> {
+  university: { name: string }
+  department: { name: string }
+  students: Array<{
+    student: Student & { university?: { name: string } | null }
+  }>
 }
 
 export interface RejectAssignmentDto {
@@ -176,6 +205,7 @@ export interface DisplaceAssignmentDto {
   displacedDepartmentId: number
   displacedStartDate: string
   displacedEndDate: string
+  forceOverride?: boolean
 }
 
 export interface CreateStudentDto {
@@ -186,11 +216,70 @@ export interface CreateStudentDto {
   email?: string | null
 }
 
+// --- Smart Import Types ---
+
+export interface SmartImportRow {
+  departmentName: string
+  universityName: string
+  startDate: string
+  endDate: string
+  studentCount?: number | null
+  yearInProgram: number
+  placementType: string
+  tutorName?: string | null
+  shiftType: string
+}
+
+export interface ImportValidationResult {
+  rows: ImportRowResult[]
+  globalWarnings?: string[]
+}
+
+export interface ImportRowResult {
+  rowIndex: number
+  status: 'success' | 'bumped' | 'failed' | 'parse_error'
+  resolvedDto?: CreateAssignmentDto
+  bumpedAssignment?: {
+    id: number
+    departmentId: number
+    universityId: number
+    universityName: string
+    departmentName: string
+    startDate: string
+    endDate: string
+    shiftType: 'MORNING' | 'EVENING'
+    type: 'GROUP' | 'ELECTIVE'
+    studentCount: number | null
+    yearInProgram: number
+  }
+  suggestedWeeks?: Array<{ startDate: string; endDate: string }>
+  failureReason?: string
+  failureParams?: Record<string, string | number>
+  parseErrors?: string[]
+  warnings?: string[]
+}
+
+export type ImportAction =
+  | { type: 'create'; rowIndex: number; dto: CreateAssignmentDto }
+  | {
+      type: 'displace'
+      rowIndex: number
+      dto: CreateAssignmentDto
+      displacedAssignmentId: number
+      displacedDepartmentId: number
+      displacedStartDate: string
+      displacedEndDate: string
+    }
+  | { type: 'force_create'; rowIndex: number; dto: CreateAssignmentDto }
+
+export type WizardStep = 'upload' | 'validating' | 'review' | 'executing' | 'complete'
+
 // --- Validation Result Types ---
 
 export type ValidationResult =
   | { type: 'valid' }
   | { type: 'blocked'; reasonKey: string; reasonParams?: Record<string, string> }
+  | { type: 'warning'; reasonKey: string; reasonParams?: Record<string, string> }
   | {
       type: 'conflict_replaceable'
       displacedAssignment: Assignment

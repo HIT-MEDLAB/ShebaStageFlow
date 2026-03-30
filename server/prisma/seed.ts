@@ -184,7 +184,10 @@ async function main() {
   for (const dept of departments) {
     const created = await prisma.department.upsert({
       where: { name: dept.name },
-      update: {},
+      update: {
+        hasMorningShift: dept.hasMorningShift,
+        hasEveningShift: dept.hasEveningShift,
+      },
       create: {
         name: dept.name,
         hasMorningShift: dept.hasMorningShift,
@@ -402,6 +405,30 @@ async function main() {
       });
     }
     console.log(`  Linked ${studentDefs.length} students`);
+  }
+
+  // Seed iron constraints
+  console.log("Seeding iron constraints...");
+
+  const ironConstraints = [
+    { name: 'SEMESTER_BOUNDARY',      description: 'Assignments must fall within university semester dates',       behavior: 'hard' },
+    { name: 'STUDENT_DOUBLE_BOOKING', description: 'Student cannot be in two overlapping assignments',            behavior: 'hard' },
+    { name: 'FIRST_CLINICAL_ROTATION', description: 'Year-1 first rotation should be Internal Medicine or Pediatrics', behavior: 'warning' },
+    { name: 'ONE_GROUP_PER_SHIFT',    description: 'One GROUP per department per shift per week',                  behavior: 'hard' },
+    { name: 'CAPACITY_LIMIT',         description: 'Student count must not exceed department shift capacity',      behavior: 'hard' },
+  ];
+
+  for (const ic of ironConstraints) {
+    await prisma.ironConstraint.upsert({
+      where: { name: ic.name },
+      update: { description: ic.description },
+      create: {
+        name: ic.name,
+        description: ic.description,
+        isActive: true,
+      },
+    });
+    console.log(`Created iron constraint: ${ic.name}`);
   }
 
   console.log("Seeding complete!");
