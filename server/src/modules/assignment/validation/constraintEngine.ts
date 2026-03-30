@@ -11,6 +11,7 @@ export interface ValidationContext {
   studentCount?: number | null;
   yearInProgram?: number | null;
   excludeAssignmentIds?: number[];
+  academicYearId?: number | null;
 }
 
 type RuleFunction = (ctx: ValidationContext) => Promise<ConstraintViolation[]>;
@@ -60,6 +61,7 @@ ruleRegistry.set('ONE_GROUP_PER_SHIFT', async (ctx) => {
       startDate: { lte: ctx.endDate },
       endDate: { gte: ctx.startDate },
       ...(ctx.excludeAssignmentIds?.length ? { id: { notIn: ctx.excludeAssignmentIds } } : {}),
+      ...(ctx.academicYearId ? { academicYearId: ctx.academicYearId } : {}),
     },
   });
 
@@ -110,6 +112,7 @@ ruleRegistry.set('CAPACITY_LIMIT', async (ctx) => {
         startDate: { lte: ctx.endDate },
         endDate: { gte: ctx.startDate },
         ...(ctx.excludeAssignmentIds?.length ? { id: { notIn: ctx.excludeAssignmentIds } } : {}),
+        ...(ctx.academicYearId ? { academicYearId: ctx.academicYearId } : {}),
       },
     });
 
