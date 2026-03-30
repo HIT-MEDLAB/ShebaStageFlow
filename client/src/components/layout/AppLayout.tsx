@@ -48,10 +48,10 @@ export function AppLayout() {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="max-h-svh">
       <AppSidebar navItems={navItems} onLogout={handleLogout} userName={user?.name ?? ''} />
 
-      <SidebarInset>
+      <SidebarInset className="overflow-hidden">
         <header className="flex h-14 items-center gap-2 border-b border-border bg-card px-4">
           <SidebarTrigger className="-ms-1" />
         </header>
