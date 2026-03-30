@@ -122,7 +122,12 @@ export default function SchedulerPage() {
     setActiveDragId(event.active.id as number)
   }
 
-  function executeMoveAssignment(assignment: Assignment, targetDeptId: number, targetWeekNum: number) {
+  function executeMoveAssignment(
+    assignment: Assignment,
+    targetDeptId: number,
+    targetWeekNum: number,
+    forceOverride?: boolean,
+  ) {
     const targetWeek = weeks.find((w) => w.weekNumber === targetWeekNum)
     if (!targetWeek) return
 
@@ -132,6 +137,7 @@ export default function SchedulerPage() {
         departmentId: targetDeptId,
         startDate: targetWeek.startDate.toISOString(),
         endDate: targetWeek.endDate.toISOString(),
+        ...(forceOverride && { forceOverride: true }),
       },
     })
   }
@@ -262,6 +268,7 @@ export default function SchedulerPage() {
       pendingMove.assignment,
       pendingMove.targetDeptId,
       pendingMove.targetWeekNum,
+      true,
     )
 
     toast.success(t('toast.overrideSuccess'))

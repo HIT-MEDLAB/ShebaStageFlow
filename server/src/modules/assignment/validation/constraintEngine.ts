@@ -210,12 +210,11 @@ export class ConstraintEngine {
     const errors = allViolations.filter((v) => v.type === 'error');
     const warnings = allViolations.filter((v) => v.type === 'warning');
 
-    // Hard errors always block — forceOverride only bypasses warnings
-    if (errors.length > 0) {
+    if (errors.length > 0 && !forceOverride) {
       throw new ConstraintValidationError(errors, warnings);
     }
 
-    // Return warnings so they can be included in successful responses
-    return warnings;
+    // When forceOverride is true, return all violations as warnings
+    return forceOverride ? allViolations : warnings;
   }
 }
