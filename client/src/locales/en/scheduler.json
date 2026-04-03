@@ -194,6 +194,8 @@
     "importFailed": "Import failed",
     "studentAdded": "Student added",
     "studentRemoved": "Student removed",
+    "capacityExceeded": "Cannot add students — group capacity of {{capacity}} has been reached",
+    "capacityExceededDetail": "Adding {{adding}} student(s) would exceed the group capacity ({{current}}/{{capacity}})",
     "replacementSuccess": "Assignments swapped successfully",
     "overrideSuccess": "Assignment placed (admin override)"
   },

@@ -174,9 +174,13 @@ export function createAssignmentController(service: AssignmentService) {
 
     async addStudent(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
+        const userRole = req.currentUser!.role;
+        const body = req.body as AddStudentDto;
         const result = await service.addStudent(
           Number(req.params.id),
-          req.body as AddStudentDto,
+          body,
+          userRole,
+          body.forceOverride,
         );
         res.status(201).json(result);
       } catch (err) {
@@ -198,9 +202,13 @@ export function createAssignmentController(service: AssignmentService) {
 
     async importStudents(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
+        const userRole = req.currentUser!.role;
+        const body = req.body as ImportStudentsDto;
         const result = await service.importStudents(
           Number(req.params.id),
-          req.body as ImportStudentsDto,
+          body,
+          userRole,
+          body.forceOverride,
         );
         res.status(201).json(result);
       } catch (err) {

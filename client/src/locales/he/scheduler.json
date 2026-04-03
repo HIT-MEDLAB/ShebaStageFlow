@@ -194,6 +194,8 @@
     "importFailed": "הייבוא נכשל",
     "studentAdded": "סטודנט נוסף",
     "studentRemoved": "סטודנט הוסר",
+    "capacityExceeded": "לא ניתן להוסיף סטודנטים — הקבוצה מלאה ({{capacity}} מקומות)",
+    "capacityExceededDetail": "הוספת {{adding}} סטודנט(ים) תחרוג ממגבלת הקבוצה ({{current}}/{{capacity}})",
     "replacementSuccess": "השיבוצים הוחלפו בהצלחה",
     "overrideSuccess": "השיבוץ בוצע (דריסת מנהל)"
   },

@@ -58,6 +58,7 @@ export const addStudentSchema = z.object({
   nationalId: z.string().min(1),
   phone: z.string().optional().nullable(),
   email: z.string().email().optional().nullable().or(z.literal('')),
+  forceOverride: z.boolean().optional(),
 });
 
 export const importStudentsSchema = z.object({
@@ -68,6 +69,7 @@ export const importStudentsSchema = z.object({
     phone: z.string().optional().nullable(),
     email: z.string().email().optional().nullable().or(z.literal('')),
   })),
+  forceOverride: z.boolean().optional(),
 });
 
 export const rejectAssignmentSchema = z.object({

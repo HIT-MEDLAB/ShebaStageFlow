@@ -104,8 +104,24 @@ export class AssignmentService {
     return this.repository.bulkCreate(dto.assignments, userId);
   }
 
-  async addStudent(assignmentId: number, dto: AddStudentDto) {
-    const assignment = await this.getById(assignmentId) as { startDate: Date; endDate: Date; shiftType: 'MORNING' | 'EVENING' };
+  async addStudent(assignmentId: number, dto: AddStudentDto, userRole: string, forceOverride?: boolean) {
+    const assignment = await this.getById(assignmentId) as {
+      startDate: Date; endDate: Date; shiftType: 'MORNING' | 'EVENING';
+      studentCount: number | null; students: unknown[];
+    };
+
+    // Check capacity
+    if (assignment.studentCount != null) {
+      const currentCount = assignment.students.length;
+      if (currentCount + 1 > assignment.studentCount) {
+        if (!this.isAdmin(userRole)) {
+          throw new AppError('Student capacity exceeded', 400);
+        }
+        if (!forceOverride) {
+          throw new AppError('Student capacity exceeded — admin override required', 409);
+        }
+      }
+    }
 
     // Check for double-booking if the student already exists
     const existingStudent = await this.repository.findStudentByNationalId?.(dto.nationalId);
@@ -118,7 +134,8 @@ export class AssignmentService {
       }
     }
 
-    return this.repository.addStudent(assignmentId, dto);
+    const { forceOverride: _, ...studentData } = dto;
+    return this.repository.addStudent(assignmentId, studentData);
   }
 
   async removeStudent(assignmentId: number, studentId: number) {
@@ -126,10 +143,24 @@ export class AssignmentService {
     return this.repository.removeStudent(assignmentId, studentId);
   }
 
-  async importStudents(assignmentId: number, dto: ImportStudentsDto) {
+  async importStudents(assignmentId: number, dto: ImportStudentsDto, userRole: string, forceOverride?: boolean) {
     const assignment = await this.getById(assignmentId) as {
       startDate: Date; endDate: Date; shiftType: 'MORNING' | 'EVENING';
+      studentCount: number | null; students: unknown[];
     };
+
+    // Check capacity
+    if (assignment.studentCount != null) {
+      const currentCount = assignment.students.length;
+      if (currentCount + dto.students.length > assignment.studentCount) {
+        if (!this.isAdmin(userRole)) {
+          throw new AppError('Student capacity exceeded', 400);
+        }
+        if (!forceOverride) {
+          throw new AppError('Student capacity exceeded — admin override required', 409);
+        }
+      }
+    }
 
     // Validate all students for double-booking before adding any
     const allViolations: ConstraintViolation[] = [];

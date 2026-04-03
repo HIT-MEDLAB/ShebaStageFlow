@@ -164,10 +164,11 @@ export async function importAssignments(assignments: CreateAssignmentDto[]) {
 export async function addStudent(
   assignmentId: number,
   dto: CreateStudentDto,
+  forceOverride?: boolean,
 ) {
   const { data } = await apiClient.post(
     `/assignments/${assignmentId}/students`,
-    dto,
+    { ...dto, forceOverride },
   )
   return data
 }
@@ -184,10 +185,11 @@ export async function removeStudent(
 export async function importStudents(
   assignmentId: number,
   students: CreateStudentDto[],
+  forceOverride?: boolean,
 ) {
   const { data } = await apiClient.post(
     `/assignments/${assignmentId}/students/import`,
-    { students },
+    { students, forceOverride },
   )
   return data
 }

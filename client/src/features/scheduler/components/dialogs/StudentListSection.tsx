@@ -21,6 +21,8 @@ import {
 import { createStudentSchema, type StudentFormData } from '../../schemas/studentSchema'
 import { addStudent, removeStudent, importStudents } from '../../api/scheduler.api'
 import { ExcelDropZone } from './ExcelDropZone'
+import { AdminOverrideDialog } from './AdminOverrideDialog'
+import { useIsAdmin } from '@/hooks/useIsAdmin'
 import type { Student, CreateStudentDto } from '../../types/scheduler.types'
 
 interface StudentListSectionProps {
@@ -85,9 +87,15 @@ export function StudentListSection({
 }: StudentListSectionProps) {
   const { t } = useTranslation('scheduler')
   const queryClient = useQueryClient()
+  const isAdmin = useIsAdmin()
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [showImport, setShowImport] = useState(false)
+  const [pendingOverride, setPendingOverride] = useState<
+    | { type: 'add'; data: CreateStudentDto }
+    | { type: 'import'; data: CreateStudentDto[] }
+    | null
+  >(null)
 
   const schema = useMemo(() => createStudentSchema(t), [t])
 
@@ -106,7 +114,8 @@ export function StudentListSection({
   }, [queryClient, assignmentId])
 
   const addMutation = useMutation({
-    mutationFn: (dto: CreateStudentDto) => addStudent(assignmentId, dto),
+    mutationFn: ({ dto, forceOverride }: { dto: CreateStudentDto; forceOverride?: boolean }) =>
+      addStudent(assignmentId, dto, forceOverride),
     onSuccess: () => {
       invalidateAssignment()
       toast.success(t('toast.studentAdded'))
@@ -130,8 +139,8 @@ export function StudentListSection({
   })
 
   const importMutation = useMutation({
-    mutationFn: (studentsData: CreateStudentDto[]) =>
-      importStudents(assignmentId, studentsData),
+    mutationFn: ({ studentsData, forceOverride }: { studentsData: CreateStudentDto[]; forceOverride?: boolean }) =>
+      importStudents(assignmentId, studentsData, forceOverride),
     onSuccess: () => {
       invalidateAssignment()
       toast.success(t('toast.studentAdded'))
@@ -143,13 +152,25 @@ export function StudentListSection({
   })
 
   function onAddSubmit(data: StudentFormData) {
-    addMutation.mutate({
+    const dto: CreateStudentDto = {
       firstName: data.firstName,
       lastName: data.lastName,
       nationalId: data.nationalId,
       phone: data.phone || null,
       email: data.email || null,
-    })
+    }
+
+    const capacity = studentCount ?? Infinity
+    if (students.length + 1 > capacity) {
+      if (!isAdmin) {
+        toast.error(t('toast.capacityExceeded', { capacity: studentCount }))
+        return
+      }
+      setPendingOverride({ type: 'add', data: dto })
+      return
+    }
+
+    addMutation.mutate({ dto })
   }
 
   const handleFileSelected = useCallback(
@@ -176,12 +197,22 @@ export function StudentListSection({
           return parseStudentRow(normalized)
         })
 
-        importMutation.mutate(parsed)
+        const capacity = studentCount ?? Infinity
+        if (students.length + parsed.length > capacity) {
+          if (!isAdmin) {
+            toast.error(t('toast.capacityExceeded', { capacity: studentCount }))
+            return
+          }
+          setPendingOverride({ type: 'import', data: parsed })
+          return
+        }
+
+        importMutation.mutate({ studentsData: parsed })
       } catch {
         toast.error(t('dialogs.import.validationError'))
       }
     },
-    [importMutation, t],
+    [importMutation, t, students.length, studentCount, isAdmin],
   )
 
   const filled = students.length
@@ -339,6 +370,31 @@ export function StudentListSection({
           </div>
         </form>
       )}
+
+      {/* Admin override dialog for capacity exceeded */}
+      <AdminOverrideDialog
+        open={!!pendingOverride}
+        reasonKey="toast.capacityExceededDetail"
+        reasonParams={{
+          current: String(students.length),
+          capacity: String(studentCount ?? 0),
+          adding: String(
+            pendingOverride?.type === 'import'
+              ? pendingOverride.data.length
+              : 1,
+          ),
+        }}
+        onConfirm={() => {
+          if (!pendingOverride) return
+          if (pendingOverride.type === 'add') {
+            addMutation.mutate({ dto: pendingOverride.data, forceOverride: true })
+          } else {
+            importMutation.mutate({ studentsData: pendingOverride.data, forceOverride: true })
+          }
+          setPendingOverride(null)
+        }}
+        onCancel={() => setPendingOverride(null)}
+      />
     </div>
   )
 }
