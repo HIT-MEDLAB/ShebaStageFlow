@@ -12,6 +12,7 @@ import type {
   DisplaceAssignmentDto,
   SmartImportValidateDto,
   SmartImportExecuteDto,
+  ValidateDisplacementWeekDto,
 } from './assignment.schema';
 
 export function createAssignmentController(service: AssignmentService) {
@@ -231,6 +232,16 @@ export function createAssignmentController(service: AssignmentService) {
         const { rejectionReason } = req.body as RejectAssignmentDto;
         await service.reject(Number(req.params.id), rejectionReason);
         res.status(204).send();
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async validateDisplacementWeek(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const dto = req.body as ValidateDisplacementWeekDto;
+        const result = await service.validateDisplacementWeek(dto);
+        res.json(result);
       } catch (err) {
         next(err);
       }

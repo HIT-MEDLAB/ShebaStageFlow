@@ -87,6 +87,20 @@ export const displaceAssignmentSchema = z.object({
   forceOverride: z.boolean().optional(),
 });
 
+// ── Displacement week validation ─────────────────────────────────
+
+export const validateDisplacementWeekSchema = z.object({
+  departmentId: z.number().int().positive(),
+  universityId: z.number().int().positive(),
+  startDate: z.coerce.date().refine((d) => d.getDay() === 0, { message: 'Start date must be a Sunday' }),
+  endDate: z.coerce.date().refine((d) => d.getDay() === 4, { message: 'End date must be a Thursday' }),
+  shiftType: z.enum(['MORNING', 'EVENING']),
+  type: z.enum(['GROUP', 'ELECTIVE']),
+  studentCount: z.number().int().positive().optional().nullable(),
+  yearInProgram: z.number().int().min(1).max(6),
+  excludeAssignmentIds: z.array(z.number().int()),
+});
+
 // ── Smart Import schemas ─────────────────────────────────────────
 
 export const smartImportValidateSchema = z.object({
@@ -145,3 +159,4 @@ export type RejectAssignmentDto = z.infer<typeof rejectAssignmentSchema>;
 export type DisplaceAssignmentDto = z.infer<typeof displaceAssignmentSchema>;
 export type SmartImportValidateDto = z.infer<typeof smartImportValidateSchema>;
 export type SmartImportExecuteDto = z.infer<typeof smartImportExecuteSchema>;
+export type ValidateDisplacementWeekDto = z.infer<typeof validateDisplacementWeekSchema>;

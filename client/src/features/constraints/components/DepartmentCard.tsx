@@ -180,14 +180,20 @@ export function DepartmentCard({
             <div className="flex items-center gap-2">
               <Switch
                 checked={hasMorningShift}
-                onCheckedChange={(val) => setValue('hasMorningShift', val)}
+                onCheckedChange={(val) => {
+                  setValue('hasMorningShift', val)
+                  if (!val) setValue('morningCapacity', 0)
+                }}
               />
               <Label>{t('department.hasMorningShift')}</Label>
             </div>
             <div className="flex items-center gap-2">
               <Switch
                 checked={hasEveningShift}
-                onCheckedChange={(val) => setValue('hasEveningShift', val)}
+                onCheckedChange={(val) => {
+                  setValue('hasEveningShift', val)
+                  if (!val) setValue('eveningCapacity', 0)
+                }}
               />
               <Label>{t('department.hasEveningShift')}</Label>
             </div>
@@ -196,11 +202,11 @@ export function DepartmentCard({
           <div className="grid grid-cols-3 gap-4">
             <div className="flex flex-col gap-1.5">
               <Label>{t('department.morningCapacity')}</Label>
-              <Input type="number" min={0} {...register('morningCapacity')} />
+              <Input type="number" min={0} {...register('morningCapacity')} disabled={!hasMorningShift} />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label>{t('department.eveningCapacity')}</Label>
-              <Input type="number" min={0} {...register('eveningCapacity')} />
+              <Input type="number" min={0} {...register('eveningCapacity')} disabled={!hasEveningShift} />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label>{t('department.electiveCapacity')}</Label>

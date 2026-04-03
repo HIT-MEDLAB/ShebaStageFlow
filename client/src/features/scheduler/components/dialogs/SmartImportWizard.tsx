@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 
 import { useSchedulerStore } from '../../stores/schedulerStore'
-import { smartImportValidate, smartImportExecute } from '../../api/scheduler.api'
+import { smartImportValidate, smartImportExecute, validateDisplacementWeek } from '../../api/scheduler.api'
 import type {
   SmartImportRow,
   ImportRowResult,
@@ -43,6 +43,7 @@ type WizardAction =
   | { type: 'START_VALIDATE'; originalRows: SmartImportRow[] }
   | { type: 'VALIDATE_DONE'; rows: ImportRowResult[]; globalWarnings?: string[] }
   | { type: 'SET_ROW_ACTION'; rowIndex: number; action: ImportAction | null }
+  | { type: 'UNDO_ROW_ACTION'; rowIndex: number }
   | { type: 'DELETE_ROW'; rowIndex: number }
   | { type: 'START_REVALIDATE'; rowIndex: number }
   | { type: 'REVALIDATE_DONE'; rowIndex: number; result: ImportRowResult; editedRow: SmartImportRow }
@@ -77,6 +78,11 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         ...state,
         actions: new Map(state.actions).set(action.rowIndex, action.action),
       }
+    case 'UNDO_ROW_ACTION': {
+      const newActions = new Map(state.actions)
+      newActions.delete(action.rowIndex)
+      return { ...state, actions: newActions }
+    }
     case 'DELETE_ROW': {
       const newDeleted = new Set(state.deletedRows)
       newDeleted.add(action.rowIndex)
@@ -193,6 +199,10 @@ export function SmartImportWizard() {
     [],
   )
 
+  const handleUndoRowAction = useCallback((rowIndex: number) => {
+    dispatch({ type: 'UNDO_ROW_ACTION', rowIndex })
+  }, [])
+
   const handleDeleteRow = useCallback((rowIndex: number) => {
     dispatch({ type: 'DELETE_ROW', rowIndex })
   }, [])
@@ -212,6 +222,23 @@ export function SmartImportWizard() {
       }
     },
     [academicYearId, t, state.rows],
+  )
+
+  const handleValidateWeek = useCallback(
+    async (params: {
+      departmentId: number
+      universityId: number
+      startDate: string
+      endDate: string
+      shiftType: 'MORNING' | 'EVENING'
+      type: 'GROUP' | 'ELECTIVE'
+      studentCount: number | null
+      yearInProgram: number
+      excludeAssignmentIds: number[]
+    }) => {
+      return validateDisplacementWeek(params)
+    },
+    [],
   )
 
   const handleExecute = useCallback(() => {
@@ -265,8 +292,10 @@ export function SmartImportWizard() {
               isAdmin={isAdmin}
               globalWarnings={state.globalWarnings}
               onSetAction={handleSetRowAction}
+              onUndoAction={handleUndoRowAction}
               onEditRow={handleEditRow}
               onDeleteRow={handleDeleteRow}
+              onValidateWeek={handleValidateWeek}
             />
           )}
 

@@ -11,10 +11,12 @@ import type {
   DisplaceAssignmentDto,
   SmartImportValidateDto,
   SmartImportExecuteDto,
+  ValidateDisplacementWeekDto,
 } from './assignment.schema';
 import { ConstraintEngine, validateStudentLink } from './validation/constraintEngine';
 import { ConstraintValidationError, type ConstraintViolation } from '../../shared/errors/ConstraintValidationError';
 import { ImportValidationService } from './import/importService';
+import { validateWeekForDisplacement } from './import/suggestionEngine';
 import type { ImportValidationResult } from './import/importTypes';
 import prisma from '../../lib/prisma';
 
@@ -207,6 +209,20 @@ export class AssignmentService {
 
     // Simple delete for assignments without displacement data
     await this.repository.remove(id);
+  }
+
+  async validateDisplacementWeek(dto: ValidateDisplacementWeekDto) {
+    return validateWeekForDisplacement(
+      dto.departmentId,
+      dto.shiftType,
+      dto.type,
+      dto.universityId,
+      dto.startDate,
+      dto.endDate,
+      dto.studentCount ?? null,
+      dto.yearInProgram,
+      dto.excludeAssignmentIds,
+    );
   }
 
   async validateSmartImport(dto: SmartImportValidateDto): Promise<ImportValidationResult> {

@@ -158,19 +158,22 @@ export class ConstraintRepository implements IConstraintRepository {
 
   async createDepartmentWithConstraint(data: CreateDepartmentDto) {
     return prisma.$transaction(async (tx) => {
+      const hasMorning = data.hasMorningShift ?? true;
+      const hasEvening = data.hasEveningShift ?? false;
+
       const department = await tx.department.create({
         data: {
           name: data.name,
-          hasMorningShift: data.hasMorningShift ?? true,
-          hasEveningShift: data.hasEveningShift ?? false,
+          hasMorningShift: hasMorning,
+          hasEveningShift: hasEvening,
         },
       });
 
       await tx.departmentConstraint.create({
         data: {
           departmentId: department.id,
-          morningCapacity: data.morningCapacity,
-          eveningCapacity: data.eveningCapacity ?? 0,
+          morningCapacity: hasMorning ? data.morningCapacity : 0,
+          eveningCapacity: hasEvening ? (data.eveningCapacity ?? 0) : 0,
           electiveCapacity: data.electiveCapacity ?? 0,
         },
       });
@@ -193,10 +196,17 @@ export class ConstraintRepository implements IConstraintRepository {
         },
       });
 
+      // Read back the current shift flags to enforce capacity consistency
+      const dept = await tx.department.findUniqueOrThrow({ where: { id } });
+
       const constraintData: Record<string, number> = {};
       if (data.morningCapacity !== undefined) constraintData['morningCapacity'] = data.morningCapacity;
       if (data.eveningCapacity !== undefined) constraintData['eveningCapacity'] = data.eveningCapacity;
       if (data.electiveCapacity !== undefined) constraintData['electiveCapacity'] = data.electiveCapacity;
+
+      // Force capacity to 0 when the shift is disabled
+      if (!dept.hasMorningShift) constraintData['morningCapacity'] = 0;
+      if (!dept.hasEveningShift) constraintData['eveningCapacity'] = 0;
 
       if (Object.keys(constraintData).length > 0) {
         const existing = await tx.departmentConstraint.findFirst({ where: { departmentId: id } });
@@ -206,8 +216,8 @@ export class ConstraintRepository implements IConstraintRepository {
           await tx.departmentConstraint.create({
             data: {
               departmentId: id,
-              morningCapacity: data.morningCapacity ?? 1,
-              eveningCapacity: data.eveningCapacity ?? 0,
+              morningCapacity: dept.hasMorningShift ? (data.morningCapacity ?? 1) : 0,
+              eveningCapacity: dept.hasEveningShift ? (data.eveningCapacity ?? 0) : 0,
               electiveCapacity: data.electiveCapacity ?? 0,
             },
           });

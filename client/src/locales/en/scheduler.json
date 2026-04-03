@@ -161,7 +161,9 @@
       "delete": "Remove",
       "save": "Save",
       "cancel": "Cancel",
-      "revalidating": "Re-validating..."
+      "revalidating": "Re-validating...",
+      "weekInvalid": "This week is not valid for the displaced assignment",
+      "weekValidationFailed": "Week validation failed — try again"
     },
     "validation": {
       "departmentRequired": "Department is required",

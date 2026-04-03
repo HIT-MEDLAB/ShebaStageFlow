@@ -11,13 +11,25 @@ import { ImportRowEditDialog } from './ImportRowEditDialog'
 
 interface ImportRowCardProps {
   row: ImportRowResult
-  action: ImportAction | null
+  action: ImportAction | null | undefined
   isAdmin: boolean
   originalRow?: SmartImportRow
   isRevalidating?: boolean
   onSetAction: (action: ImportAction | null) => void
+  onUndoAction?: () => void
   onEditRow?: (editedRow: SmartImportRow) => void
   onDeleteRow?: () => void
+  onValidateWeek?: (params: {
+    departmentId: number
+    universityId: number
+    startDate: string
+    endDate: string
+    shiftType: 'MORNING' | 'EVENING'
+    type: 'GROUP' | 'ELECTIVE'
+    studentCount: number | null
+    yearInProgram: number
+    excludeAssignmentIds: number[]
+  }) => Promise<{ valid: boolean; failureReason?: string; failureParams?: Record<string, string | number> }>
 }
 
 const statusConfig = {
@@ -50,18 +62,55 @@ export function ImportRowCard({
   originalRow,
   isRevalidating,
   onSetAction,
+  onUndoAction,
   onEditRow,
   onDeleteRow,
+  onValidateWeek,
 }: ImportRowCardProps) {
   const { t } = useTranslation('scheduler')
   const [isEditing, setIsEditing] = useState(false)
+  const [isValidatingWeek, setIsValidatingWeek] = useState(false)
+  const [weekValidationError, setWeekValidationError] = useState<string | undefined>()
   const config = statusConfig[row.status]
   const Icon = config.icon
 
   const dto = row.resolvedDto
 
-  function handleSelectWeek(startDate: string, endDate: string) {
+  async function handleSelectWeek(startDate: string, endDate: string) {
     if (!dto || !row.bumpedAssignment) return
+
+    setWeekValidationError(undefined)
+
+    if (onValidateWeek) {
+      setIsValidatingWeek(true)
+      try {
+        const result = await onValidateWeek({
+          departmentId: row.bumpedAssignment.departmentId,
+          universityId: row.bumpedAssignment.universityId,
+          startDate,
+          endDate,
+          shiftType: row.bumpedAssignment.shiftType,
+          type: row.bumpedAssignment.type,
+          studentCount: row.bumpedAssignment.studentCount,
+          yearInProgram: row.bumpedAssignment.yearInProgram,
+          excludeAssignmentIds: [row.bumpedAssignment.id],
+        })
+        if (!result.valid) {
+          setWeekValidationError(
+            result.failureReason
+              ? t(result.failureReason, result.failureParams as Record<string, string> | undefined)
+              : t('dialogs.smartImport.weekInvalid'),
+          )
+          return
+        }
+      } catch {
+        setWeekValidationError(t('dialogs.smartImport.weekValidationFailed'))
+        return
+      } finally {
+        setIsValidatingWeek(false)
+      }
+    }
+
     onSetAction({
       type: 'displace',
       rowIndex: row.rowIndex,
@@ -172,12 +221,25 @@ export function ImportRowCard({
                   <span className="text-xs text-muted-foreground">
                     {t('dialogs.smartImport.skipped')}
                   </span>
+                  {onUndoAction && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs ms-auto"
+                      onClick={onUndoAction}
+                    >
+                      {t('dialogs.smartImport.undo')}
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <>
                   <ImportWeekPicker
                     suggestedWeeks={row.suggestedWeeks ?? []}
                     onSelect={handleSelectWeek}
+                    isValidating={isValidatingWeek}
+                    validationError={weekValidationError}
                   />
                   <Button
                     type="button"

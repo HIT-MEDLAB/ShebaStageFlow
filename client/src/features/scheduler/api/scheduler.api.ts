@@ -145,6 +145,24 @@ export async function smartImportValidate(
   return data
 }
 
+export async function validateDisplacementWeek(params: {
+  departmentId: number
+  universityId: number
+  startDate: string
+  endDate: string
+  shiftType: 'MORNING' | 'EVENING'
+  type: 'GROUP' | 'ELECTIVE'
+  studentCount?: number | null
+  yearInProgram: number
+  excludeAssignmentIds: number[]
+}): Promise<{ valid: boolean; failureReason?: string; failureParams?: Record<string, string | number> }> {
+  const { data } = await apiClient.post<{ valid: boolean; failureReason?: string; failureParams?: Record<string, string | number> }>(
+    '/assignments/import/validate-displacement-week',
+    params,
+  )
+  return data
+}
+
 export async function smartImportExecute(
   academicYearId: number,
   actions: ImportAction[],

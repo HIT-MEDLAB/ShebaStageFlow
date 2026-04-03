@@ -161,7 +161,9 @@
       "delete": "הסר",
       "save": "שמור",
       "cancel": "ביטול",
-      "revalidating": "מאמת מחדש..."
+      "revalidating": "מאמת מחדש...",
+      "weekInvalid": "שבוע זה אינו תקף לשיבוץ המוחלף",
+      "weekValidationFailed": "אימות השבוע נכשל — נסה שוב"
     },
     "validation": {
       "departmentRequired": "יש לבחור מחלקה",

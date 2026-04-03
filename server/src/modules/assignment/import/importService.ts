@@ -379,11 +379,11 @@ export class ImportValidationService {
       };
     }
 
-    // Lower priority number = higher priority
+    // Higher priority number = higher priority
     const incomingPriority = incomingUniversity.priority;
     const existingPriority = existing.university.priority;
 
-    if (incomingPriority >= existingPriority) {
+    if (incomingPriority <= existingPriority) {
       // Incoming does NOT have higher priority → fail
       const suggestions = await findSuggestedWeeks(
         dto.departmentId, dto.shiftType, dto.type, dto.universityId,

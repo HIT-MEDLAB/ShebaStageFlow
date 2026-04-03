@@ -13,8 +13,20 @@ interface ImportReviewStepProps {
   isAdmin: boolean
   globalWarnings?: string[]
   onSetAction: (rowIndex: number, action: ImportAction | null) => void
+  onUndoAction: (rowIndex: number) => void
   onEditRow: (rowIndex: number, editedRow: SmartImportRow) => void
   onDeleteRow: (rowIndex: number) => void
+  onValidateWeek?: (params: {
+    departmentId: number
+    universityId: number
+    startDate: string
+    endDate: string
+    shiftType: 'MORNING' | 'EVENING'
+    type: 'GROUP' | 'ELECTIVE'
+    studentCount: number | null
+    yearInProgram: number
+    excludeAssignmentIds: number[]
+  }) => Promise<{ valid: boolean; failureReason?: string; failureParams?: Record<string, string | number> }>
 }
 
 export function ImportReviewStep({
@@ -26,8 +38,10 @@ export function ImportReviewStep({
   isAdmin,
   globalWarnings,
   onSetAction,
+  onUndoAction,
   onEditRow,
   onDeleteRow,
+  onValidateWeek,
 }: ImportReviewStepProps) {
   const { t } = useTranslation('scheduler')
 
@@ -99,13 +113,15 @@ export function ImportReviewStep({
             <ImportRowCard
               key={row.rowIndex}
               row={row}
-              action={action ?? null}
+              action={action}
               isAdmin={isAdmin}
               originalRow={originalRows[row.rowIndex]}
               isRevalidating={revalidatingRow === row.rowIndex}
               onSetAction={(act) => onSetAction(row.rowIndex, act)}
+              onUndoAction={() => onUndoAction(row.rowIndex)}
               onEditRow={(editedRow) => onEditRow(row.rowIndex, editedRow)}
               onDeleteRow={() => onDeleteRow(row.rowIndex)}
+              onValidateWeek={onValidateWeek}
             />
           )
         })}

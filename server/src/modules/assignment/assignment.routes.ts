@@ -13,6 +13,7 @@ import {
   displaceAssignmentSchema,
   smartImportValidateSchema,
   smartImportExecuteSchema,
+  validateDisplacementWeekSchema,
 } from './assignment.schema';
 import { AssignmentRepository } from './assignment.repository';
 import { AssignmentService } from './assignment.service';
@@ -33,6 +34,7 @@ assignmentRouter.get('/', controller.getByAcademicYear);
 assignmentRouter.get('/export', controller.exportAssignments);
 assignmentRouter.post('/', validateRequest(createAssignmentSchema), controller.create);
 assignmentRouter.post('/import/validate', validateRequest(smartImportValidateSchema), controller.smartImportValidate);
+assignmentRouter.post('/import/validate-displacement-week', validateRequest(validateDisplacementWeekSchema), controller.validateDisplacementWeek);
 assignmentRouter.post('/import/execute', validateRequest(smartImportExecuteSchema), controller.smartImportExecute);
 assignmentRouter.post('/import', validateRequest(importAssignmentsSchema), controller.importAssignments);
 

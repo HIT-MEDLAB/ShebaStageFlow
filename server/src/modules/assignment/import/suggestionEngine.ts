@@ -37,6 +37,73 @@ function computeAllWeeks(startDate: Date, endDate: Date): Array<{ startDate: Dat
   return weeks;
 }
 
+export async function validateWeekForDisplacement(
+  departmentId: number,
+  shiftType: 'MORNING' | 'EVENING',
+  type: 'GROUP' | 'ELECTIVE',
+  universityId: number,
+  startDate: Date,
+  endDate: Date,
+  studentCount: number | null,
+  yearInProgram: number,
+  excludeAssignmentIds: number[],
+): Promise<{ valid: boolean; failureReason?: string; failureParams?: Record<string, string | number> }> {
+  // Check holidays
+  const holiday = await prisma.holiday.findFirst({
+    where: {
+      isActive: true,
+      date: { gte: startDate, lte: endDate },
+    },
+  });
+  if (holiday) {
+    return { valid: false, failureReason: 'grid.blocked.holiday' };
+  }
+
+  // Check date constraints
+  const dateConstraint = await prisma.dateConstraint.findFirst({
+    where: {
+      isActive: true,
+      startDate: { lte: endDate },
+      endDate: { gte: startDate },
+    },
+  });
+  if (dateConstraint) {
+    return { valid: false, failureReason: 'grid.blocked.dateConstraint', failureParams: { name: dateConstraint.name } };
+  }
+
+  // Check department blocked dates
+  const deptConstraint = await prisma.departmentConstraint.findFirst({
+    where: { departmentId },
+  });
+  if (
+    deptConstraint?.blockedStartDate &&
+    deptConstraint?.blockedEndDate &&
+    startDate <= deptConstraint.blockedEndDate &&
+    endDate >= deptConstraint.blockedStartDate
+  ) {
+    return { valid: false, failureReason: 'grid.blocked.dateBlock' };
+  }
+
+  // Run constraint engine
+  try {
+    await engine.validate({
+      departmentId,
+      universityId,
+      startDate,
+      endDate,
+      type,
+      shiftType,
+      studentCount,
+      yearInProgram,
+      excludeAssignmentIds,
+    });
+    return { valid: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Constraint violation';
+    return { valid: false, failureReason: message };
+  }
+}
+
 export async function findSuggestedWeeks(
   departmentId: number,
   shiftType: 'MORNING' | 'EVENING',
@@ -70,57 +137,21 @@ export async function findSuggestedWeeks(
     const key = getWeekKey(departmentId, shiftType, week.startDate.toISOString());
     if (virtuallyOccupied.has(key)) continue;
 
-    // Check holidays
-    const holiday = await prisma.holiday.findFirst({
-      where: {
-        isActive: true,
-        date: { gte: week.startDate, lte: week.endDate },
-      },
-    });
-    if (holiday) continue;
+    const result = await validateWeekForDisplacement(
+      departmentId,
+      shiftType,
+      type,
+      universityId,
+      week.startDate,
+      week.endDate,
+      studentCount,
+      yearInProgram,
+      excludeAssignmentIds,
+    );
 
-    // Check date constraints
-    const dateConstraint = await prisma.dateConstraint.findFirst({
-      where: {
-        isActive: true,
-        startDate: { lte: week.endDate },
-        endDate: { gte: week.startDate },
-      },
-    });
-    if (dateConstraint) continue;
-
-    // Check department blocked dates
-    const deptConstraint = await prisma.departmentConstraint.findFirst({
-      where: { departmentId },
-    });
-    if (
-      deptConstraint?.blockedStartDate &&
-      deptConstraint?.blockedEndDate &&
-      week.startDate <= deptConstraint.blockedEndDate &&
-      week.endDate >= deptConstraint.blockedStartDate
-    ) {
-      continue;
-    }
-
-    // Run constraint engine
-    try {
-      await engine.validate({
-        departmentId,
-        universityId,
-        startDate: week.startDate,
-        endDate: week.endDate,
-        type,
-        shiftType,
-        studentCount,
-        yearInProgram,
-        excludeAssignmentIds,
-      });
-      // No error → valid week
+    if (result.valid) {
       results.push(week);
       if (results.length >= maxResults) break;
-    } catch {
-      // Constraint violation → skip
-      continue;
     }
   }
 
