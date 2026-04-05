@@ -1,0 +1,12 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, stageflow]
+    steps:
+      - name: Deploy
+        run: /home/ubuntu/scripts/deploy-stageflow.sh
