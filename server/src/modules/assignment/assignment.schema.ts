@@ -4,8 +4,8 @@ export const createAssignmentSchema = z.object({
   departmentId: z.number().int().positive(),
   universityId: z.number().int().positive(),
   academicYearId: z.number().int().positive(),
-  startDate: z.coerce.date().refine((d) => d.getDay() === 0, { message: 'Start date must be a Sunday' }),
-  endDate: z.coerce.date().refine((d) => d.getDay() === 4, { message: 'End date must be a Thursday' }),
+  startDate: z.coerce.date().refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' }),
+  endDate: z.coerce.date().refine((d) => d.getUTCDay() === 4, { message: 'End date must be a Thursday' }),
   type: z.enum(['GROUP', 'ELECTIVE']),
   shiftType: z.enum(['MORNING', 'EVENING']),
   studentCount: z.number().int().positive().optional().nullable(),
@@ -32,8 +32,8 @@ export const updateAssignmentSchema = z.object({
 
 export const moveAssignmentSchema = z.object({
   departmentId: z.number().int().positive(),
-  startDate: z.coerce.date().refine((d) => d.getDay() === 0, { message: 'Start date must be a Sunday' }),
-  endDate: z.coerce.date().refine((d) => d.getDay() === 4, { message: 'End date must be a Thursday' }),
+  startDate: z.coerce.date().refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' }),
+  endDate: z.coerce.date().refine((d) => d.getUTCDay() === 4, { message: 'End date must be a Thursday' }),
   forceOverride: z.boolean().optional(),
 });
 
@@ -78,8 +78,8 @@ export const rejectAssignmentSchema = z.object({
 
 export const displaceAssignmentSchema = z.object({
   departmentId: z.number().int().positive(),
-  startDate: z.coerce.date().refine((d) => d.getDay() === 0, { message: 'Start date must be a Sunday' }),
-  endDate: z.coerce.date().refine((d) => d.getDay() === 4, { message: 'End date must be a Thursday' }),
+  startDate: z.coerce.date().refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' }),
+  endDate: z.coerce.date().refine((d) => d.getUTCDay() === 4, { message: 'End date must be a Thursday' }),
   displacedAssignmentId: z.number().int(),
   displacedDepartmentId: z.number().int().positive(),
   displacedStartDate: z.coerce.date(),
@@ -92,8 +92,8 @@ export const displaceAssignmentSchema = z.object({
 export const validateDisplacementWeekSchema = z.object({
   departmentId: z.number().int().positive(),
   universityId: z.number().int().positive(),
-  startDate: z.coerce.date().refine((d) => d.getDay() === 0, { message: 'Start date must be a Sunday' }),
-  endDate: z.coerce.date().refine((d) => d.getDay() === 4, { message: 'End date must be a Thursday' }),
+  startDate: z.coerce.date().refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' }),
+  endDate: z.coerce.date().refine((d) => d.getUTCDay() === 4, { message: 'End date must be a Thursday' }),
   shiftType: z.enum(['MORNING', 'EVENING']),
   type: z.enum(['GROUP', 'ELECTIVE']),
   studentCount: z.number().int().positive().optional().nullable(),
