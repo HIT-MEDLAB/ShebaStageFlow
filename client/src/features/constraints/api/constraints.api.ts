@@ -67,3 +67,11 @@ export async function updateUniversityWithSemester(id: number, payload: UpdateUn
   const { data } = await apiClient.patch(`/constraints/universities/${id}`, payload)
   return data
 }
+
+export async function deleteDepartment(id: number) {
+  await apiClient.delete(`/constraints/departments/${id}`)
+}
+
+export async function deleteUniversity(id: number) {
+  await apiClient.delete(`/constraints/universities/${id}`)
+}

@@ -101,6 +101,10 @@ export class ConstraintService {
     return this.repository.updateDepartmentWithConstraint(id, data);
   }
 
+  async deleteDepartment(id: number) {
+    return this.repository.deleteDepartment(id);
+  }
+
   // ─── Universities ──────────────────────────────────────────
 
   async createUniversityWithSemester(data: CreateUniversityWithSemesterDto & { year: number }) {
@@ -109,5 +113,9 @@ export class ConstraintService {
 
   async updateUniversityWithSemester(id: number, data: UpdateUniversityWithSemesterDto & { year?: number }) {
     return this.repository.updateUniversityWithSemester(id, data);
+  }
+
+  async deleteUniversity(id: number) {
+    return this.repository.deleteUniversity(id);
   }
 }

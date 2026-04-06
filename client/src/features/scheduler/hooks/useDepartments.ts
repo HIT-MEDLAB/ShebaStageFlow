@@ -6,5 +6,6 @@ export function useDepartments() {
     queryKey: ['scheduler', 'departments'],
     queryFn: fetchDepartments,
     staleTime: 5 * 60 * 1000, // 5 minutes – departments rarely change
+    select: (data) => [...data].sort((a, b) => a.name.localeCompare(b.name, 'he')),
   })
 }

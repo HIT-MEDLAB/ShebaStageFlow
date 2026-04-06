@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,6 +15,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { departmentFormSchema, type DepartmentFormValues } from '../schemas/constraints.schemas'
 import type { DepartmentWithConstraint } from '../types/constraints.types'
 
@@ -22,8 +34,10 @@ interface DepartmentCardProps {
   isAdmin: boolean
   onCreate: (data: DepartmentFormValues) => void
   onUpdate: (id: number, data: DepartmentFormValues) => void
+  onDelete: (id: number) => void
   isCreatePending: boolean
   isUpdatePending: boolean
+  isDeletePending: boolean
 }
 
 export function DepartmentCard({
@@ -31,8 +45,10 @@ export function DepartmentCard({
   isAdmin,
   onCreate,
   onUpdate,
+  onDelete,
   isCreatePending,
   isUpdatePending,
+  isDeletePending,
 }: DepartmentCardProps) {
   const { t } = useTranslation('constraints')
   const [mode, setMode] = useState<'add' | 'edit'>('edit')
@@ -214,7 +230,47 @@ export function DepartmentCard({
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-between">
+            <div>
+              {mode === 'edit' && selectedId && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" type="button" disabled={isDeletePending}>
+                      <Trash2 className="size-4 me-2" />
+                      {t('actions.delete')}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t('dialog.deleteDepartmentTitle')}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t('dialog.deleteDepartmentConfirm')}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('form.cancel')}</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          onDelete(selectedId)
+                          setSelectedId(null)
+                          reset({
+                            name: '',
+                            hasMorningShift: true,
+                            hasEveningShift: false,
+                            morningCapacity: 1,
+                            eveningCapacity: 0,
+                            electiveCapacity: 0,
+                          })
+                        }}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {t('actions.delete')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
             <Button
               type="submit"
               disabled={isCreatePending || isUpdatePending || (mode === 'edit' && !selectedId)}

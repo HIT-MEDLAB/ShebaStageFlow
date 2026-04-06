@@ -49,7 +49,9 @@ constraintRouter.patch('/soft/:id/toggle', adminOnly, validateRequest(toggleCons
 // Departments (transactional)
 constraintRouter.post('/departments', adminOnly, validateRequest(createDepartmentSchema), controller.createDepartmentWithConstraint);
 constraintRouter.patch('/departments/:id', adminOnly, validateRequest(updateDepartmentSchema), controller.updateDepartmentWithConstraint);
+constraintRouter.delete('/departments/:id', adminOnly, controller.deleteDepartment);
 
 // Universities (transactional)
 constraintRouter.post('/universities', adminOnly, validateRequest(createUniversityWithSemesterSchema), controller.createUniversityWithSemester);
 constraintRouter.patch('/universities/:id', adminOnly, validateRequest(updateUniversityWithSemesterSchema), controller.updateUniversityWithSemester);
+constraintRouter.delete('/universities/:id', adminOnly, controller.deleteUniversity);

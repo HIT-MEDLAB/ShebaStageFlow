@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
 import {
   createUniversityWithSemester,
   updateUniversityWithSemester,
+  deleteUniversity,
 } from '../api/constraints.api'
 import type { CreateUniversityData, UpdateUniversityData } from '../types/constraints.types'
 import { toast } from 'sonner'
@@ -36,5 +38,21 @@ export function useUniversityMutation() {
     },
   })
 
-  return { createMutation, updateMutation }
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteUniversity(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
+      toast.success(t('toast.universityDeleted'))
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err) && err.response?.status === 409) {
+        toast.error(t('toast.universityHasReferences'))
+      } else {
+        toast.error(t('toast.deleteFailed'))
+      }
+    },
+  })
+
+  return { createMutation, updateMutation, deleteMutation }
 }

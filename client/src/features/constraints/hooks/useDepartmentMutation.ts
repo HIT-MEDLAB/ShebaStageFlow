@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
 import {
   createDepartmentWithConstraint,
   updateDepartmentWithConstraint,
+  deleteDepartment,
 } from '../api/constraints.api'
 import type { CreateDepartmentData, UpdateDepartmentData } from '../types/constraints.types'
 import { toast } from 'sonner'
@@ -36,5 +38,21 @@ export function useDepartmentMutation() {
     },
   })
 
-  return { createMutation, updateMutation }
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteDepartment(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
+      toast.success(t('toast.departmentDeleted'))
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err) && err.response?.status === 409) {
+        toast.error(t('toast.departmentHasAssignments'))
+      } else {
+        toast.error(t('toast.deleteFailed'))
+      }
+    },
+  })
+
+  return { createMutation, updateMutation, deleteMutation }
 }
