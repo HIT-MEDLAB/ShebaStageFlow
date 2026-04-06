@@ -28,7 +28,6 @@ export const universityFormSchema = z.object({
   priority: z.coerce.number().int().min(0).optional(),
   semesterStart: z.string().min(1),
   semesterEnd: z.string().min(1),
-  year: z.coerce.number().int().positive(),
 })
 
 export type UniversityFormValues = z.infer<typeof universityFormSchema>
