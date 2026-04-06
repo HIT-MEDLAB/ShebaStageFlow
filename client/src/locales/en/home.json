@@ -17,8 +17,7 @@
   },
   "weekSelector": {
     "label": "Select Week",
-    "week": "Week {{number}}",
-    "weekRange": "Week {{number}} ({{start}} - {{end}})"
+    "weekRange": "{{start}} - {{end}}"
   },
   "viewToggle": {
     "weekly": "Weekly",
