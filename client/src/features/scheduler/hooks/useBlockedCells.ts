@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { startOfDay } from 'date-fns'
 import type { ConstraintsResponse, WeekDefinition, BlockReason } from '../types/scheduler.types'
 
 /**
@@ -20,7 +21,7 @@ export function useBlockedCells(
     // block ALL departments for that week (hospital-wide closure)
     for (const week of weeks) {
       for (const holiday of constraints.holidays) {
-        const holidayDate = new Date(holiday.date)
+        const holidayDate = startOfDay(new Date(holiday.date))
         if (holidayDate >= week.startDate && holidayDate <= week.endDate) {
           blocked.set(`holiday:week:${week.weekNumber}`, {
             type: 'holiday',
@@ -33,8 +34,8 @@ export function useBlockedCells(
     // Department date blocks
     for (const dc of constraints.departmentConstraints) {
       if (dc.blockedStartDate && dc.blockedEndDate) {
-        const blockStart = new Date(dc.blockedStartDate)
-        const blockEnd = new Date(dc.blockedEndDate)
+        const blockStart = startOfDay(new Date(dc.blockedStartDate))
+        const blockEnd = startOfDay(new Date(dc.blockedEndDate))
         for (const week of weeks) {
           // Check if week overlaps with blocked date range
           if (week.startDate <= blockEnd && week.endDate >= blockStart) {
@@ -50,8 +51,8 @@ export function useBlockedCells(
     // Date constraint blocking (global blocks, like holidays)
     if (constraints.dateConstraints) {
       for (const dc of constraints.dateConstraints) {
-        const dcStart = new Date(dc.startDate)
-        const dcEnd = new Date(dc.endDate)
+        const dcStart = startOfDay(new Date(dc.startDate))
+        const dcEnd = startOfDay(new Date(dc.endDate))
         for (const week of weeks) {
           if (week.startDate <= dcEnd && week.endDate >= dcStart) {
             const key = `dateConstraint:week:${week.weekNumber}`
@@ -70,8 +71,8 @@ export function useBlockedCells(
     // Soft constraint blocks (treated as hard blocks — cells are disabled)
     if (constraints.softConstraints) {
       for (const sc of constraints.softConstraints) {
-        const scStart = new Date(sc.startDate)
-        const scEnd = new Date(sc.endDate)
+        const scStart = startOfDay(new Date(sc.startDate))
+        const scEnd = startOfDay(new Date(sc.endDate))
         for (const week of weeks) {
           if (week.startDate <= scEnd && week.endDate >= scStart) {
             if (sc.departmentId) {

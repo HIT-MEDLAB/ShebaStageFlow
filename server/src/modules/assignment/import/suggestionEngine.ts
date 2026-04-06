@@ -9,16 +9,16 @@ function getWeekKey(deptId: number, shiftType: string, weekStart: string): strin
 
 function getSundayOfWeek(date: Date): Date {
   const d = new Date(date);
-  const day = d.getDay();
-  d.setDate(d.getDate() - day);
-  d.setHours(0, 0, 0, 0);
+  const day = d.getUTCDay();
+  d.setUTCDate(d.getUTCDate() - day);
+  d.setUTCHours(0, 0, 0, 0);
   return d;
 }
 
 function getThursdayOfWeek(sunday: Date): Date {
   const d = new Date(sunday);
-  d.setDate(d.getDate() + 4);
-  d.setHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + 4);
+  d.setUTCHours(0, 0, 0, 0);
   return d;
 }
 
@@ -31,7 +31,7 @@ function computeAllWeeks(startDate: Date, endDate: Date): Array<{ startDate: Dat
     if (thursday >= startDate && current <= endDate) {
       weeks.push({ startDate: new Date(current), endDate: new Date(thursday) });
     }
-    current.setDate(current.getDate() + 7);
+    current.setUTCDate(current.getUTCDate() + 7);
   }
 
   return weeks;
