@@ -146,5 +146,25 @@ export function createConstraintController(service: ConstraintService) {
         next(err);
       }
     },
+
+    async deleteDepartment(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const id = Number(req.params['id']);
+        await service.deleteDepartment(id);
+        res.status(204).send();
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async deleteUniversity(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const id = Number(req.params['id']);
+        await service.deleteUniversity(id);
+        res.status(204).send();
+      } catch (err) {
+        next(err);
+      }
+    },
   };
 }

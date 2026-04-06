@@ -6,6 +6,7 @@ import type {
   SoftConstraint,
   DateConstraint,
 } from '@prisma/client';
+import { AppError } from '../../shared/errors/AppError';
 import type {
   CreateSoftConstraintDto,
   UpdateSoftConstraintDto,
@@ -309,6 +310,41 @@ export class ConstraintRepository implements IConstraintRepository {
         where: { id },
         include: { semesters: { orderBy: { year: 'desc' } } },
       });
+    });
+  }
+
+  // ─── Delete Department (transactional) ─────────────────────
+
+  async deleteDepartment(id: number) {
+    return prisma.$transaction(async (tx) => {
+      const department = await tx.department.findUnique({ where: { id } });
+      if (!department) throw new AppError('Department not found', 404);
+
+      const assignmentCount = await tx.assignment.count({ where: { departmentId: id } });
+      if (assignmentCount > 0) throw new AppError('Cannot delete department with existing assignments', 409);
+
+      await tx.departmentConstraint.deleteMany({ where: { departmentId: id } });
+      await tx.softConstraint.updateMany({ where: { departmentId: id }, data: { departmentId: null } });
+      await tx.department.delete({ where: { id } });
+    });
+  }
+
+  // ─── Delete University (transactional) ─────────────────────
+
+  async deleteUniversity(id: number) {
+    return prisma.$transaction(async (tx) => {
+      const university = await tx.university.findUnique({ where: { id } });
+      if (!university) throw new AppError('University not found', 404);
+
+      const studentCount = await tx.student.count({ where: { universityId: id } });
+      if (studentCount > 0) throw new AppError('Cannot delete university with existing students', 409);
+
+      const assignmentCount = await tx.assignment.count({ where: { universityId: id } });
+      if (assignmentCount > 0) throw new AppError('Cannot delete university with existing assignments', 409);
+
+      await tx.universitySemester.deleteMany({ where: { universityId: id } });
+      await tx.softConstraint.updateMany({ where: { universityId: id }, data: { universityId: null } });
+      await tx.university.delete({ where: { id } });
     });
   }
 }

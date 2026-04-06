@@ -76,6 +76,14 @@ export function ConstraintsPage() {
     universityMutation.updateMutation.mutate({ id, data: formData })
   }
 
+  function handleDeleteDepartment(id: number) {
+    departmentMutation.deleteMutation.mutate(id)
+  }
+
+  function handleDeleteUniversity(id: number) {
+    universityMutation.deleteMutation.mutate(id)
+  }
+
   return (
     <div className="flex flex-col gap-6 h-full overflow-auto">
       <h1 className="text-2xl font-bold">{t('pageTitle')}</h1>
@@ -120,16 +128,20 @@ export function ConstraintsPage() {
           isAdmin={isAdmin}
           onCreate={handleCreateDepartment}
           onUpdate={handleUpdateDepartment}
+          onDelete={handleDeleteDepartment}
           isCreatePending={departmentMutation.createMutation.isPending}
           isUpdatePending={departmentMutation.updateMutation.isPending}
+          isDeletePending={departmentMutation.deleteMutation.isPending}
         />
         <UniversityCard
           universities={data.universities}
           isAdmin={isAdmin}
           onCreate={handleCreateUniversity}
           onUpdate={handleUpdateUniversity}
+          onDelete={handleDeleteUniversity}
           isCreatePending={universityMutation.createMutation.isPending}
           isUpdatePending={universityMutation.updateMutation.isPending}
+          isDeletePending={universityMutation.deleteMutation.isPending}
         />
       </div>
     </div>

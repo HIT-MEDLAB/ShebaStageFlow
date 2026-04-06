@@ -31,7 +31,11 @@
     "addTitle": "הוספת אילוץ רך",
     "editTitle": "עריכת אילוץ רך",
     "deleteTitle": "מחיקת אילוץ",
-    "deleteConfirm": "האם אתה בטוח שברצונך למחוק אילוץ זה? פעולה זו אינה ניתנת לביטול."
+    "deleteConfirm": "האם אתה בטוח שברצונך למחוק אילוץ זה? פעולה זו אינה ניתנת לביטול.",
+    "deleteDepartmentTitle": "מחיקת מחלקה",
+    "deleteDepartmentConfirm": "האם אתה בטוח שברצונך למחוק מחלקה זו? כל אילוצי הקיבולת של המחלקה יימחקו. פעולה זו אינה ניתנת לביטול.",
+    "deleteUniversityTitle": "מחיקת אוניברסיטה",
+    "deleteUniversityConfirm": "האם אתה בטוח שברצונך למחוק אוניברסיטה זו? נתוני הסמסטרים יימחקו. פעולה זו אינה ניתנת לביטול."
   },
   "form": {
     "name": "שם",
@@ -76,6 +80,10 @@
     "departmentUpdated": "המחלקה עודכנה בהצלחה",
     "universityCreated": "האוניברסיטה נוצרה בהצלחה",
     "universityUpdated": "האוניברסיטה עודכנה בהצלחה",
+    "departmentDeleted": "המחלקה נמחקה בהצלחה",
+    "universityDeleted": "האוניברסיטה נמחקה בהצלחה",
+    "departmentHasAssignments": "לא ניתן למחוק מחלקה עם שיבוצים קיימים",
+    "universityHasReferences": "לא ניתן למחוק אוניברסיטה עם סטודנטים או שיבוצים קיימים",
     "createFailed": "היצירה נכשלה",
     "updateFailed": "העדכון נכשל",
     "deleteFailed": "המחיקה נכשלה"
