@@ -88,13 +88,8 @@ export function ReplacementDialog({
                   )}
                 >
                   <span className="font-medium">
-                    {t('dialogs.replacement.week', {
-                      number: week.weekNumber,
-                    })}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {format(week.startDate, 'dd/MM')} –{' '}
-                    {format(week.endDate, 'dd/MM')}
+                    {format(week.startDate, 'dd/MM/yy')} –{' '}
+                    {format(week.endDate, 'dd/MM/yy')}
                   </span>
                 </button>
               ))}

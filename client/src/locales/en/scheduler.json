@@ -19,7 +19,6 @@
   },
   "grid": {
     "departments": "Departments",
-    "week": "Week",
     "morning": "Morning",
     "evening": "Evening",
     "blocked": {
@@ -109,7 +108,6 @@
       "description": "A higher priority assignment is replacing {{university}} (Year {{year}}, {{shift}}). Choose a new week for the displaced assignment.",
       "suggestedWeeks": "Suggested Weeks",
       "chooseManually": "Choose Manually",
-      "week": "Week {{number}}",
       "cancel": "Cancel",
       "confirm": "Confirm"
     },

@@ -34,9 +34,8 @@ export function WeekSelector({
         {weeks.map((week) => (
           <SelectItem key={week.weekNumber} value={String(week.weekNumber)}>
             {t('weekSelector.weekRange', {
-              number: week.weekNumber,
-              start: format(week.startDate, 'yyyy-MM-dd'),
-              end: format(week.endDate, 'yyyy-MM-dd'),
+              start: format(week.startDate, 'dd/MM/yy'),
+              end: format(week.endDate, 'dd/MM/yy'),
             })}
           </SelectItem>
         ))}

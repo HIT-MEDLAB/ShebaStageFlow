@@ -240,7 +240,7 @@ export class ConstraintRepository implements IConstraintRepository {
     });
   }
 
-  async createUniversityWithSemester(data: CreateUniversityWithSemesterDto) {
+  async createUniversityWithSemester(data: CreateUniversityWithSemesterDto & { year: number }) {
     return prisma.$transaction(async (tx) => {
       const university = await tx.university.create({
         data: {
@@ -265,7 +265,7 @@ export class ConstraintRepository implements IConstraintRepository {
     });
   }
 
-  async updateUniversityWithSemester(id: number, data: UpdateUniversityWithSemesterDto) {
+  async updateUniversityWithSemester(id: number, data: UpdateUniversityWithSemesterDto & { year?: number }) {
     return prisma.$transaction(async (tx) => {
       const universityData: Record<string, unknown> = {};
       if (data.name !== undefined) universityData['name'] = data.name;

@@ -14,7 +14,7 @@ export function GridHeader({ weeks }: GridHeaderProps) {
   const locale = isHebrew ? he : undefined
 
   const formatDate = (date: Date) =>
-    format(date, 'dd/MM', { locale })
+    format(date, 'dd/MM/yy', { locale })
 
   return (
     <div className="flex gap-px min-w-fit sticky top-0 z-10 bg-border">
@@ -33,9 +33,6 @@ export function GridHeader({ weeks }: GridHeaderProps) {
           className="bg-[#1E2A5E] text-white text-center p-2 min-w-[200px] flex-1"
         >
           <div className="text-sm font-semibold">
-            {t('grid.week')} {week.weekNumber}
-          </div>
-          <div className="text-xs opacity-80">
             {formatDate(week.startDate)} - {formatDate(week.endDate)}
           </div>
         </div>

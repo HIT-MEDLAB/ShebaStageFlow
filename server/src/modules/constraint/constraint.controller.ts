@@ -125,7 +125,8 @@ export function createConstraintController(service: ConstraintService) {
 
     async createUniversityWithSemester(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
-        const result = await service.createUniversityWithSemester(req.body);
+        const year = new Date(req.body.semesterStart).getFullYear();
+        const result = await service.createUniversityWithSemester({ ...req.body, year });
         res.status(201).json(result);
       } catch (err) {
         next(err);
@@ -135,7 +136,11 @@ export function createConstraintController(service: ConstraintService) {
     async updateUniversityWithSemester(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const id = Number(req.params['id']);
-        const result = await service.updateUniversityWithSemester(id, req.body);
+        const data = { ...req.body };
+        if (req.body.semesterStart) {
+          data.year = new Date(req.body.semesterStart).getFullYear();
+        }
+        const result = await service.updateUniversityWithSemester(id, data);
         res.json(result);
       } catch (err) {
         next(err);

@@ -50,7 +50,6 @@ export function UniversityCard({
       priority: 0,
       semesterStart: '',
       semesterEnd: '',
-      year: new Date().getFullYear(),
     },
   })
 
@@ -65,7 +64,6 @@ export function UniversityCard({
         priority: uni.priority,
         semesterStart: semester ? format(new Date(semester.semesterStart), 'yyyy-MM-dd') : '',
         semesterEnd: semester ? format(new Date(semester.semesterEnd), 'yyyy-MM-dd') : '',
-        year: semester?.year ?? new Date().getFullYear(),
       })
     }
   }
@@ -78,7 +76,6 @@ export function UniversityCard({
       priority: 0,
       semesterStart: '',
       semesterEnd: '',
-      year: new Date().getFullYear(),
     })
   }
 
@@ -174,7 +171,7 @@ export function UniversityCard({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <Label>{t('university.semesterStart')}</Label>
               <Input type="date" {...register('semesterStart')} />
@@ -188,11 +185,6 @@ export function UniversityCard({
               {errors.semesterEnd && (
                 <p className="text-sm text-destructive">{errors.semesterEnd.message}</p>
               )}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label>{t('university.year')}</Label>
-              <Input type="number" {...register('year')} />
-              {errors.year && <p className="text-sm text-destructive">{errors.year.message}</p>}
             </div>
           </div>
 

@@ -65,8 +65,8 @@ export function ImportWeekPicker({ suggestedWeeks, onSelect, isValidating, valid
                 {isValidating && clickedIndex === i && (
                   <Loader2 className="size-3 animate-spin" />
                 )}
-                {format(new Date(week.startDate), 'dd/MM')} –{' '}
-                {format(new Date(week.endDate), 'dd/MM')}
+                {format(new Date(week.startDate), 'dd/MM/yy')} –{' '}
+                {format(new Date(week.endDate), 'dd/MM/yy')}
               </button>
             ))}
           </div>

@@ -37,9 +37,8 @@ export function StatisticsWeekSelector({
             value={String(week.weekNumber)}
           >
             {t('weekSelector.weekRange', {
-              number: week.weekNumber,
-              start: format(week.startDate, 'MMM d'),
-              end: format(week.endDate, 'MMM d'),
+              start: format(week.startDate, 'dd/MM/yy'),
+              end: format(week.endDate, 'dd/MM/yy'),
             })}
           </SelectItem>
         ))}

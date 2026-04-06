@@ -151,7 +151,7 @@ export function ImportRowCard({
               {t('dialogs.smartImport.row', { num: row.rowIndex + 1 })}
               {dto && (
                 <span className="font-normal text-muted-foreground ms-2">
-                  {dto.departmentId} · {format(new Date(dto.startDate), 'dd/MM')}–{format(new Date(dto.endDate), 'dd/MM')}
+                  {dto.departmentId} · {format(new Date(dto.startDate), 'dd/MM/yy')}–{format(new Date(dto.endDate), 'dd/MM/yy')}
                 </span>
               )}
             </span>

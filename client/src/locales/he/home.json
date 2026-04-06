@@ -17,8 +17,7 @@
   },
   "weekSelector": {
     "label": "בחירת שבוע",
-    "week": "שבוע {{number}}",
-    "weekRange": "שבוע {{number}} ({{start}} - {{end}})"
+    "weekRange": "{{start}} - {{end}}"
   },
   "viewToggle": {
     "weekly": "שבועי",

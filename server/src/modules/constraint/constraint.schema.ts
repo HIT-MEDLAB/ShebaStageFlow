@@ -47,7 +47,6 @@ export const createUniversityWithSemesterSchema = z.object({
   priority: z.number().int().min(0).optional(),
   semesterStart: z.coerce.date(),
   semesterEnd: z.coerce.date(),
-  year: z.number().int().positive(),
 });
 
 export const updateUniversityWithSemesterSchema = z.object({
@@ -55,7 +54,6 @@ export const updateUniversityWithSemesterSchema = z.object({
   priority: z.number().int().min(0).optional(),
   semesterStart: z.coerce.date().optional(),
   semesterEnd: z.coerce.date().optional(),
-  year: z.number().int().positive().optional(),
 });
 
 // Export inferred types

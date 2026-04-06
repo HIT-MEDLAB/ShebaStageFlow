@@ -103,11 +103,11 @@ export class ConstraintService {
 
   // ─── Universities ──────────────────────────────────────────
 
-  async createUniversityWithSemester(data: CreateUniversityWithSemesterDto) {
+  async createUniversityWithSemester(data: CreateUniversityWithSemesterDto & { year: number }) {
     return this.repository.createUniversityWithSemester(data);
   }
 
-  async updateUniversityWithSemester(id: number, data: UpdateUniversityWithSemesterDto) {
+  async updateUniversityWithSemester(id: number, data: UpdateUniversityWithSemesterDto & { year?: number }) {
     return this.repository.updateUniversityWithSemester(id, data);
   }
 }

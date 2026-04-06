@@ -19,7 +19,6 @@
   },
   "grid": {
     "departments": "מחלקות",
-    "week": "שבוע",
     "morning": "בוקר",
     "evening": "ערב",
     "blocked": {
@@ -109,7 +108,6 @@
       "description": "שיבוץ בעדיפות גבוהה יותר מחליף את {{university}} (שנה {{year}}, {{shift}}). בחר שבוע חדש לשיבוץ המוחלף.",
       "suggestedWeeks": "שבועות מוצעים",
       "chooseManually": "בחר ידנית",
-      "week": "שבוע {{number}}",
       "cancel": "ביטול",
       "confirm": "אישור"
     },

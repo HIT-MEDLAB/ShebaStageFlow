@@ -124,7 +124,6 @@ export interface CreateUniversityData {
   priority?: number
   semesterStart: string
   semesterEnd: string
-  year: number
 }
 
 export interface UpdateUniversityData {
@@ -132,5 +131,4 @@ export interface UpdateUniversityData {
   priority?: number
   semesterStart?: string
   semesterEnd?: string
-  year?: number
 }

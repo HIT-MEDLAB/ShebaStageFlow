@@ -31,6 +31,6 @@
   "noData": "No statistics data available",
   "weekSelector": {
     "label": "Select week",
-    "weekRange": "Week {{number}}: {{start}} – {{end}}"
+    "weekRange": "{{start}} – {{end}}"
   }
 }
