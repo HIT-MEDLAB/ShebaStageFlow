@@ -14,7 +14,7 @@ export function GridHeader({ weeks }: GridHeaderProps) {
   const locale = isHebrew ? he : undefined
 
   const formatDate = (date: Date) =>
-    format(date, 'dd/MM', { locale })
+    format(date, 'dd/MM/yy', { locale })
 
   return (
     <div className="flex gap-px min-w-fit sticky top-0 z-10 bg-border">

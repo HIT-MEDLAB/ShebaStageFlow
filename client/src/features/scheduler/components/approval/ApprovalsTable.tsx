@@ -24,7 +24,7 @@ function formatDateRange(start: string, end: string, locale: string) {
   const s = new Date(start)
   const e = new Date(end)
   const dateLocale = locale === 'he' ? 'he-IL' : 'en-GB'
-  const fmt = (d: Date) => d.toLocaleDateString(dateLocale, { day: '2-digit', month: '2-digit' })
+  const fmt = (d: Date) => d.toLocaleDateString(dateLocale, { day: '2-digit', month: '2-digit', year: '2-digit' })
   return `${fmt(s)} – ${fmt(e)}`
 }
 
