@@ -178,7 +178,7 @@ export class ConstraintRepository implements IConstraintRepository {
         },
       });
 
-      return prisma.department.findUniqueOrThrow({
+      return tx.department.findUniqueOrThrow({
         where: { id: department.id },
         include: { departmentConstraints: true },
       });
@@ -224,7 +224,7 @@ export class ConstraintRepository implements IConstraintRepository {
         }
       }
 
-      return prisma.department.findUniqueOrThrow({
+      return tx.department.findUniqueOrThrow({
         where: { id },
         include: { departmentConstraints: true },
       });
@@ -258,7 +258,7 @@ export class ConstraintRepository implements IConstraintRepository {
         },
       });
 
-      return prisma.university.findUniqueOrThrow({
+      return tx.university.findUniqueOrThrow({
         where: { id: university.id },
         include: { semesters: { orderBy: { year: 'desc' } } },
       });
@@ -305,7 +305,7 @@ export class ConstraintRepository implements IConstraintRepository {
         }
       }
 
-      return prisma.university.findUniqueOrThrow({
+      return tx.university.findUniqueOrThrow({
         where: { id },
         include: { semesters: { orderBy: { year: 'desc' } } },
       });
