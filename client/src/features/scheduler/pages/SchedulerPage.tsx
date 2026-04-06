@@ -32,6 +32,7 @@ import { ReplacementDialog } from '../components/dialogs/ReplacementDialog'
 import { AdminOverrideDialog } from '../components/dialogs/AdminOverrideDialog'
 import { WarningConfirmDialog } from '../components/dialogs/WarningConfirmDialog'
 import { ApprovalTab } from '../components/approval/ApprovalTab'
+import { format } from 'date-fns'
 import type { Assignment, WeekDefinition } from '../types/scheduler.types'
 
 export default function SchedulerPage() {
@@ -135,8 +136,8 @@ export default function SchedulerPage() {
       id: assignment.id,
       data: {
         departmentId: targetDeptId,
-        startDate: targetWeek.startDate.toISOString(),
-        endDate: targetWeek.endDate.toISOString(),
+        startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+        endDate: format(targetWeek.endDate, 'yyyy-MM-dd'),
         ...(forceOverride && { forceOverride: true }),
       },
     })
@@ -230,12 +231,12 @@ export default function SchedulerPage() {
       id: pendingMove.assignment.id,
       data: {
         departmentId: pendingMove.targetDeptId,
-        startDate: incomingTargetWeek.startDate.toISOString(),
-        endDate: incomingTargetWeek.endDate.toISOString(),
+        startDate: format(incomingTargetWeek.startDate, 'yyyy-MM-dd'),
+        endDate: format(incomingTargetWeek.endDate, 'yyyy-MM-dd'),
         displacedAssignmentId: displacedAssignment.id,
         displacedDepartmentId: displacedAssignment.departmentId,
-        displacedStartDate: targetWeek.startDate.toISOString(),
-        displacedEndDate: targetWeek.endDate.toISOString(),
+        displacedStartDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+        displacedEndDate: format(targetWeek.endDate, 'yyyy-MM-dd'),
       },
     })
 
@@ -252,8 +253,8 @@ export default function SchedulerPage() {
       id: pendingMove.assignment.id,
       data: {
         departmentId: pendingMove.targetDeptId,
-        startDate: targetWeek.startDate.toISOString(),
-        endDate: targetWeek.endDate.toISOString(),
+        startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+        endDate: format(targetWeek.endDate, 'yyyy-MM-dd'),
         forceOverride: true,
       },
     })

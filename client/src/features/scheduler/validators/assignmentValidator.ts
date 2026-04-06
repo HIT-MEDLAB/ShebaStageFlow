@@ -252,8 +252,8 @@ export function validateDrop(
         (s) => s.universityId === assignment.universityId,
       )
       if (semester) {
-        const semStart = new Date(semester.semesterStart)
-        const semEnd = new Date(semester.semesterEnd)
+        const semStart = startOfDay(new Date(semester.semesterStart))
+        const semEnd = startOfDay(new Date(semester.semesterEnd))
         if (targetWeek.startDate < semStart || targetWeek.endDate > semEnd) {
           return {
             type: 'blocked',

@@ -133,8 +133,8 @@ export function ImportRowEditDialog({
     const editedRow: SmartImportRow = {
       departmentName: deptName,
       universityName: uniName,
-      startDate: data.startDate.toISOString(),
-      endDate: data.endDate.toISOString(),
+      startDate: format(data.startDate, 'yyyy-MM-dd'),
+      endDate: format(data.endDate, 'yyyy-MM-dd'),
       placementType: enumToPlacementType(data.type),
       shiftType: enumToShift(data.shiftType),
       studentCount: data.studentCount ?? null,

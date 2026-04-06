@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 import {
   Card,
   CardAction,
@@ -57,8 +58,8 @@ export function StatisticsPage() {
 
   const currentWeek = weeks[selectedWeek - 1]
 
-  const weekStart = currentWeek?.startDate.toISOString()
-  const weekEnd = currentWeek?.endDate.toISOString()
+  const weekStart = currentWeek ? format(currentWeek.startDate, 'yyyy-MM-dd') : undefined
+  const weekEnd = currentWeek ? format(currentWeek.endDate, 'yyyy-MM-dd') : undefined
 
   const { data, isLoading } = useStatistics(
     academicYearId,

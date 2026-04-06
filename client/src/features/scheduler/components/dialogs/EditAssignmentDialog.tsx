@@ -116,8 +116,8 @@ export function EditAssignmentDialog() {
         data: {
           departmentId: data.departmentId,
           universityId: data.universityId,
-          startDate: data.startDate.toISOString(),
-          endDate: data.endDate.toISOString(),
+          startDate: format(data.startDate, 'yyyy-MM-dd'),
+          endDate: format(data.endDate, 'yyyy-MM-dd'),
           type: data.type,
           shiftType: data.shiftType,
           studentCount: data.studentCount ?? null,

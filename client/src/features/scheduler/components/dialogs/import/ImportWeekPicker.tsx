@@ -33,7 +33,7 @@ export function ImportWeekPicker({ suggestedWeeks, onSelect, isValidating, valid
     const endDate = new Date(manualDate)
     endDate.setDate(endDate.getDate() + 4)
     setClickedIndex(-1)
-    await onSelect(manualDate.toISOString(), endDate.toISOString())
+    await onSelect(format(manualDate, 'yyyy-MM-dd'), format(endDate, 'yyyy-MM-dd'))
   }
 
   async function handleSuggestedClick(week: { startDate: string; endDate: string }, index: number) {
