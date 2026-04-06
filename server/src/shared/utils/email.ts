@@ -49,9 +49,9 @@ async function sendEmail(to: string, subject: string, text: string, html: string
 export async function sendWelcomeEmail(to: string, password: string): Promise<void> {
   await sendEmail(
     to,
-    'Welcome to Shiba – Your account credentials',
-    `Welcome to Shiba!\n\nYour account has been created.\nEmail: ${to}\nPassword: ${password}\n\nPlease change your password after first login.`,
-    `<p>Welcome to Shiba!</p><p>Your account has been created.</p><p>Email: <strong>${escapeHtml(to)}</strong></p><p>Password: <strong>${escapeHtml(password)}</strong></p><p>Please change your password after first login.</p>`,
+    'Welcome to Sheba – Your account credentials',
+    `Welcome to Sheba!\n\nYour account has been created.\nEmail: ${to}\nPassword: ${password}\n\nPlease change your password after first login.`,
+    `<p>Welcome to Sheba!</p><p>Your account has been created.</p><p>Email: <strong>${escapeHtml(to)}</strong></p><p>Password: <strong>${escapeHtml(password)}</strong></p><p>Please change your password after first login.</p>`,
   );
 }
 
