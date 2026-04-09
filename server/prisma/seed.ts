@@ -164,6 +164,28 @@ async function main() {
   });
   console.log("Created academic year: 2025-2026");
 
+  await prisma.academicYear.upsert({
+    where: { name: '2024-2025' },
+    update: {},
+    create: {
+      name: '2024-2025',
+      startDate: new Date('2024-10-01'),
+      endDate: new Date('2025-06-30'),
+    },
+  });
+  console.log("Created academic year: 2024-2025");
+
+  await prisma.academicYear.upsert({
+    where: { name: '2023-2024' },
+    update: {},
+    create: {
+      name: '2023-2024',
+      startDate: new Date('2023-10-01'),
+      endDate: new Date('2024-06-30'),
+    },
+  });
+  console.log("Created academic year: 2023-2024");
+
   // Seed departments
   console.log("Seeding departments...");
 

@@ -44,12 +44,12 @@ export class StatisticsService {
 
   async getStatistics(
     academicYearId: number,
-    timeframe: 'weekly' | 'yearly',
+    timeframe: 'weekly' | 'calendarYear' | 'academicYear',
     weekStart?: string,
     weekEnd?: string,
   ): Promise<StatisticsResponse> {
-    const startDate = timeframe === 'weekly' && weekStart ? new Date(weekStart) : undefined;
-    const endDate = timeframe === 'weekly' && weekEnd ? new Date(weekEnd) : undefined;
+    const startDate = weekStart ? new Date(weekStart) : undefined;
+    const endDate = weekEnd ? new Date(weekEnd) : undefined;
 
     const [departments, assignments] = await Promise.all([
       this.repository.getDepartmentCapacities(),

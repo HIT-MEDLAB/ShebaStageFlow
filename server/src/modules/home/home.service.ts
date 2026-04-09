@@ -25,12 +25,12 @@ export class HomeService {
 
   async getSummary(
     academicYearId: number,
-    timeframe: 'weekly' | 'yearly',
+    timeframe: 'weekly' | 'calendarYear' | 'academicYear',
     weekStart?: string,
     weekEnd?: string,
   ): Promise<HomeResponse> {
-    const startDate = timeframe === 'weekly' && weekStart ? new Date(weekStart) : undefined;
-    const endDate = timeframe === 'weekly' && weekEnd ? new Date(weekEnd) : undefined;
+    const startDate = weekStart ? new Date(weekStart) : undefined;
+    const endDate = weekEnd ? new Date(weekEnd) : undefined;
 
     const [assignments, activeDepartments] = await Promise.all([
       this.repository.getApprovedAssignments(academicYearId, startDate, endDate),

@@ -2,7 +2,8 @@
   "pageTitle": "Statistics",
   "timeframe": {
     "weekly": "Weekly",
-    "yearly": "Yearly"
+    "calendarYear": "Calendar Year",
+    "academicYear": "Academic Year"
   },
   "charts": {
     "departmentCapacity": "Department Capacities",

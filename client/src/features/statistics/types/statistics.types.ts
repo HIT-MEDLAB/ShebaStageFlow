@@ -1,4 +1,4 @@
-export type Timeframe = 'weekly' | 'yearly'
+export type Timeframe = 'weekly' | 'calendarYear' | 'academicYear'
 
 export interface DepartmentCapacity {
   departmentId: number

@@ -13,7 +13,7 @@ export interface UniversityRow {
   eveningRotations: number
 }
 
-export type ViewMode = 'weekly' | 'yearly'
+export type ViewMode = 'weekly' | 'calendarYear' | 'academicYear'
 
 export interface HomeData {
   stats: HomeStats

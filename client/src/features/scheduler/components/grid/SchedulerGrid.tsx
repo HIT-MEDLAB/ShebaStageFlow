@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { startOfDay } from 'date-fns'
 import { GridHeader } from './GridHeader'
 import { GridRow } from './GridRow'
 import type {
@@ -23,9 +25,24 @@ export function SchedulerGrid({
 }: SchedulerGridProps) {
   const { i18n } = useTranslation()
   const dir = i18n.dir()
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!weeks.length || !containerRef.current) return
+    const today = startOfDay(new Date())
+    const currentWeek = weeks.find(
+      (w) => startOfDay(w.startDate) <= today && today <= startOfDay(w.endDate)
+    )
+    if (!currentWeek) return
+    const weekEl = containerRef.current.querySelector(
+      `[data-week-number="${currentWeek.weekNumber}"]`
+    )
+    weekEl?.scrollIntoView({ inline: 'start', block: 'nearest' })
+  }, [weeks])
 
   return (
     <div
+      ref={containerRef}
       className="flex-1 min-h-0 w-full overflow-auto border border-border rounded-lg"
       dir={dir}
     >

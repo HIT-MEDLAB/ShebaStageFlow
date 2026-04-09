@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { GraduationCap, Sun, Moon, Building2 } from 'lucide-react'
@@ -9,6 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { useAcademicYears } from '@/features/scheduler/hooks/useAcademicYears'
@@ -23,29 +30,57 @@ export function HomePage() {
   const { t } = useTranslation('home')
   const isAdmin = useIsAdmin()
 
+  const [academicYearId, setAcademicYearId] = useState<number | null>(null)
   const [selectedWeek, setSelectedWeek] = useState(1)
   const [viewMode, setViewMode] = useState<ViewMode>('weekly')
 
   const { data: academicYears } = useAcademicYears()
-  const academicYear = academicYears?.[0]
+
+  useEffect(() => {
+    if (academicYears?.length && !academicYearId) {
+      setAcademicYearId(academicYears[0].id)
+    }
+  }, [academicYears, academicYearId])
+
+  const academicYear = useMemo(
+    () => academicYears?.find((y) => y.id === academicYearId),
+    [academicYears, academicYearId],
+  )
+
   const weeks = useAcademicYearWeeks(academicYear)
 
   const currentWeek = useMemo(() => {
     return weeks.find((w) => w.weekNumber === selectedWeek)
   }, [weeks, selectedWeek])
 
-  const weekStart = viewMode === 'weekly' && currentWeek
-    ? format(currentWeek.startDate, 'yyyy-MM-dd')
-    : undefined
-  const weekEnd = viewMode === 'weekly' && currentWeek
-    ? format(currentWeek.endDate, 'yyyy-MM-dd')
-    : undefined
+  const { startDate, endDate } = useMemo(() => {
+    if (viewMode === 'weekly') {
+      return {
+        startDate: currentWeek ? format(currentWeek.startDate, 'yyyy-MM-dd') : undefined,
+        endDate: currentWeek ? format(currentWeek.endDate, 'yyyy-MM-dd') : undefined,
+      }
+    }
+    if (viewMode === 'calendarYear' && academicYear) {
+      const year = new Date(academicYear.startDate).getFullYear()
+      return {
+        startDate: `${year}-01-01`,
+        endDate: `${year}-12-31`,
+      }
+    }
+    if (viewMode === 'academicYear' && academicYear) {
+      return {
+        startDate: format(new Date(academicYear.startDate), 'yyyy-MM-dd'),
+        endDate: format(new Date(academicYear.endDate), 'yyyy-MM-dd'),
+      }
+    }
+    return { startDate: undefined, endDate: undefined }
+  }, [viewMode, currentWeek, academicYear])
 
   const { data, isLoading } = useHomeStats(
     academicYear?.id,
     viewMode,
-    weekStart,
-    weekEnd,
+    startDate,
+    endDate,
   )
 
   if (isLoading || !data) {
@@ -85,6 +120,31 @@ export function HomePage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{t('pageTitle')}</h1>
+        {academicYears && (
+          <Select
+            value={academicYearId?.toString() ?? ''}
+            onValueChange={(val) => {
+              setAcademicYearId(Number(val))
+              setSelectedWeek(1)
+            }}
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder={t('academicYear')} />
+            </SelectTrigger>
+            <SelectContent>
+              {academicYears.map((year) => (
+                <SelectItem key={year.id} value={String(year.id)}>
+                  {year.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
@@ -102,7 +162,11 @@ export function HomePage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            {viewMode === 'weekly' ? t('table.title') : t('table.yearlyTitle')}
+            {viewMode === 'weekly'
+              ? t('table.title')
+              : viewMode === 'calendarYear'
+                ? t('table.calendarYearTitle')
+                : t('table.academicYearTitle')}
           </CardTitle>
           {isAdmin && (
             <CardAction>
@@ -116,8 +180,11 @@ export function HomePage() {
                 <ToggleGroupItem value="weekly" aria-label={t('viewToggle.weekly')}>
                   {t('viewToggle.weekly')}
                 </ToggleGroupItem>
-                <ToggleGroupItem value="yearly" aria-label={t('viewToggle.yearly')}>
-                  {t('viewToggle.yearly')}
+                <ToggleGroupItem value="calendarYear" aria-label={t('viewToggle.calendarYear')}>
+                  {t('viewToggle.calendarYear')}
+                </ToggleGroupItem>
+                <ToggleGroupItem value="academicYear" aria-label={t('viewToggle.academicYear')}>
+                  {t('viewToggle.academicYear')}
                 </ToggleGroupItem>
               </ToggleGroup>
             </CardAction>

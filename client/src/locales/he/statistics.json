@@ -2,7 +2,8 @@
   "pageTitle": "סטטיסטיקות",
   "timeframe": {
     "weekly": "שבועי",
-    "yearly": "שנתי"
+    "calendarYear": "שנה קלנדרית",
+    "academicYear": "שנה אקדמית"
   },
   "charts": {
     "departmentCapacity": "קיבולת מחלקות",
