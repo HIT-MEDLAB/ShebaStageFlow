@@ -21,8 +21,11 @@ export function TimeframeToggle({ value, onChange }: TimeframeToggleProps) {
       <ToggleGroupItem value="weekly" aria-label={t('timeframe.weekly')}>
         {t('timeframe.weekly')}
       </ToggleGroupItem>
-      <ToggleGroupItem value="yearly" aria-label={t('timeframe.yearly')}>
-        {t('timeframe.yearly')}
+      <ToggleGroupItem value="calendarYear" aria-label={t('timeframe.calendarYear')}>
+        {t('timeframe.calendarYear')}
+      </ToggleGroupItem>
+      <ToggleGroupItem value="academicYear" aria-label={t('timeframe.academicYear')}>
+        {t('timeframe.academicYear')}
       </ToggleGroupItem>
     </ToggleGroup>
   )

@@ -8,7 +8,8 @@
   },
   "table": {
     "title": "מידע שבועי על האוניברסיטאות",
-    "yearlyTitle": "מידע שנתי על האוניברסיטאות",
+    "calendarYearTitle": "מידע שנה קלנדרית על האוניברסיטאות",
+    "academicYearTitle": "מידע שנה אקדמית על האוניברסיטאות",
     "institutionName": "שם המוסד",
     "totalStudents": "סה״כ סטודנטים",
     "morningRotations": "מספר סבבי בוקר",
@@ -19,8 +20,10 @@
     "label": "בחירת שבוע",
     "weekRange": "{{start}} - {{end}}"
   },
+  "academicYear": "שנה אקדמית",
   "viewToggle": {
     "weekly": "שבועי",
-    "yearly": "שנתי"
+    "calendarYear": "שנה קלנדרית",
+    "academicYear": "שנה אקדמית"
   }
 }

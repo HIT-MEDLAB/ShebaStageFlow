@@ -58,14 +58,34 @@ export function StatisticsPage() {
 
   const currentWeek = weeks[selectedWeek - 1]
 
-  const weekStart = currentWeek ? format(currentWeek.startDate, 'yyyy-MM-dd') : undefined
-  const weekEnd = currentWeek ? format(currentWeek.endDate, 'yyyy-MM-dd') : undefined
+  const { startDate, endDate } = useMemo(() => {
+    if (timeframe === 'weekly') {
+      return {
+        startDate: currentWeek ? format(currentWeek.startDate, 'yyyy-MM-dd') : undefined,
+        endDate: currentWeek ? format(currentWeek.endDate, 'yyyy-MM-dd') : undefined,
+      }
+    }
+    if (timeframe === 'calendarYear' && currentYear) {
+      const year = new Date(currentYear.startDate).getFullYear()
+      return {
+        startDate: `${year}-01-01`,
+        endDate: `${year}-12-31`,
+      }
+    }
+    if (timeframe === 'academicYear' && currentYear) {
+      return {
+        startDate: format(new Date(currentYear.startDate), 'yyyy-MM-dd'),
+        endDate: format(new Date(currentYear.endDate), 'yyyy-MM-dd'),
+      }
+    }
+    return { startDate: undefined, endDate: undefined }
+  }, [timeframe, currentWeek, currentYear])
 
   const { data, isLoading } = useStatistics(
     academicYearId,
     timeframe,
-    weekStart,
-    weekEnd,
+    startDate,
+    endDate,
   )
 
   return (

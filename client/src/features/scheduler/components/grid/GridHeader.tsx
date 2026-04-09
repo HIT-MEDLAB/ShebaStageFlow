@@ -30,6 +30,7 @@ export function GridHeader({ weeks }: GridHeaderProps) {
       {weeks.map((week) => (
         <div
           key={week.weekNumber}
+          data-week-number={week.weekNumber}
           className="bg-[#1E2A5E] text-white text-center p-2 min-w-[200px] flex-1"
         >
           <div className="text-sm font-semibold">

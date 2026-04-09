@@ -8,7 +8,7 @@ export async function fetchStatistics(
   weekEnd?: string,
 ): Promise<StatisticsData> {
   const params: Record<string, unknown> = { academicYearId, timeframe }
-  if (timeframe === 'weekly' && weekStart && weekEnd) {
+  if (weekStart && weekEnd) {
     params.weekStart = weekStart
     params.weekEnd = weekEnd
   }

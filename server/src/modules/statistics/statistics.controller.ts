@@ -12,26 +12,27 @@ export function createStatisticsController(service: StatisticsService) {
         }
 
         const timeframe = req.query.timeframe as string;
-        if (!timeframe || !['weekly', 'yearly'].includes(timeframe)) {
-          res.status(400).json({ message: 'timeframe must be "weekly" or "yearly"' });
+        if (!timeframe || !['weekly', 'calendarYear', 'academicYear'].includes(timeframe)) {
+          res.status(400).json({ message: 'timeframe must be "weekly", "calendarYear", or "academicYear"' });
           return;
         }
 
         let weekStart: string | undefined;
         let weekEnd: string | undefined;
 
-        if (timeframe === 'weekly') {
-          if (!req.query.weekStart || !req.query.weekEnd) {
+        if (!req.query.weekStart || !req.query.weekEnd) {
+          if (timeframe === 'weekly') {
             res.status(400).json({ message: 'weekStart and weekEnd are required for weekly timeframe' });
             return;
           }
+        } else {
           weekStart = req.query.weekStart as string;
           weekEnd = req.query.weekEnd as string;
         }
 
         const data = await service.getStatistics(
           academicYearId,
-          timeframe as 'weekly' | 'yearly',
+          timeframe as 'weekly' | 'calendarYear' | 'academicYear',
           weekStart,
           weekEnd,
         );

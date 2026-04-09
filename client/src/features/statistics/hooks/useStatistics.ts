@@ -11,6 +11,6 @@ export function useStatistics(
   return useQuery({
     queryKey: ['statistics', academicYearId, timeframe, weekStart, weekEnd],
     queryFn: () => fetchStatistics(academicYearId!, timeframe, weekStart, weekEnd),
-    enabled: !!academicYearId && (timeframe === 'yearly' || (!!weekStart && !!weekEnd)),
+    enabled: !!academicYearId && !!weekStart && !!weekEnd,
   })
 }

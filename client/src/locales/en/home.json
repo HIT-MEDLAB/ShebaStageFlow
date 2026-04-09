@@ -8,7 +8,8 @@
   },
   "table": {
     "title": "Weekly University Information",
-    "yearlyTitle": "Yearly University Information",
+    "calendarYearTitle": "Calendar Year University Information",
+    "academicYearTitle": "Academic Year University Information",
     "institutionName": "Institution Name",
     "totalStudents": "Total Students",
     "morningRotations": "Morning Rotations",
@@ -19,8 +20,10 @@
     "label": "Select Week",
     "weekRange": "{{start}} - {{end}}"
   },
+  "academicYear": "Academic Year",
   "viewToggle": {
     "weekly": "Weekly",
-    "yearly": "Yearly"
+    "calendarYear": "Calendar Year",
+    "academicYear": "Academic Year"
   }
 }
