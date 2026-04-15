@@ -84,6 +84,14 @@ export function ConstraintsPage() {
     universityMutation.deleteMutation.mutate(id)
   }
 
+  function handleArchiveDepartment(id: number, isActive: boolean) {
+    departmentMutation.archiveMutation.mutate({ id, isActive })
+  }
+
+  function handleArchiveUniversity(id: number, isActive: boolean) {
+    universityMutation.archiveMutation.mutate({ id, isActive })
+  }
+
   return (
     <div className="flex flex-col gap-6 h-full overflow-auto">
       <h1 className="text-2xl font-bold">{t('pageTitle')}</h1>
@@ -129,9 +137,11 @@ export function ConstraintsPage() {
           onCreate={handleCreateDepartment}
           onUpdate={handleUpdateDepartment}
           onDelete={handleDeleteDepartment}
+          onArchive={handleArchiveDepartment}
           isCreatePending={departmentMutation.createMutation.isPending}
           isUpdatePending={departmentMutation.updateMutation.isPending}
           isDeletePending={departmentMutation.deleteMutation.isPending}
+          isArchivePending={departmentMutation.archiveMutation.isPending}
         />
         <UniversityCard
           universities={data.universities}
@@ -139,9 +149,11 @@ export function ConstraintsPage() {
           onCreate={handleCreateUniversity}
           onUpdate={handleUpdateUniversity}
           onDelete={handleDeleteUniversity}
+          onArchive={handleArchiveUniversity}
           isCreatePending={universityMutation.createMutation.isPending}
           isUpdatePending={universityMutation.updateMutation.isPending}
           isDeletePending={universityMutation.deleteMutation.isPending}
+          isArchivePending={universityMutation.archiveMutation.isPending}
         />
       </div>
     </div>

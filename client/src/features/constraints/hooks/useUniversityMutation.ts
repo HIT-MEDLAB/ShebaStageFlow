@@ -4,6 +4,7 @@ import {
   createUniversityWithSemester,
   updateUniversityWithSemester,
   deleteUniversity,
+  setUniversityActive,
 } from '../api/constraints.api'
 import type { CreateUniversityData, UpdateUniversityData } from '../types/constraints.types'
 import { toast } from 'sonner'
@@ -54,5 +55,23 @@ export function useUniversityMutation() {
     },
   })
 
-  return { createMutation, updateMutation, deleteMutation }
+  const archiveMutation = useMutation({
+    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
+      setUniversityActive(id, isActive),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'universities'] })
+      toast.success(
+        variables.isActive
+          ? t('toast.universityUnarchived')
+          : t('toast.universityArchived'),
+      )
+    },
+    onError: () => {
+      toast.error(t('toast.archiveFailed'))
+    },
+  })
+
+  return { createMutation, updateMutation, deleteMutation, archiveMutation }
 }

@@ -313,6 +313,20 @@ export class ConstraintRepository implements IConstraintRepository {
     });
   }
 
+  // ─── Archive / Unarchive ───────────────────────────────────
+
+  async setDepartmentActive(id: number, isActive: boolean) {
+    const dept = await prisma.department.findUnique({ where: { id } });
+    if (!dept) throw new AppError('Department not found', 404);
+    return prisma.department.update({ where: { id }, data: { isActive } });
+  }
+
+  async setUniversityActive(id: number, isActive: boolean) {
+    const uni = await prisma.university.findUnique({ where: { id } });
+    if (!uni) throw new AppError('University not found', 404);
+    return prisma.university.update({ where: { id }, data: { isActive } });
+  }
+
   // ─── Delete Department (transactional) ─────────────────────
 
   async deleteDepartment(id: number) {

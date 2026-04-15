@@ -105,6 +105,10 @@ export class ConstraintService {
     return this.repository.deleteDepartment(id);
   }
 
+  async setDepartmentActive(id: number, isActive: boolean) {
+    return this.repository.setDepartmentActive(id, isActive);
+  }
+
   // ─── Universities ──────────────────────────────────────────
 
   async createUniversityWithSemester(data: CreateUniversityWithSemesterDto & { year: number }) {
@@ -117,5 +121,9 @@ export class ConstraintService {
 
   async deleteUniversity(id: number) {
     return this.repository.deleteUniversity(id);
+  }
+
+  async setUniversityActive(id: number, isActive: boolean) {
+    return this.repository.setUniversityActive(id, isActive);
   }
 }

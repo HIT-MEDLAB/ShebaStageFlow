@@ -13,7 +13,10 @@ export interface IUniversityRepository {
 
 export class UniversityRepository implements IUniversityRepository {
   async findAll(): Promise<University[]> {
-    return prisma.university.findMany({ orderBy: { priority: 'asc' } });
+    return prisma.university.findMany({
+      where: { isActive: true },
+      orderBy: { priority: 'asc' },
+    });
   }
 
   async findById(id: number): Promise<University | null> {
