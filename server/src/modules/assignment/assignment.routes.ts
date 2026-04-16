@@ -14,6 +14,9 @@ import {
   smartImportValidateSchema,
   smartImportExecuteSchema,
   validateDisplacementWeekSchema,
+  createBlockSchema,
+  moveBlockSchema,
+  findBlockPositionsSchema,
 } from './assignment.schema';
 import { AssignmentRepository } from './assignment.repository';
 import { AssignmentService } from './assignment.service';
@@ -38,6 +41,11 @@ assignmentRouter.post('/import/validate-displacement-week', validateRequest(vali
 assignmentRouter.post('/import/execute', validateRequest(smartImportExecuteSchema), controller.smartImportExecute);
 assignmentRouter.post('/import', validateRequest(importAssignmentsSchema), controller.importAssignments);
 
+// Block (multi-week) routes
+assignmentRouter.post('/block', validateRequest(createBlockSchema), controller.createBlock);
+assignmentRouter.post('/block/find-positions', validateRequest(findBlockPositionsSchema), controller.findBlockPositions);
+assignmentRouter.patch('/block/:groupId/move', validateRequest(moveBlockSchema), controller.moveBlock);
+
 // Dynamic :id paths
 assignmentRouter.get('/:id', controller.getById);
 assignmentRouter.patch('/:id', validateRequest(updateAssignmentSchema), controller.update);
@@ -45,6 +53,7 @@ assignmentRouter.patch('/:id/approve', adminOnly, controller.approve);
 assignmentRouter.patch('/:id/reject', adminOnly, validateRequest(rejectAssignmentSchema), controller.reject);
 assignmentRouter.patch('/:id/move', validateRequest(moveAssignmentSchema), controller.move);
 assignmentRouter.patch('/:id/displace', validateRequest(displaceAssignmentSchema), controller.displace);
+assignmentRouter.patch('/:id/detach', adminOnly, controller.detachFromBlock);
 assignmentRouter.delete('/:id', controller.remove);
 assignmentRouter.post('/:id/students', validateRequest(addStudentSchema), controller.addStudent);
 assignmentRouter.post('/:id/students/import', validateRequest(importStudentsSchema), controller.importStudents);

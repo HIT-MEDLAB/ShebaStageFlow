@@ -12,12 +12,16 @@ import type {
   SmartImportValidateDto,
   SmartImportExecuteDto,
   ValidateDisplacementWeekDto,
+  CreateBlockDto,
+  MoveBlockDto,
+  FindBlockPositionsDto,
 } from './assignment.schema';
 import { ConstraintEngine, validateStudentLink } from './validation/constraintEngine';
 import { ConstraintValidationError, type ConstraintViolation } from '../../shared/errors/ConstraintValidationError';
 import { ImportValidationService } from './import/importService';
-import { validateWeekForDisplacement } from './import/suggestionEngine';
+import { validateWeekForDisplacement, findAvailableBlockPositions } from './import/suggestionEngine';
 import type { ImportValidationResult } from './import/importTypes';
+import { Prisma } from '@prisma/client';
 import prisma from '../../lib/prisma';
 
 type Role = 'SUPER_ADMIN' | 'ADMIN' | 'ACADEMIC_COORDINATOR';
@@ -357,6 +361,256 @@ export class AssignmentService {
     });
 
     return { created, displaced };
+  }
+
+  // ── Block (multi-week) operations ─────────────────────────────
+
+  private computeBlockWeeks(startDate: Date, weekCount: number): Array<{ startDate: Date; endDate: Date }> {
+    const weeks: Array<{ startDate: Date; endDate: Date }> = [];
+    for (let i = 0; i < weekCount; i++) {
+      const weekStart = new Date(startDate);
+      weekStart.setUTCDate(weekStart.getUTCDate() + i * 7);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setUTCDate(weekEnd.getUTCDate() + 4);
+      weeks.push({ startDate: weekStart, endDate: weekEnd });
+    }
+    return weeks;
+  }
+
+  async createBlock(dto: CreateBlockDto, userId: number, userRole: string, forceOverride?: boolean) {
+    const canForce = this.isAdmin(userRole) && forceOverride;
+    const weekCount = dto.shifts.length;
+    if (weekCount < 2) {
+      throw new AppError('Block must have at least 2 weeks', 400);
+    }
+    const weeks = this.computeBlockWeeks(dto.startDate, weekCount);
+
+    // Validate each week
+    const allWarnings: Array<{ weekIndex: number; warnings: unknown[] }> = [];
+    for (let i = 0; i < weeks.length; i++) {
+      const warnings = await this.engine.validate({
+        departmentId: dto.departmentId,
+        universityId: dto.universityId,
+        startDate: weeks[i].startDate,
+        endDate: weeks[i].endDate,
+        type: dto.type,
+        shiftType: dto.shifts[i],
+        studentCount: dto.studentCount,
+        yearInProgram: dto.yearInProgram,
+        academicYearId: dto.academicYearId,
+      }, canForce);
+      if (warnings.length > 0) {
+        allWarnings.push({ weekIndex: i, warnings });
+      }
+    }
+
+    const groupId = crypto.randomUUID();
+    const status = this.determineStatus(userRole);
+    const approvedById = this.isAdmin(userRole) ? userId : undefined;
+
+    const assignments = await prisma.$transaction(async (tx) => {
+      const results = [];
+      for (let i = 0; i < weeks.length; i++) {
+        const assignment = await tx.assignment.create({
+          data: {
+            departmentId: dto.departmentId,
+            universityId: dto.universityId,
+            academicYearId: dto.academicYearId,
+            startDate: weeks[i].startDate,
+            endDate: weeks[i].endDate,
+            type: dto.type,
+            shiftType: dto.shifts[i],
+            studentCount: dto.studentCount ?? null,
+            yearInProgram: dto.yearInProgram,
+            tutorName: dto.tutorName ?? null,
+            createdById: userId,
+            status,
+            ...(approvedById ? { approvedById } : {}),
+            groupId,
+            groupIndex: i,
+          },
+          include: {
+            university: { select: { name: true } },
+            department: { select: { name: true } },
+          },
+        });
+        results.push(assignment);
+      }
+      return results;
+    });
+
+    return { assignments, warnings: allWarnings };
+  }
+
+  async moveBlock(groupId: string, dto: MoveBlockDto, userId: number, userRole: string, forceOverride?: boolean) {
+    const blockAssignments = await prisma.assignment.findMany({
+      where: { groupId },
+      orderBy: { groupIndex: 'asc' },
+    });
+
+    if (blockAssignments.length === 0) {
+      throw new AppError('Block not found', 404);
+    }
+
+    const canForce = this.isAdmin(userRole) && forceOverride;
+    const weeks = this.computeBlockWeeks(dto.startDate, blockAssignments.length);
+    const excludeIds = blockAssignments.map((a) => a.id);
+
+    // Validate each week at the new position
+    for (let i = 0; i < weeks.length; i++) {
+      await this.engine.validate({
+        departmentId: dto.departmentId,
+        universityId: blockAssignments[0].universityId,
+        startDate: weeks[i].startDate,
+        endDate: weeks[i].endDate,
+        type: blockAssignments[0].type,
+        shiftType: blockAssignments[i].shiftType,
+        studentCount: blockAssignments[0].studentCount,
+        yearInProgram: blockAssignments[0].yearInProgram,
+        excludeAssignmentIds: excludeIds,
+        academicYearId: blockAssignments[0].academicYearId,
+      }, canForce);
+    }
+
+    const status = this.isAdmin(userRole) ? 'APPROVED' as const : undefined;
+    const approvedById = this.isAdmin(userRole) ? userId : undefined;
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const results = [];
+      for (let i = 0; i < blockAssignments.length; i++) {
+        const assignment = await tx.assignment.update({
+          where: { id: blockAssignments[i].id },
+          data: {
+            departmentId: dto.departmentId,
+            startDate: weeks[i].startDate,
+            endDate: weeks[i].endDate,
+            ...(status ? { status, pendingMoveData: Prisma.DbNull } : {}),
+            ...(approvedById ? { approvedById } : {}),
+          },
+          include: {
+            university: { select: { name: true } },
+            department: { select: { name: true } },
+          },
+        });
+        results.push(assignment);
+      }
+      return results;
+    });
+
+    return updated;
+  }
+
+  async detachFromBlock(assignmentId: number) {
+    const assignment = await this.getById(assignmentId) as { id: number; groupId: string | null; groupIndex: number | null };
+    if (!assignment.groupId) {
+      throw new AppError('Assignment is not part of a block', 400);
+    }
+
+    const groupId = assignment.groupId;
+    const detachedIndex = assignment.groupIndex!;
+
+    // Get all siblings
+    const siblings = await prisma.assignment.findMany({
+      where: { groupId },
+      orderBy: { groupIndex: 'asc' },
+    });
+
+    await prisma.$transaction(async (tx) => {
+      // Detach the target assignment
+      await tx.assignment.update({
+        where: { id: assignmentId },
+        data: { groupId: null, groupIndex: null },
+      });
+
+      const remaining = siblings.filter((s) => s.id !== assignmentId);
+
+      if (remaining.length <= 1) {
+        // Only 0 or 1 left — dissolve the block entirely
+        for (const s of remaining) {
+          await tx.assignment.update({
+            where: { id: s.id },
+            data: { groupId: null, groupIndex: null },
+          });
+        }
+      } else if (detachedIndex === 0 || detachedIndex === siblings.length - 1) {
+        // Detached from edge — just re-index remaining
+        for (let i = 0; i < remaining.length; i++) {
+          await tx.assignment.update({
+            where: { id: remaining[i].id },
+            data: { groupIndex: i },
+          });
+        }
+      } else {
+        // Detached from middle — split into two blocks
+        const beforeGroup = remaining.filter((s) => s.groupIndex! < detachedIndex);
+        const afterGroup = remaining.filter((s) => s.groupIndex! > detachedIndex);
+
+        if (beforeGroup.length <= 1) {
+          // Before group becomes standalone
+          for (const s of beforeGroup) {
+            await tx.assignment.update({
+              where: { id: s.id },
+              data: { groupId: null, groupIndex: null },
+            });
+          }
+        } else {
+          // Before group keeps original groupId, re-index
+          for (let i = 0; i < beforeGroup.length; i++) {
+            await tx.assignment.update({
+              where: { id: beforeGroup[i].id },
+              data: { groupIndex: i },
+            });
+          }
+        }
+
+        if (afterGroup.length <= 1) {
+          // After group becomes standalone
+          for (const s of afterGroup) {
+            await tx.assignment.update({
+              where: { id: s.id },
+              data: { groupId: null, groupIndex: null },
+            });
+          }
+        } else {
+          // After group gets a new groupId
+          const newGroupId = crypto.randomUUID();
+          for (let i = 0; i < afterGroup.length; i++) {
+            await tx.assignment.update({
+              where: { id: afterGroup[i].id },
+              data: { groupId: newGroupId, groupIndex: i },
+            });
+          }
+        }
+      }
+    });
+
+    return { success: true };
+  }
+
+  async findBlockPositions(dto: FindBlockPositionsDto) {
+    const academicYear = await prisma.academicYear.findUnique({
+      where: { id: dto.academicYearId },
+    });
+    if (!academicYear) {
+      throw new AppError('Academic year not found', 404);
+    }
+
+    const positions = await findAvailableBlockPositions(
+      dto.departmentId,
+      dto.blockSize,
+      dto.shifts,
+      dto.type,
+      dto.universityId,
+      { startDate: academicYear.startDate, endDate: academicYear.endDate },
+      dto.studentCount ?? null,
+      dto.yearInProgram,
+      dto.excludeGroupId,
+    );
+
+    return positions.map((p) => ({
+      startDate: p.startDate.toISOString(),
+      endDate: p.endDate.toISOString(),
+    }));
   }
 
   async displace(id: number, dto: DisplaceAssignmentDto, userId: number, userRole: string, forceOverride?: boolean) {

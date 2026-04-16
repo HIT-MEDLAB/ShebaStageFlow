@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useMemo, useState, useEffect } from 'react'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
@@ -30,6 +30,7 @@ import { useIsAdmin } from '@/hooks/useIsAdmin'
 
 import { createAssignmentSchema, type AssignmentFormData } from '../../schemas/assignmentSchema'
 import { useCreateAssignment } from '../../hooks/useCreateAssignment'
+import { useCreateBlock } from '../../hooks/useBlockActions'
 import { useDepartments } from '../../hooks/useDepartments'
 import { useUniversities } from '../../hooks/useUniversities'
 import { useAssignments } from '../../hooks/useAssignments'
@@ -60,6 +61,7 @@ export function ManualAssignmentDialog() {
   const { data: departments } = useDepartments()
   const { data: universities } = useUniversities()
   const createAssignment = useCreateAssignment()
+  const createBlockMutation = useCreateBlock()
 
   const { data: academicYears } = useAcademicYears()
   const currentYear = academicYears?.find((y) => y.id === academicYearId)
@@ -100,10 +102,39 @@ export function ManualAssignmentDialog() {
 
   const [startDateOpen, setStartDateOpen] = useState(false)
   const [endDateOpen, setEndDateOpen] = useState(false)
+  const [perWeekShifts, setPerWeekShifts] = useState<('MORNING' | 'EVENING')[]>([])
+
+  // Watch dates and shift to compute week count
+  const watchedStartDate = useWatch({ control, name: 'startDate' })
+  const watchedEndDate = useWatch({ control, name: 'endDate' })
+  const watchedShiftType = useWatch({ control, name: 'shiftType' })
+
+  const weekCount = useMemo(() => {
+    if (!watchedStartDate || !watchedEndDate) return 1
+    const diffMs = watchedEndDate.getTime() - watchedStartDate.getTime()
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24))
+    // A single week is 4 days (Sun-Thu). Each additional week adds 7.
+    return Math.max(1, Math.floor(diffDays / 7) + 1)
+  }, [watchedStartDate, watchedEndDate])
+
+  const isMultiWeek = weekCount > 1
+
+  // Sync per-week shifts when week count or default shift changes
+  useEffect(() => {
+    if (isMultiWeek) {
+      setPerWeekShifts((prev) => {
+        const defaultShift = watchedShiftType || 'MORNING'
+        if (prev.length === weekCount) return prev
+        const next = Array.from({ length: weekCount }, (_, i) => prev[i] ?? defaultShift)
+        return next
+      })
+    }
+  }, [weekCount, isMultiWeek, watchedShiftType])
 
   function handleClose() {
     closeDialog()
     reset()
+    setPerWeekShifts([])
   }
 
   async function onSubmit(data: AssignmentFormData) {
@@ -196,28 +227,50 @@ export function ManualAssignmentDialog() {
       }
     }
 
-    createAssignment.mutate(
-      {
-        departmentId: data.departmentId,
-        universityId: data.universityId,
-        academicYearId,
-        startDate: format(data.startDate, 'yyyy-MM-dd'),
-        endDate: format(data.endDate, 'yyyy-MM-dd'),
-        type: data.type,
-        shiftType: data.shiftType,
-        studentCount: data.studentCount ?? null,
-        yearInProgram: data.yearInProgram,
-        tutorName: data.tutorName ?? null,
-      },
-      {
-        onSuccess: () => {
-          handleClose()
+    if (isMultiWeek) {
+      createBlockMutation.mutate(
+        {
+          departmentId: data.departmentId,
+          universityId: data.universityId,
+          academicYearId,
+          startDate: format(data.startDate, 'yyyy-MM-dd'),
+          endDate: format(data.endDate, 'yyyy-MM-dd'),
+          type: data.type,
+          shifts: perWeekShifts,
+          studentCount: data.studentCount ?? null,
+          yearInProgram: data.yearInProgram,
+          tutorName: data.tutorName ?? null,
         },
-        onError: () => {
-          toast.error(t('toast.importFailed'))
+        {
+          onSuccess: () => {
+            handleClose()
+          },
         },
-      },
-    )
+      )
+    } else {
+      createAssignment.mutate(
+        {
+          departmentId: data.departmentId,
+          universityId: data.universityId,
+          academicYearId,
+          startDate: format(data.startDate, 'yyyy-MM-dd'),
+          endDate: format(data.endDate, 'yyyy-MM-dd'),
+          type: data.type,
+          shiftType: data.shiftType,
+          studentCount: data.studentCount ?? null,
+          yearInProgram: data.yearInProgram,
+          tutorName: data.tutorName ?? null,
+        },
+        {
+          onSuccess: () => {
+            handleClose()
+          },
+          onError: () => {
+            toast.error(t('toast.importFailed'))
+          },
+        },
+      )
+    }
   }
 
   return (
@@ -430,6 +483,47 @@ export function ManualAssignmentDialog() {
             </fieldset>
           </div>
 
+          {/* Per-week shift selectors (multi-week only) */}
+          {isMultiWeek && (
+            <fieldset className="flex flex-col gap-2 rounded-md border p-3 bg-muted/30">
+              <label className="text-sm font-medium">
+                {t('dialogs.manual.perWeekShifts', { count: weekCount })}
+              </label>
+              <div className="flex flex-col gap-2">
+                {perWeekShifts.map((shift, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground min-w-[60px]">
+                      {t('dialogs.manual.weekLabel', { num: i + 1 })}
+                    </span>
+                    <ToggleGroup
+                      type="single"
+                      variant="outline"
+                      size="sm"
+                      value={shift}
+                      onValueChange={(val) => {
+                        if (val) {
+                          setPerWeekShifts((prev) => {
+                            const next = [...prev]
+                            next[i] = val as 'MORNING' | 'EVENING'
+                            return next
+                          })
+                        }
+                      }}
+                      className="flex-1"
+                    >
+                      <ToggleGroupItem value="MORNING" className="flex-1">
+                        {t('filters.morning')}
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="EVENING" className="flex-1">
+                        {t('filters.evening')}
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  </div>
+                ))}
+              </div>
+            </fieldset>
+          )}
+
           {/* Student Count & Year in Program - grid pair */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Student Count */}
@@ -507,7 +601,7 @@ export function ManualAssignmentDialog() {
             <Button type="button" variant="outline" onClick={handleClose}>
               {t('dialogs.manual.cancel')}
             </Button>
-            <Button type="submit" disabled={isSubmitting || createAssignment.isPending}>
+            <Button type="submit" disabled={isSubmitting || createAssignment.isPending || createBlockMutation.isPending}>
               {t('dialogs.manual.save')}
             </Button>
           </DialogFooter>

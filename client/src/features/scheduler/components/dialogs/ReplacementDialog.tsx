@@ -20,6 +20,7 @@ import type { Assignment, WeekDefinition } from '../../types/scheduler.types'
 interface ReplacementDialogProps {
   open: boolean
   displacedAssignment: Assignment
+  displacedBlock?: Assignment[] | null
   suggestedWeeks: WeekDefinition[]
   allWeeks: WeekDefinition[]
   onReplace: (week: WeekDefinition) => void
@@ -29,11 +30,14 @@ interface ReplacementDialogProps {
 export function ReplacementDialog({
   open,
   displacedAssignment,
+  displacedBlock,
   suggestedWeeks,
   allWeeks,
   onReplace,
   onCancel,
 }: ReplacementDialogProps) {
+  const isBlockDisplacement = displacedBlock && displacedBlock.length > 1
+  const blockSize = isBlockDisplacement ? displacedBlock.length : 1
   const { t } = useTranslation('scheduler')
   const [manualDate, setManualDate] = useState<Date | undefined>()
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -60,14 +64,20 @@ export function ReplacementDialog({
         </DialogHeader>
 
         <p className="text-sm text-muted-foreground">
-          {t('dialogs.replacement.description', {
-            university: displacedAssignment.universityName,
-            year: displacedAssignment.yearInProgram,
-            shift:
-              displacedAssignment.shiftType === 'MORNING'
-                ? t('filters.morning')
-                : t('filters.evening'),
-          })}
+          {isBlockDisplacement
+            ? t('dialogs.replacement.blockDescription', {
+                university: displacedAssignment.universityName,
+                year: displacedAssignment.yearInProgram,
+                weeks: blockSize,
+              })
+            : t('dialogs.replacement.description', {
+                university: displacedAssignment.universityName,
+                year: displacedAssignment.yearInProgram,
+                shift:
+                  displacedAssignment.shiftType === 'MORNING'
+                    ? t('filters.morning')
+                    : t('filters.evening'),
+              })}
         </p>
 
         {/* Suggested weeks */}
@@ -77,22 +87,33 @@ export function ReplacementDialog({
               {t('dialogs.replacement.suggestedWeeks')}
             </p>
             <div className="flex flex-col gap-2">
-              {suggestedWeeks.map((week) => (
-                <button
-                  key={week.weekNumber}
-                  type="button"
-                  onClick={() => onReplace(week)}
-                  className={cn(
-                    'flex items-center justify-between rounded-md border p-3 text-sm',
-                    'hover:border-primary hover:bg-accent transition-colors text-start',
-                  )}
-                >
-                  <span className="font-medium">
-                    {format(week.startDate, 'dd/MM/yy')} –{' '}
-                    {format(week.endDate, 'dd/MM/yy')}
-                  </span>
-                </button>
-              ))}
+              {suggestedWeeks.map((week) => {
+                // For block displacement, show the full window range
+                const windowEnd = isBlockDisplacement
+                  ? allWeeks.find((w) => w.weekNumber === week.weekNumber + blockSize - 1)
+                  : undefined
+                return (
+                  <button
+                    key={week.weekNumber}
+                    type="button"
+                    onClick={() => onReplace(week)}
+                    className={cn(
+                      'flex items-center justify-between rounded-md border p-3 text-sm',
+                      'hover:border-primary hover:bg-accent transition-colors text-start',
+                    )}
+                  >
+                    <span className="font-medium">
+                      {format(week.startDate, 'dd/MM/yy')} –{' '}
+                      {format(windowEnd?.endDate ?? week.endDate, 'dd/MM/yy')}
+                      {isBlockDisplacement && (
+                        <span className="text-muted-foreground ms-2">
+                          ({blockSize} {t('dialogs.replacement.weeks')})
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}

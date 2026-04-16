@@ -148,6 +148,51 @@ export const smartImportExecuteSchema = z.object({
   ])),
 });
 
+// ── Block (multi-week) schemas ──────────────────────────────────
+
+export const createBlockSchema = z.object({
+  departmentId: z.number().int().positive(),
+  universityId: z.number().int().positive(),
+  academicYearId: z.number().int().positive(),
+  startDate: z.coerce.date().refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' }),
+  endDate: z.coerce.date().refine((d) => d.getUTCDay() === 4, { message: 'End date must be a Thursday' }),
+  type: z.enum(['GROUP', 'ELECTIVE']),
+  shifts: z.array(z.enum(['MORNING', 'EVENING'])).min(2, 'Block must have at least 2 weeks'),
+  studentCount: z.number().int().positive().optional().nullable(),
+  yearInProgram: z.number().int().min(1).max(6),
+  tutorName: z.string().optional().nullable(),
+  forceOverride: z.boolean().optional(),
+}).refine((data) => data.endDate > data.startDate, {
+  message: 'End date must be after start date',
+  path: ['endDate'],
+}).refine((data) => {
+  // Validate that endDate matches startDate + (shifts.length - 1) * 7 + 4 days
+  const expectedEnd = new Date(data.startDate);
+  expectedEnd.setUTCDate(expectedEnd.getUTCDate() + (data.shifts.length - 1) * 7 + 4);
+  return Math.abs(data.endDate.getTime() - expectedEnd.getTime()) < 24 * 60 * 60 * 1000;
+}, {
+  message: 'End date must match the number of weeks specified by shifts',
+  path: ['endDate'],
+});
+
+export const moveBlockSchema = z.object({
+  departmentId: z.number().int().positive(),
+  startDate: z.coerce.date().refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' }),
+  forceOverride: z.boolean().optional(),
+});
+
+export const findBlockPositionsSchema = z.object({
+  departmentId: z.number().int().positive(),
+  academicYearId: z.number().int().positive(),
+  blockSize: z.number().int().min(2),
+  shifts: z.array(z.enum(['MORNING', 'EVENING'])).min(2),
+  type: z.enum(['GROUP', 'ELECTIVE']),
+  universityId: z.number().int().positive(),
+  studentCount: z.number().int().positive().optional().nullable(),
+  yearInProgram: z.number().int().min(1).max(6),
+  excludeGroupId: z.string().optional(),
+});
+
 // Export inferred types
 export type CreateAssignmentDto = z.infer<typeof createAssignmentSchema>;
 export type UpdateAssignmentDto = z.infer<typeof updateAssignmentSchema>;
@@ -160,3 +205,6 @@ export type DisplaceAssignmentDto = z.infer<typeof displaceAssignmentSchema>;
 export type SmartImportValidateDto = z.infer<typeof smartImportValidateSchema>;
 export type SmartImportExecuteDto = z.infer<typeof smartImportExecuteSchema>;
 export type ValidateDisplacementWeekDto = z.infer<typeof validateDisplacementWeekSchema>;
+export type CreateBlockDto = z.infer<typeof createBlockSchema>;
+export type MoveBlockDto = z.infer<typeof moveBlockSchema>;
+export type FindBlockPositionsDto = z.infer<typeof findBlockPositionsSchema>;

@@ -12,12 +12,14 @@ import { useAcademicYearWeeks } from '../hooks/useAcademicYearWeeks'
 import { useGridData } from '../hooks/useGridData'
 import { useBlockedCells } from '../hooks/useBlockedCells'
 import { useMoveAssignment } from '../hooks/useMoveAssignment'
+import { useBlockGroups } from '../hooks/useBlockGroups'
+import { useMoveBlock } from '../hooks/useBlockActions'
 import { useDisplaceAssignment } from '../hooks/useDisplaceAssignment'
 import { useUniversities } from '../hooks/useUniversities'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { validateDrop } from '../validators/assignmentValidator'
 import type { ValidationContext } from '../validators/assignmentValidator'
-import { findAvailableWeeks } from '../validators/findAvailableWeeks'
+import { findAvailableWeeks, findAvailableBlockWeeks } from '../validators/findAvailableWeeks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SchedulerGrid } from '../components/grid/SchedulerGrid'
 import { GridDragOverlay } from '../components/grid/GridDragOverlay'
@@ -48,6 +50,7 @@ export default function SchedulerPage() {
     setActiveDragId,
     pendingMove,
     displacedAssignment,
+    displacedBlock,
     replacementSuggestedWeeks,
     adminOverrideReason,
     warningReason,
@@ -87,7 +90,9 @@ export default function SchedulerPage() {
     selectedYear,
   })
   const blockedCells = useBlockedCells(constraints, weeks)
+  const blockGroups = useBlockGroups(assignments)
   const moveMutation = useMoveAssignment()
+  const moveBlockMutation = useMoveBlock()
   const displaceMutation = useDisplaceAssignment()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -170,6 +175,34 @@ export default function SchedulerPage() {
       if (currentWeek?.weekNumber === weekNumber) return
     }
 
+    // Block-aware drag: if assignment is part of a block, move the entire block
+    if (assignment.groupId) {
+      const block = blockGroups.get(assignment.groupId)
+      if (block && block.length > 1) {
+        const targetWeek = weeks.find((w) => w.weekNumber === weekNumber)
+        if (!targetWeek) return
+
+        // Calculate the offset: which week in the block was dragged
+        const draggedIndex = assignment.groupIndex ?? 0
+        // First week of block at the target position
+        const firstWeekNum = weekNumber - draggedIndex
+        const firstWeek = weeks.find((w) => w.weekNumber === firstWeekNum)
+        if (!firstWeek) {
+          toast.error(t('grid.blocked.noSpace'))
+          return
+        }
+
+        moveBlockMutation.mutate({
+          groupId: assignment.groupId,
+          data: {
+            departmentId,
+            startDate: format(firstWeek.startDate, 'yyyy-MM-dd'),
+          },
+        })
+        return
+      }
+    }
+
     const result = validateDrop(assignment, departmentId, weekNumber, validationContext)
 
     switch (result.type) {
@@ -190,16 +223,38 @@ export default function SchedulerPage() {
         break
 
       case 'conflict_replaceable': {
-        const suggestedWeeks = findAvailableWeeks(
-          result.displacedAssignment,
-          weekNumber,
-          validationContext,
-        )
-        openReplacementDialog(
-          { assignment, targetDeptId: departmentId, targetWeekNum: weekNumber },
-          result.displacedAssignment,
-          suggestedWeeks,
-        )
+        // Check if the displaced assignment is part of a block
+        const displacedGroupId = result.displacedAssignment.groupId
+        const displacedBlockMembers = displacedGroupId
+          ? blockGroups.get(displacedGroupId)
+          : undefined
+
+        if (displacedBlockMembers && displacedBlockMembers.length > 1) {
+          // Block displacement — find contiguous N-week windows
+          const suggestedWeeks = findAvailableBlockWeeks(
+            displacedBlockMembers,
+            weekNumber,
+            validationContext,
+          )
+          openReplacementDialog(
+            { assignment, targetDeptId: departmentId, targetWeekNum: weekNumber },
+            result.displacedAssignment,
+            suggestedWeeks,
+            displacedBlockMembers,
+          )
+        } else {
+          // Single assignment displacement
+          const suggestedWeeks = findAvailableWeeks(
+            result.displacedAssignment,
+            weekNumber,
+            validationContext,
+          )
+          openReplacementDialog(
+            { assignment, targetDeptId: departmentId, targetWeekNum: weekNumber },
+            result.displacedAssignment,
+            suggestedWeeks,
+          )
+        }
         break
       }
 
@@ -234,6 +289,37 @@ export default function SchedulerPage() {
     const incomingTargetWeek = weeks.find((w) => w.weekNumber === pendingMove.targetWeekNum)
     if (!incomingTargetWeek) return
 
+    // Block displacement: move the entire displaced block to a contiguous window
+    if (displacedBlock && displacedBlock.length > 1 && displacedAssignment.groupId) {
+      // targetWeek is the first week of the window where the block should go
+      // First: move the displaced block to the new position
+      moveBlockMutation.mutate(
+        {
+          groupId: displacedAssignment.groupId,
+          data: {
+            departmentId: displacedAssignment.departmentId,
+            startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+          },
+        },
+        {
+          onSuccess: () => {
+            // Then: move the incoming assignment to its target
+            moveMutation.mutate({
+              id: pendingMove.assignment.id,
+              data: {
+                departmentId: pendingMove.targetDeptId,
+                startDate: format(incomingTargetWeek.startDate, 'yyyy-MM-dd'),
+                endDate: format(incomingTargetWeek.endDate, 'yyyy-MM-dd'),
+              },
+            })
+          },
+        },
+      )
+      clearPendingMove()
+      return
+    }
+
+    // Single assignment displacement
     displaceMutation.mutate({
       id: pendingMove.assignment.id,
       data: {
@@ -304,6 +390,7 @@ export default function SchedulerPage() {
               weeks={weeks}
               gridData={gridData}
               blockedCells={blockedCells}
+              blockGroups={blockGroups}
             />
             <DragOverlay>
               {draggedAssignment ? (
@@ -328,6 +415,7 @@ export default function SchedulerPage() {
         <ReplacementDialog
           open
           displacedAssignment={displacedAssignment}
+          displacedBlock={displacedBlock}
           suggestedWeeks={replacementSuggestedWeeks}
           allWeeks={weeks}
           onReplace={handleReplacementConfirm}

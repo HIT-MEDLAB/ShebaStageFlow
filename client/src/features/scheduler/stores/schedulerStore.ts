@@ -26,6 +26,7 @@ interface SchedulerStore {
     targetWeekNum: number
   } | null
   displacedAssignment: Assignment | null
+  displacedBlock: Assignment[] | null
   replacementSuggestedWeeks: WeekDefinition[] | null
   adminOverrideReason: {
     reasonKey: string
@@ -52,6 +53,7 @@ interface SchedulerStore {
     pendingMove: SchedulerStore['pendingMove'],
     displacedAssignment: Assignment,
     suggestedWeeks: WeekDefinition[],
+    displacedBlock?: Assignment[],
   ) => void
   openAdminOverrideDialog: (
     pendingMove: SchedulerStore['pendingMove'],
@@ -78,6 +80,7 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
 
   pendingMove: null,
   displacedAssignment: null,
+  displacedBlock: null,
   replacementSuggestedWeeks: null,
   adminOverrideReason: null,
   warningReason: null,
@@ -95,17 +98,19 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
       editingAssignmentId: null,
       pendingMove: null,
       displacedAssignment: null,
+      displacedBlock: null,
       replacementSuggestedWeeks: null,
       adminOverrideReason: null,
       warningReason: null,
     }),
   setActiveDragId: (id) => set({ activeDragId: id }),
 
-  openReplacementDialog: (pendingMove, displacedAssignment, suggestedWeeks) =>
+  openReplacementDialog: (pendingMove, displacedAssignment, suggestedWeeks, displacedBlock) =>
     set({
       activeDialog: 'replacement',
       pendingMove,
       displacedAssignment,
+      displacedBlock: displacedBlock ?? null,
       replacementSuggestedWeeks: suggestedWeeks,
     }),
 
@@ -128,6 +133,7 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
       activeDialog: null,
       pendingMove: null,
       displacedAssignment: null,
+      displacedBlock: null,
       replacementSuggestedWeeks: null,
       adminOverrideReason: null,
       warningReason: null,

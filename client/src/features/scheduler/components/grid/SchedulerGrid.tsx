@@ -15,6 +15,7 @@ interface SchedulerGridProps {
   weeks: WeekDefinition[]
   gridData: Map<number, Map<number, Assignment[]>>
   blockedCells: Map<string, BlockReason>
+  blockGroups?: Map<string, Assignment[]>
 }
 
 export function SchedulerGrid({
@@ -22,6 +23,7 @@ export function SchedulerGrid({
   weeks,
   gridData,
   blockedCells,
+  blockGroups,
 }: SchedulerGridProps) {
   const { i18n } = useTranslation()
   const dir = i18n.dir()
@@ -55,6 +57,7 @@ export function SchedulerGrid({
             weeks={weeks}
             gridData={gridData}
             blockedCells={blockedCells}
+            blockGroups={blockGroups}
           />
         ))}
       </div>

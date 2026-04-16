@@ -37,7 +37,8 @@
       "dateConstraint": "אילוץ תאריך — {{name}}",
       "studentDoubleBooking": "הסטודנט כבר משובץ ב{{departmentName}} בתקופה זו",
       "oneGroupPerShift": "ניתן לשבץ רק קבוצה אחת למחלקה למשמרת לשבוע",
-      "duplicateAssignment": "כפילות — שיבוץ זה כבר קיים במערכת"
+      "duplicateAssignment": "כפילות — שיבוץ זה כבר קיים במערכת",
+      "noSpace": "אין מספיק שבועות רצופים פנויים לבלוק זה"
     },
     "warning": {
       "firstClinicalRotation": "מומלץ שסטודנטים בשנה א׳ ישובצו ברפואה פנימית או ילדים (לא ב{{departmentName}})",
@@ -51,7 +52,9 @@
     "group": "קבוצתי",
     "elective": "אלקטיב",
     "noStudents": "-",
-    "pendingApproval": "ממתין לאישור מנהל"
+    "pendingApproval": "ממתין לאישור מנהל",
+    "blockBadge": "{{position}}/{{total}}",
+    "detachFromBlock": "הפרד מבלוק"
   },
   "status": {
     "approved": "מאושר",
@@ -71,7 +74,10 @@
       "yearInProgram": "שנת לימוד",
       "tutorName": "שם מדריך",
       "save": "שמור שיבוץ",
-      "cancel": "ביטול"
+      "cancel": "ביטול",
+      "perWeekShifts": "משמרת לכל שבוע ({{count}} שבועות)",
+      "weekLabel": "שבוע {{num}}",
+      "multiWeekNotice": "יצירת בלוק של {{count}} שבועות"
     },
     "import": {
       "title": "ייבוא מקובץ אקסל",
@@ -107,7 +113,9 @@
     "replacement": {
       "title": "נדרשת החלפה",
       "description": "שיבוץ בעדיפות גבוהה יותר מחליף את {{university}} (שנה {{year}}, {{shift}}). בחר שבוע חדש לשיבוץ המוחלף.",
+      "blockDescription": "שיבוץ בעדיפות גבוהה יותר מחליף את {{university}} (שנה {{year}}). בחר מיקום חדש לבלוק של {{weeks}} שבועות.",
       "suggestedWeeks": "שבועות מוצעים",
+      "weeks": "שבועות",
       "chooseManually": "בחר ידנית",
       "cancel": "ביטול",
       "confirm": "אישור"
@@ -198,7 +206,12 @@
     "capacityExceeded": "לא ניתן להוסיף סטודנטים — הקבוצה מלאה ({{capacity}} מקומות)",
     "capacityExceededDetail": "הוספת {{adding}} סטודנט(ים) תחרוג ממגבלת הקבוצה ({{current}}/{{capacity}})",
     "replacementSuccess": "השיבוצים הוחלפו בהצלחה",
-    "overrideSuccess": "השיבוץ בוצע (דריסת מנהל)"
+    "overrideSuccess": "השיבוץ בוצע (דריסת מנהל)",
+    "blockCreated": "בלוק רב-שבועי נוצר בהצלחה",
+    "blockMoved": "הבלוק הועבר בהצלחה",
+    "detachedFromBlock": "השבוע הופרד מהבלוק",
+    "detachFailed": "הפרדת השבוע מהבלוק נכשלה",
+    "findPositionsFailed": "חיפוש מיקומים זמינים נכשל"
   },
   "approval": {
     "tab": "אישורים",

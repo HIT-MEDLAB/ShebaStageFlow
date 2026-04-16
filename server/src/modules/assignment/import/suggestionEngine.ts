@@ -104,6 +104,80 @@ export async function validateWeekForDisplacement(
   }
 }
 
+export async function findAvailableBlockPositions(
+  departmentId: number,
+  blockSize: number,
+  shifts: ('MORNING' | 'EVENING')[],
+  type: 'GROUP' | 'ELECTIVE',
+  universityId: number,
+  academicYear: { startDate: Date; endDate: Date },
+  studentCount: number | null,
+  yearInProgram: number,
+  excludeGroupId?: string,
+  maxResults = 5,
+): Promise<Array<{ startDate: Date; endDate: Date }>> {
+  const allWeeks = computeAllWeeks(academicYear.startDate, academicYear.endDate);
+
+  // Get IDs to exclude (all assignments in the block being moved)
+  let excludeIds: number[] = [];
+  if (excludeGroupId) {
+    const blockAssignments = await prisma.assignment.findMany({
+      where: { groupId: excludeGroupId },
+      select: { id: true },
+    });
+    excludeIds = blockAssignments.map((a) => a.id);
+  }
+
+  const results: Array<{ startDate: Date; endDate: Date }> = [];
+
+  // Slide a window of size blockSize across all weeks
+  for (let i = 0; i <= allWeeks.length - blockSize; i++) {
+    const window = allWeeks.slice(i, i + blockSize);
+
+    // Check that weeks are consecutive (7 days apart)
+    let consecutive = true;
+    for (let j = 1; j < window.length; j++) {
+      const diff = window[j].startDate.getTime() - window[j - 1].startDate.getTime();
+      if (diff !== 7 * 24 * 60 * 60 * 1000) {
+        consecutive = false;
+        break;
+      }
+    }
+    if (!consecutive) continue;
+
+    // Validate each week in the window
+    let allValid = true;
+    for (let j = 0; j < window.length; j++) {
+      const result = await validateWeekForDisplacement(
+        departmentId,
+        shifts[j],
+        type,
+        universityId,
+        window[j].startDate,
+        window[j].endDate,
+        studentCount,
+        yearInProgram,
+        excludeIds,
+      );
+      if (!result.valid) {
+        allValid = false;
+        break;
+      }
+    }
+
+    if (allValid) {
+      // Return the start of first week to end of last week
+      results.push({
+        startDate: window[0].startDate,
+        endDate: window[window.length - 1].endDate,
+      });
+      if (results.length >= maxResults) break;
+    }
+  }
+
+  return results;
+}
+
 export async function findSuggestedWeeks(
   departmentId: number,
   shiftType: 'MORNING' | 'EVENING',

@@ -18,6 +18,9 @@ import type {
   ImportValidationResult,
   ImportAction,
   ExportAssignment,
+  CreateBlockDto,
+  MoveBlockDto,
+  FindBlockPositionsDto,
 } from '../types/scheduler.types'
 
 // Raw shape from the API (Prisma includes nested relations)
@@ -170,6 +173,42 @@ export async function smartImportExecute(
   const { data } = await apiClient.post<{ created: number; displaced: number }>(
     '/assignments/import/execute',
     { academicYearId, actions },
+  )
+  return data
+}
+
+// ── Block (multi-week) mutations ────────────────────────────────
+
+export async function createBlock(dto: CreateBlockDto) {
+  const { data } = await apiClient.post<{ assignments: RawAssignment[]; warnings: unknown[] }>(
+    '/assignments/block',
+    dto,
+  )
+  return {
+    assignments: data.assignments.map(mapAssignment),
+    warnings: data.warnings,
+  }
+}
+
+export async function moveBlock(groupId: string, dto: MoveBlockDto) {
+  const { data } = await apiClient.patch<RawAssignment[]>(
+    `/assignments/block/${groupId}/move`,
+    dto,
+  )
+  return data.map(mapAssignment)
+}
+
+export async function detachFromBlock(assignmentId: number) {
+  const { data } = await apiClient.patch<{ success: boolean }>(
+    `/assignments/${assignmentId}/detach`,
+  )
+  return data
+}
+
+export async function findBlockPositions(dto: FindBlockPositionsDto) {
+  const { data } = await apiClient.post<Array<{ startDate: string; endDate: string }>>(
+    '/assignments/block/find-positions',
+    dto,
   )
   return data
 }
