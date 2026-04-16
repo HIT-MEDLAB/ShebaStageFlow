@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Input } from '@/components/ui/input'
 import { useSchedulerStore } from '../stores/schedulerStore'
 import { useUniversities } from '../hooks/useUniversities'
 
@@ -18,14 +19,25 @@ export function SchedulerFilters() {
     selectedUniversities,
     selectedShift,
     selectedYear,
+    departmentNameFilter,
     setUniversityFilter,
     setShiftFilter,
     setYearFilter,
+    setDepartmentNameFilter,
   } = useSchedulerStore()
   const { data: universities } = useUniversities()
 
   return (
     <div className="flex items-center gap-3 flex-wrap">
+      {/* Department name filter */}
+      <Input
+        type="search"
+        placeholder={t('filters.departmentName')}
+        value={departmentNameFilter}
+        onChange={(e) => setDepartmentNameFilter(e.target.value)}
+        className="w-[200px]"
+      />
+
       {/* University filter */}
       <Select
         value={selectedUniversities.length === 1 ? selectedUniversities[0].toString() : 'all'}

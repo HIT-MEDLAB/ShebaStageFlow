@@ -15,7 +15,8 @@
     "allYears": "All Years",
     "allShifts": "All",
     "morning": "Morning",
-    "evening": "Evening"
+    "evening": "Evening",
+    "departmentName": "Search department"
   },
   "grid": {
     "departments": "Departments",

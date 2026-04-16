@@ -6,6 +6,7 @@ interface SchedulerStore {
   selectedUniversities: number[]
   selectedShift: 'all' | 'morning' | 'evening'
   selectedYear: number | null
+  departmentNameFilter: string
   activeDialog:
     | null
     | 'create'
@@ -39,6 +40,7 @@ interface SchedulerStore {
   setUniversityFilter: (ids: number[]) => void
   setShiftFilter: (shift: 'all' | 'morning' | 'evening') => void
   setYearFilter: (year: number | null) => void
+  setDepartmentNameFilter: (value: string) => void
   openDialog: (
     type: 'create' | 'import' | 'smartImport' | 'edit',
     assignmentId?: number,
@@ -69,6 +71,7 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
   selectedUniversities: [],
   selectedShift: 'all',
   selectedYear: null,
+  departmentNameFilter: '',
   activeDialog: null,
   editingAssignmentId: null,
   activeDragId: null,
@@ -83,6 +86,7 @@ export const useSchedulerStore = create<SchedulerStore>((set) => ({
   setUniversityFilter: (ids) => set({ selectedUniversities: ids }),
   setShiftFilter: (shift) => set({ selectedShift: shift }),
   setYearFilter: (year) => set({ selectedYear: year }),
+  setDepartmentNameFilter: (value) => set({ departmentNameFilter: value }),
   openDialog: (type, assignmentId) =>
     set({ activeDialog: type, editingAssignmentId: assignmentId ?? null }),
   closeDialog: () =>

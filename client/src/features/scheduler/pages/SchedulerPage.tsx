@@ -42,6 +42,7 @@ export default function SchedulerPage() {
     selectedUniversities,
     selectedShift,
     selectedYear,
+    departmentNameFilter,
     activeDialog,
     activeDragId,
     setActiveDragId,
@@ -60,6 +61,12 @@ export default function SchedulerPage() {
   const { data: academicYears } = useAcademicYears()
   const currentYear = academicYears?.find((y) => y.id === academicYearId)
   const { data: departments } = useDepartments()
+  const filteredDepartments = useMemo(() => {
+    const list = departments ?? []
+    const q = departmentNameFilter.trim().toLowerCase()
+    if (!q) return list
+    return list.filter((d) => d.name.toLowerCase().includes(q))
+  }, [departments, departmentNameFilter])
   const { data: assignments } = useAssignments(academicYearId, {
     selectedUniversities,
     selectedShift,
@@ -293,7 +300,7 @@ export default function SchedulerPage() {
           </div>
           <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <SchedulerGrid
-              departments={departments ?? []}
+              departments={filteredDepartments}
               weeks={weeks}
               gridData={gridData}
               blockedCells={blockedCells}

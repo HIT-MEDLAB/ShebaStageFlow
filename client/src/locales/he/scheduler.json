@@ -15,7 +15,8 @@
     "allYears": "כל השנים",
     "allShifts": "הכל",
     "morning": "בוקר",
-    "evening": "ערב"
+    "evening": "ערב",
+    "departmentName": "חיפוש מחלקה"
   },
   "grid": {
     "departments": "מחלקות",
