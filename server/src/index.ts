@@ -52,22 +52,22 @@ app.use('/api/home', homeRouter);
 app.use(errorHandler);
 
 async function ensureAcademicYears() {
-  const years = [
-    { name: '2025-2026', startDate: new Date('2025-10-01'), endDate: new Date('2026-06-30') },
-    { name: '2026-2027', startDate: new Date('2026-10-01'), endDate: new Date('2027-06-30') },
-    { name: '2027-2028', startDate: new Date('2027-10-01'), endDate: new Date('2028-06-30') },
-    { name: '2028-2029', startDate: new Date('2028-10-01'), endDate: new Date('2029-06-30') },
-    { name: '2029-2030', startDate: new Date('2029-10-01'), endDate: new Date('2030-06-30') },
-    { name: '2030-2031', startDate: new Date('2030-10-01'), endDate: new Date('2031-06-30') },
-  ];
-  for (const y of years) {
+  const START_YEAR = 2025;
+  const endYear = new Date().getFullYear() + 5;
+
+  for (let y = START_YEAR; y <= endYear; y++) {
+    const name = `${y}-${y + 1}`;
     await prisma.academicYear.upsert({
-      where: { name: y.name },
+      where: { name },
       update: {},
-      create: y,
+      create: {
+        name,
+        startDate: new Date(`${y}-10-01`),
+        endDate: new Date(`${y + 1}-06-30`),
+      },
     });
   }
-  console.log('Academic years 2025-2031 ensured.');
+  console.log(`Academic years ${START_YEAR}-${endYear + 1} ensured.`);
 }
 
 ensureAcademicYears()

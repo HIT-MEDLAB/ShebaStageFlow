@@ -24,6 +24,7 @@ import { useHomeStats } from '../hooks/useHomeStats'
 import { StatsCard } from '../components/StatsCard'
 import { WeekSelector } from '../components/WeekSelector'
 import { UniversityTable } from '../components/UniversityTable'
+import { getCurrentAcademicYearName } from '@/features/scheduler/utils/getCurrentAcademicYearName'
 import type { ViewMode } from '../types/home.types'
 
 export function HomePage() {
@@ -38,7 +39,9 @@ export function HomePage() {
 
   useEffect(() => {
     if (academicYears?.length && !academicYearId) {
-      setAcademicYearId(academicYears[0].id)
+      const currentName = getCurrentAcademicYearName()
+      const current = academicYears.find((y) => y.name === currentName)
+      setAcademicYearId(current?.id ?? academicYears[0].id)
     }
   }, [academicYears, academicYearId])
 

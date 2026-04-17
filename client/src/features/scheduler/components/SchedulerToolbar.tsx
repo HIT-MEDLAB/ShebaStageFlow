@@ -13,6 +13,7 @@ import { useSchedulerStore } from '../stores/schedulerStore'
 import { useAcademicYears } from '../hooks/useAcademicYears'
 import { fetchAssignmentsForExport } from '../api/scheduler.api'
 import { exportSchedulerToExcel } from '../utils/exportSchedulerToExcel'
+import { getCurrentAcademicYearName } from '../utils/getCurrentAcademicYearName'
 
 export function SchedulerToolbar() {
   const { t } = useTranslation('scheduler')
@@ -42,10 +43,12 @@ export function SchedulerToolbar() {
     }
   }
 
-  // Auto-select first academic year when data loads and none is selected
+  // Auto-select current academic year when data loads and none is selected
   useEffect(() => {
     if (academicYears?.length && !academicYearId) {
-      setAcademicYear(academicYears[0].id)
+      const currentName = getCurrentAcademicYearName()
+      const current = academicYears.find((y) => y.name === currentName)
+      setAcademicYear(current?.id ?? academicYears[0].id)
     }
   }, [academicYears, academicYearId, setAcademicYear])
 
