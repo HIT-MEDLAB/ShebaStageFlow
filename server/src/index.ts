@@ -51,9 +51,35 @@ app.use('/api/home', homeRouter);
 // Error handler (must be last)
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+async function ensureAcademicYears() {
+  const years = [
+    { name: '2025-2026', startDate: new Date('2025-10-01'), endDate: new Date('2026-06-30') },
+    { name: '2026-2027', startDate: new Date('2026-10-01'), endDate: new Date('2027-06-30') },
+    { name: '2027-2028', startDate: new Date('2027-10-01'), endDate: new Date('2028-06-30') },
+    { name: '2028-2029', startDate: new Date('2028-10-01'), endDate: new Date('2029-06-30') },
+    { name: '2029-2030', startDate: new Date('2029-10-01'), endDate: new Date('2030-06-30') },
+    { name: '2030-2031', startDate: new Date('2030-10-01'), endDate: new Date('2031-06-30') },
+  ];
+  for (const y of years) {
+    await prisma.academicYear.upsert({
+      where: { name: y.name },
+      update: {},
+      create: y,
+    });
+  }
+  console.log('Academic years 2025-2031 ensured.');
+}
+
+ensureAcademicYears()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to ensure academic years:', err);
+    process.exit(1);
+  });
 
 export { prisma };
 export default app;
