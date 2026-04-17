@@ -385,9 +385,27 @@ export class AssignmentService {
     }
     const weeks = this.computeBlockWeeks(dto.startDate, weekCount);
 
-    // Validate each week
+    // Validate each week against ALL constraints (holidays, date blocks, dept blocks, engine rules)
     const allWarnings: Array<{ weekIndex: number; warnings: unknown[] }> = [];
     for (let i = 0; i < weeks.length; i++) {
+      const fullCheck = await validateWeekForDisplacement(
+        dto.departmentId,
+        dto.shifts[i],
+        dto.type,
+        dto.universityId,
+        weeks[i].startDate,
+        weeks[i].endDate,
+        dto.studentCount ?? null,
+        dto.yearInProgram,
+        [],
+      );
+      if (!fullCheck.valid && !canForce) {
+        throw new AppError(
+          fullCheck.failureReason ?? 'Constraint violation on week ' + (i + 1),
+          422,
+        );
+      }
+
       const warnings = await this.engine.validate({
         departmentId: dto.departmentId,
         universityId: dto.universityId,
@@ -398,7 +416,7 @@ export class AssignmentService {
         studentCount: dto.studentCount,
         yearInProgram: dto.yearInProgram,
         academicYearId: dto.academicYearId,
-      }, canForce);
+      }, true); // pass true to collect warnings without throwing
       if (warnings.length > 0) {
         allWarnings.push({ weekIndex: i, warnings });
       }
@@ -456,20 +474,25 @@ export class AssignmentService {
     const weeks = this.computeBlockWeeks(dto.startDate, blockAssignments.length);
     const excludeIds = blockAssignments.map((a) => a.id);
 
-    // Validate each week at the new position
+    // Validate each week against ALL constraints (holidays, date blocks, dept blocks, engine rules)
     for (let i = 0; i < weeks.length; i++) {
-      await this.engine.validate({
-        departmentId: dto.departmentId,
-        universityId: blockAssignments[0].universityId,
-        startDate: weeks[i].startDate,
-        endDate: weeks[i].endDate,
-        type: blockAssignments[0].type,
-        shiftType: blockAssignments[i].shiftType,
-        studentCount: blockAssignments[0].studentCount,
-        yearInProgram: blockAssignments[0].yearInProgram,
-        excludeAssignmentIds: excludeIds,
-        academicYearId: blockAssignments[0].academicYearId,
-      }, canForce);
+      const fullCheck = await validateWeekForDisplacement(
+        dto.departmentId,
+        blockAssignments[i].shiftType,
+        blockAssignments[0].type,
+        blockAssignments[0].universityId,
+        weeks[i].startDate,
+        weeks[i].endDate,
+        blockAssignments[0].studentCount,
+        blockAssignments[0].yearInProgram ?? 1,
+        excludeIds,
+      );
+      if (!fullCheck.valid && !canForce) {
+        throw new AppError(
+          fullCheck.failureReason ?? 'Constraint violation on week ' + (i + 1),
+          422,
+        );
+      }
     }
 
     const status = this.isAdmin(userRole) ? 'APPROVED' as const : undefined;

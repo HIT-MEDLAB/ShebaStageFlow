@@ -176,21 +176,49 @@ export default function SchedulerPage() {
     }
 
     // Block-aware drag: if assignment is part of a block, move the entire block
-    if (assignment.groupId) {
+    if (assignment.groupId && validationContext) {
       const block = blockGroups.get(assignment.groupId)
       if (block && block.length > 1) {
-        const targetWeek = weeks.find((w) => w.weekNumber === weekNumber)
-        if (!targetWeek) return
+        const sorted = [...block].sort((a, b) => (a.groupIndex ?? 0) - (b.groupIndex ?? 0))
 
         // Calculate the offset: which week in the block was dragged
         const draggedIndex = assignment.groupIndex ?? 0
         // First week of block at the target position
         const firstWeekNum = weekNumber - draggedIndex
+        const lastWeekNum = firstWeekNum + block.length - 1
         const firstWeek = weeks.find((w) => w.weekNumber === firstWeekNum)
-        if (!firstWeek) {
+        const lastWeek = weeks.find((w) => w.weekNumber === lastWeekNum)
+
+        if (!firstWeek || !lastWeek) {
           toast.error(t('grid.blocked.noSpace'))
           return
         }
+
+        // Validate every week in the block's target position
+        // Exclude block members from existing assignments for validation
+        const contextWithoutBlock: ValidationContext = {
+          ...validationContext,
+          existingAssignments: validationContext.existingAssignments.filter(
+            (a) => a.groupId !== assignment.groupId,
+          ),
+        }
+
+        let blocked = false
+        for (let i = 0; i < sorted.length; i++) {
+          const targetWeekNum = firstWeekNum + i
+          const result = validateDrop(sorted[i], departmentId, targetWeekNum, contextWithoutBlock)
+          if (result.type === 'blocked') {
+            toast.error(t(result.reasonKey, result.reasonParams))
+            blocked = true
+            break
+          }
+          if (result.type === 'conflict_replaceable' || result.type === 'conflict_same_priority' || result.type === 'conflict_admin_override') {
+            toast.error(t('grid.blocked.noSpace'))
+            blocked = true
+            break
+          }
+        }
+        if (blocked) return
 
         moveBlockMutation.mutate({
           groupId: assignment.groupId,
