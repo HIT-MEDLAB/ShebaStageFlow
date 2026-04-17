@@ -249,9 +249,37 @@ export class AssignmentService {
     let created = 0;
     let displaced = 0;
 
+    // Pre-compute block groupings: actions sharing a blockKey form a group block
+    const blockGroups = new Map<string, number[]>();
+    for (let i = 0; i < dto.actions.length; i++) {
+      const action = dto.actions[i];
+      if (action.blockKey) {
+        if (!blockGroups.has(action.blockKey)) {
+          blockGroups.set(action.blockKey, []);
+        }
+        blockGroups.get(action.blockKey)!.push(i);
+      }
+    }
+
+    // Build lookup: actionIndex -> { groupId, groupIndex } for blocks with 2+ members
+    const blockLookup = new Map<number, { groupId: string; groupIndex: number }>();
+    for (const [, indices] of blockGroups) {
+      if (indices.length < 2) continue;
+      const groupId = crypto.randomUUID();
+      // Sort by startDate to determine groupIndex order
+      const sorted = [...indices].sort((a, b) =>
+        new Date(dto.actions[a].dto.startDate).getTime() - new Date(dto.actions[b].dto.startDate).getTime(),
+      );
+      sorted.forEach((actionIdx, groupIndex) => {
+        blockLookup.set(actionIdx, { groupId, groupIndex });
+      });
+    }
+
     await prisma.$transaction(async (tx) => {
-      for (const action of dto.actions) {
+      for (let i = 0; i < dto.actions.length; i++) {
+        const action = dto.actions[i];
         const actionDto = action.dto;
+        const blockInfo = blockLookup.get(i);
 
         if (action.type === 'create') {
           // Re-validate within transaction
@@ -282,6 +310,7 @@ export class AssignmentService {
               createdById: userId,
               status: 'APPROVED',
               ...(isAdminRole ? { approvedById: userId } : {}),
+              ...(blockInfo ? { groupId: blockInfo.groupId, groupIndex: blockInfo.groupIndex } : {}),
             },
           });
           created++;
@@ -333,6 +362,7 @@ export class AssignmentService {
               createdById: userId,
               status: 'APPROVED',
               ...(isAdminRole ? { approvedById: userId } : {}),
+              ...(blockInfo ? { groupId: blockInfo.groupId, groupIndex: blockInfo.groupIndex } : {}),
             },
           });
           created++;
@@ -353,6 +383,7 @@ export class AssignmentService {
               createdById: userId,
               status: 'APPROVED',
               approvedById: userId,
+              ...(blockInfo ? { groupId: blockInfo.groupId, groupIndex: blockInfo.groupIndex } : {}),
             },
           });
           created++;

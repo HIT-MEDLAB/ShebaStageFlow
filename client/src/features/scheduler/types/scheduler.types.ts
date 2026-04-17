@@ -262,6 +262,7 @@ export interface SmartImportRow {
   placementType: string
   tutorName?: string | null
   shiftType: string
+  blockKey?: string
 }
 
 export interface ImportValidationResult {
@@ -294,7 +295,7 @@ export interface ImportRowResult {
 }
 
 export type ImportAction =
-  | { type: 'create'; rowIndex: number; dto: CreateAssignmentDto }
+  | { type: 'create'; rowIndex: number; dto: CreateAssignmentDto; blockKey?: string }
   | {
       type: 'displace'
       rowIndex: number
@@ -303,8 +304,9 @@ export type ImportAction =
       displacedDepartmentId: number
       displacedStartDate: string
       displacedEndDate: string
+      blockKey?: string
     }
-  | { type: 'force_create'; rowIndex: number; dto: CreateAssignmentDto }
+  | { type: 'force_create'; rowIndex: number; dto: CreateAssignmentDto; blockKey?: string }
 
 export type WizardStep = 'upload' | 'validating' | 'review' | 'executing' | 'complete'
 

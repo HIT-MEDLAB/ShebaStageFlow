@@ -134,7 +134,7 @@ const createAssignmentInnerSchema = z.object({
 export const smartImportExecuteSchema = z.object({
   academicYearId: z.number().int().positive(),
   actions: z.array(z.discriminatedUnion('type', [
-    z.object({ type: z.literal('create'), rowIndex: z.number(), dto: createAssignmentInnerSchema }),
+    z.object({ type: z.literal('create'), rowIndex: z.number(), dto: createAssignmentInnerSchema, blockKey: z.string().optional() }),
     z.object({
       type: z.literal('displace'),
       rowIndex: z.number(),
@@ -143,8 +143,9 @@ export const smartImportExecuteSchema = z.object({
       displacedDepartmentId: z.number(),
       displacedStartDate: z.coerce.date(),
       displacedEndDate: z.coerce.date(),
+      blockKey: z.string().optional(),
     }),
-    z.object({ type: z.literal('force_create'), rowIndex: z.number(), dto: createAssignmentInnerSchema }),
+    z.object({ type: z.literal('force_create'), rowIndex: z.number(), dto: createAssignmentInnerSchema, blockKey: z.string().optional() }),
   ])),
 });
 

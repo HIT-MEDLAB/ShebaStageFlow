@@ -279,29 +279,22 @@ export class ConstraintRepository implements IConstraintRepository {
       if (data.semesterStart !== undefined || data.semesterEnd !== undefined || data.year !== undefined) {
         const year = data.year;
         if (year) {
-          const existing = await tx.universitySemester.findUnique({
-            where: { universityId_year: { universityId: id, year } },
+          // Remove all existing semesters for this university, then upsert the current one.
+          // This avoids unique-constraint conflicts from duplicate semesters
+          // that may have been created by earlier bugs.
+          await tx.universitySemester.deleteMany({
+            where: { universityId: id },
           });
 
-          if (existing) {
-            await tx.universitySemester.update({
-              where: { id: existing.id },
+          if (data.semesterStart && data.semesterEnd) {
+            await tx.universitySemester.create({
               data: {
-                ...(data.semesterStart !== undefined && { semesterStart: data.semesterStart }),
-                ...(data.semesterEnd !== undefined && { semesterEnd: data.semesterEnd }),
+                universityId: id,
+                semesterStart: data.semesterStart,
+                semesterEnd: data.semesterEnd,
+                year,
               },
             });
-          } else {
-            if (data.semesterStart && data.semesterEnd) {
-              await tx.universitySemester.create({
-                data: {
-                  universityId: id,
-                  semesterStart: data.semesterStart,
-                  semesterEnd: data.semesterEnd,
-                  year,
-                },
-              });
-            }
           }
         }
       }

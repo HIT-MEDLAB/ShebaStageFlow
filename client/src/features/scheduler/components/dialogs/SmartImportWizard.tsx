@@ -243,8 +243,11 @@ export function SmartImportWizard() {
 
   const handleExecute = useCallback(() => {
     const actionsToExecute: ImportAction[] = []
-    for (const [, action] of state.actions) {
-      if (action) actionsToExecute.push(action)
+    for (const [rowIdx, action] of state.actions) {
+      if (action) {
+        const blockKey = state.originalRows[rowIdx]?.blockKey
+        actionsToExecute.push(blockKey ? { ...action, blockKey } : action)
+      }
     }
     if (actionsToExecute.length === 0) {
       toast.error(t('dialogs.smartImport.noActions'))
