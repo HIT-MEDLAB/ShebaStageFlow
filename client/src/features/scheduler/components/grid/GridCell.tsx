@@ -10,6 +10,7 @@ interface GridCellProps {
   weekNumber: number
   assignments: Assignment[]
   blockReason?: BlockReason
+  blockGroups?: Map<string, Assignment[]>
 }
 
 export function GridCell({
@@ -17,6 +18,7 @@ export function GridCell({
   weekNumber,
   assignments,
   blockReason,
+  blockGroups,
 }: GridCellProps) {
   const isWarning = blockReason?.type === 'warning'
   const isHardBlock = blockReason && !isWarning
@@ -43,9 +45,18 @@ export function GridCell({
         <>
           {isWarning && <WarningOverlay reason={blockReason} />}
           <div className="flex flex-col gap-1">
-            {assignments.map((assignment) => (
-              <AssignmentCard key={assignment.id} assignment={assignment} />
-            ))}
+            {assignments.map((assignment) => {
+              const blockInfo = assignment.groupId && blockGroups
+                ? (() => {
+                    const group = blockGroups.get(assignment.groupId!)
+                    if (!group || group.length <= 1) return null
+                    return { position: (assignment.groupIndex ?? 0) + 1, total: group.length }
+                  })()
+                : null
+              return (
+                <AssignmentCard key={assignment.id} assignment={assignment} blockInfo={blockInfo} />
+              )
+            })}
           </div>
         </>
       )}

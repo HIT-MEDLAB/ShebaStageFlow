@@ -12,12 +12,14 @@ import { useAcademicYearWeeks } from '../hooks/useAcademicYearWeeks'
 import { useGridData } from '../hooks/useGridData'
 import { useBlockedCells } from '../hooks/useBlockedCells'
 import { useMoveAssignment } from '../hooks/useMoveAssignment'
+import { useBlockGroups } from '../hooks/useBlockGroups'
+import { useMoveBlock } from '../hooks/useBlockActions'
 import { useDisplaceAssignment } from '../hooks/useDisplaceAssignment'
 import { useUniversities } from '../hooks/useUniversities'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { validateDrop } from '../validators/assignmentValidator'
 import type { ValidationContext } from '../validators/assignmentValidator'
-import { findAvailableWeeks } from '../validators/findAvailableWeeks'
+import { findAvailableWeeks, findAvailableBlockWeeks } from '../validators/findAvailableWeeks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SchedulerGrid } from '../components/grid/SchedulerGrid'
 import { GridDragOverlay } from '../components/grid/GridDragOverlay'
@@ -42,11 +44,13 @@ export default function SchedulerPage() {
     selectedUniversities,
     selectedShift,
     selectedYear,
+    departmentNameFilter,
     activeDialog,
     activeDragId,
     setActiveDragId,
     pendingMove,
     displacedAssignment,
+    displacedBlock,
     replacementSuggestedWeeks,
     adminOverrideReason,
     warningReason,
@@ -60,6 +64,12 @@ export default function SchedulerPage() {
   const { data: academicYears } = useAcademicYears()
   const currentYear = academicYears?.find((y) => y.id === academicYearId)
   const { data: departments } = useDepartments()
+  const filteredDepartments = useMemo(() => {
+    const list = departments ?? []
+    const q = departmentNameFilter.trim().toLowerCase()
+    if (!q) return list
+    return list.filter((d) => d.name.toLowerCase().includes(q))
+  }, [departments, departmentNameFilter])
   const { data: assignments } = useAssignments(academicYearId, {
     selectedUniversities,
     selectedShift,
@@ -80,7 +90,9 @@ export default function SchedulerPage() {
     selectedYear,
   })
   const blockedCells = useBlockedCells(constraints, weeks)
+  const blockGroups = useBlockGroups(assignments)
   const moveMutation = useMoveAssignment()
+  const moveBlockMutation = useMoveBlock()
   const displaceMutation = useDisplaceAssignment()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -163,6 +175,150 @@ export default function SchedulerPage() {
       if (currentWeek?.weekNumber === weekNumber) return
     }
 
+    // Block-aware drag: if assignment is part of a block, move the entire block
+    if (assignment.groupId && validationContext) {
+      const block = blockGroups.get(assignment.groupId)
+      if (block && block.length > 1) {
+        const sorted = [...block].sort((a, b) => (a.groupIndex ?? 0) - (b.groupIndex ?? 0))
+
+        // Calculate the offset: which week in the block was dragged
+        const draggedIndex = assignment.groupIndex ?? 0
+        // First week of block at the target position
+        const firstWeekNum = weekNumber - draggedIndex
+        const lastWeekNum = firstWeekNum + block.length - 1
+        const firstWeek = weeks.find((w) => w.weekNumber === firstWeekNum)
+        const lastWeek = weeks.find((w) => w.weekNumber === lastWeekNum)
+
+        if (!firstWeek || !lastWeek) {
+          toast.error(t('grid.blocked.noSpace'))
+          return
+        }
+
+        // Validate every week in the block's target position
+        // Exclude block members from existing assignments for validation
+        const contextWithoutBlock: ValidationContext = {
+          ...validationContext,
+          existingAssignments: validationContext.existingAssignments.filter(
+            (a) => a.groupId !== assignment.groupId,
+          ),
+        }
+
+        // Collect validation results across all block weeks
+        let hasHardBlock = false
+        const replaceableConflicts: Array<{ displacedAssignment: Assignment }> = []
+        let adminOverrideReason: { reasonKey: string; reasonParams?: Record<string, string> } | null = null
+        let warningResult: { reasonKey: string; reasonParams?: Record<string, string> } | null = null
+
+        for (let i = 0; i < sorted.length; i++) {
+          const targetWeekNum = firstWeekNum + i
+          const result = validateDrop(sorted[i], departmentId, targetWeekNum, contextWithoutBlock)
+
+          if (result.type === 'blocked') {
+            toast.error(t(result.reasonKey, result.reasonParams))
+            hasHardBlock = true
+            break
+          }
+          if (result.type === 'conflict_replaceable') {
+            replaceableConflicts.push({ displacedAssignment: result.displacedAssignment })
+          }
+          if (result.type === 'conflict_same_priority' || result.type === 'conflict_admin_override') {
+            adminOverrideReason = {
+              reasonKey: result.reasonKey,
+              reasonParams: 'reasonParams' in result ? result.reasonParams : undefined,
+            }
+          }
+          if (result.type === 'warning' && !warningResult) {
+            warningResult = { reasonKey: result.reasonKey, reasonParams: result.reasonParams }
+          }
+        }
+        if (hasHardBlock) return
+
+        // Admin override takes precedence over replaceable conflicts
+        if (adminOverrideReason) {
+          if (isAdmin) {
+            openAdminOverrideDialog(
+              { assignment, targetDeptId: departmentId, targetWeekNum: firstWeekNum },
+              adminOverrideReason.reasonKey,
+              adminOverrideReason.reasonParams,
+            )
+          } else {
+            toast.error(t(adminOverrideReason.reasonKey))
+          }
+          return
+        }
+
+        // Handle replaceable conflicts — all must belong to the same entity
+        if (replaceableConflicts.length > 0) {
+          const displacedIds = new Set(replaceableConflicts.map((c) => c.displacedAssignment.id))
+          const displacedGroupIds = new Set(
+            replaceableConflicts
+              .map((c) => c.displacedAssignment.groupId)
+              .filter((gid): gid is string => gid != null),
+          )
+
+          const sameEntity =
+            displacedIds.size === 1 ||
+            (displacedGroupIds.size === 1 && displacedGroupIds.values().next().value != null)
+
+          if (!sameEntity) {
+            toast.error(t('grid.blocked.noSpace'))
+            return
+          }
+
+          const firstDisplaced = replaceableConflicts[0].displacedAssignment
+          const displacedBlockMembers = firstDisplaced.groupId
+            ? blockGroups.get(firstDisplaced.groupId)
+            : undefined
+
+          if (displacedBlockMembers && displacedBlockMembers.length > 1) {
+            const suggestedWeeks = findAvailableBlockWeeks(
+              displacedBlockMembers,
+              firstWeekNum,
+              validationContext,
+            )
+            openReplacementDialog(
+              { assignment, targetDeptId: departmentId, targetWeekNum: firstWeekNum },
+              firstDisplaced,
+              suggestedWeeks,
+              displacedBlockMembers,
+            )
+          } else {
+            const suggestedWeeks = findAvailableWeeks(
+              firstDisplaced,
+              firstWeekNum,
+              validationContext,
+            )
+            openReplacementDialog(
+              { assignment, targetDeptId: departmentId, targetWeekNum: firstWeekNum },
+              firstDisplaced,
+              suggestedWeeks,
+            )
+          }
+          return
+        }
+
+        // Warning — prompt for confirmation
+        if (warningResult) {
+          openWarningConfirmDialog(
+            { assignment, targetDeptId: departmentId, targetWeekNum: firstWeekNum },
+            warningResult.reasonKey,
+            warningResult.reasonParams,
+          )
+          return
+        }
+
+        // All valid — proceed with block move
+        moveBlockMutation.mutate({
+          groupId: assignment.groupId,
+          data: {
+            departmentId,
+            startDate: format(firstWeek.startDate, 'yyyy-MM-dd'),
+          },
+        })
+        return
+      }
+    }
+
     const result = validateDrop(assignment, departmentId, weekNumber, validationContext)
 
     switch (result.type) {
@@ -183,16 +339,38 @@ export default function SchedulerPage() {
         break
 
       case 'conflict_replaceable': {
-        const suggestedWeeks = findAvailableWeeks(
-          result.displacedAssignment,
-          weekNumber,
-          validationContext,
-        )
-        openReplacementDialog(
-          { assignment, targetDeptId: departmentId, targetWeekNum: weekNumber },
-          result.displacedAssignment,
-          suggestedWeeks,
-        )
+        // Check if the displaced assignment is part of a block
+        const displacedGroupId = result.displacedAssignment.groupId
+        const displacedBlockMembers = displacedGroupId
+          ? blockGroups.get(displacedGroupId)
+          : undefined
+
+        if (displacedBlockMembers && displacedBlockMembers.length > 1) {
+          // Block displacement — find contiguous N-week windows
+          const suggestedWeeks = findAvailableBlockWeeks(
+            displacedBlockMembers,
+            weekNumber,
+            validationContext,
+          )
+          openReplacementDialog(
+            { assignment, targetDeptId: departmentId, targetWeekNum: weekNumber },
+            result.displacedAssignment,
+            suggestedWeeks,
+            displacedBlockMembers,
+          )
+        } else {
+          // Single assignment displacement
+          const suggestedWeeks = findAvailableWeeks(
+            result.displacedAssignment,
+            weekNumber,
+            validationContext,
+          )
+          openReplacementDialog(
+            { assignment, targetDeptId: departmentId, targetWeekNum: weekNumber },
+            result.displacedAssignment,
+            suggestedWeeks,
+          )
+        }
         break
       }
 
@@ -227,6 +405,69 @@ export default function SchedulerPage() {
     const incomingTargetWeek = weeks.find((w) => w.weekNumber === pendingMove.targetWeekNum)
     if (!incomingTargetWeek) return
 
+    // Determine if incoming is a block
+    const incomingBlock = pendingMove.assignment.groupId
+      ? blockGroups.get(pendingMove.assignment.groupId)
+      : undefined
+    const isIncomingBlock = !!(incomingBlock && incomingBlock.length > 1 && pendingMove.assignment.groupId)
+    const isDisplacedBlock = !!(displacedBlock && displacedBlock.length > 1 && displacedAssignment.groupId)
+
+    // Helper: move the incoming after displaced is moved
+    const moveIncoming = () => {
+      if (isIncomingBlock) {
+        moveBlockMutation.mutate({
+          groupId: pendingMove.assignment.groupId!,
+          data: {
+            departmentId: pendingMove.targetDeptId,
+            startDate: format(incomingTargetWeek.startDate, 'yyyy-MM-dd'),
+          },
+        })
+      } else {
+        moveMutation.mutate({
+          id: pendingMove.assignment.id,
+          data: {
+            departmentId: pendingMove.targetDeptId,
+            startDate: format(incomingTargetWeek.startDate, 'yyyy-MM-dd'),
+            endDate: format(incomingTargetWeek.endDate, 'yyyy-MM-dd'),
+          },
+        })
+      }
+    }
+
+    if (isDisplacedBlock) {
+      // Displaced is a block — move it first, then move incoming
+      moveBlockMutation.mutate(
+        {
+          groupId: displacedAssignment.groupId!,
+          data: {
+            departmentId: displacedAssignment.departmentId,
+            startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+          },
+        },
+        { onSuccess: moveIncoming },
+      )
+      clearPendingMove()
+      return
+    }
+
+    if (isIncomingBlock) {
+      // Incoming is a block, displaced is single — move displaced first, then incoming block
+      moveMutation.mutate(
+        {
+          id: displacedAssignment.id,
+          data: {
+            departmentId: displacedAssignment.departmentId,
+            startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+            endDate: format(targetWeek.endDate, 'yyyy-MM-dd'),
+          },
+        },
+        { onSuccess: moveIncoming },
+      )
+      clearPendingMove()
+      return
+    }
+
+    // Both single — use atomic displace endpoint
     displaceMutation.mutate({
       id: pendingMove.assignment.id,
       data: {
@@ -249,15 +490,30 @@ export default function SchedulerPage() {
     const targetWeek = weeks.find((w) => w.weekNumber === pendingMove.targetWeekNum)
     if (!targetWeek) return
 
-    moveMutation.mutate({
-      id: pendingMove.assignment.id,
-      data: {
-        departmentId: pendingMove.targetDeptId,
-        startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
-        endDate: format(targetWeek.endDate, 'yyyy-MM-dd'),
-        forceOverride: true,
-      },
-    })
+    const incomingBlock = pendingMove.assignment.groupId
+      ? blockGroups.get(pendingMove.assignment.groupId)
+      : undefined
+
+    if (incomingBlock && incomingBlock.length > 1 && pendingMove.assignment.groupId) {
+      moveBlockMutation.mutate({
+        groupId: pendingMove.assignment.groupId,
+        data: {
+          departmentId: pendingMove.targetDeptId,
+          startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+          forceOverride: true,
+        },
+      })
+    } else {
+      moveMutation.mutate({
+        id: pendingMove.assignment.id,
+        data: {
+          departmentId: pendingMove.targetDeptId,
+          startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+          endDate: format(targetWeek.endDate, 'yyyy-MM-dd'),
+          forceOverride: true,
+        },
+      })
+    }
 
     clearPendingMove()
   }
@@ -265,12 +521,29 @@ export default function SchedulerPage() {
   function handleAdminOverrideConfirm() {
     if (!pendingMove) return
 
-    executeMoveAssignment(
-      pendingMove.assignment,
-      pendingMove.targetDeptId,
-      pendingMove.targetWeekNum,
-      true,
-    )
+    const incomingBlock = pendingMove.assignment.groupId
+      ? blockGroups.get(pendingMove.assignment.groupId)
+      : undefined
+
+    if (incomingBlock && incomingBlock.length > 1 && pendingMove.assignment.groupId) {
+      const firstWeek = weeks.find((w) => w.weekNumber === pendingMove.targetWeekNum)
+      if (!firstWeek) return
+      moveBlockMutation.mutate({
+        groupId: pendingMove.assignment.groupId,
+        data: {
+          departmentId: pendingMove.targetDeptId,
+          startDate: format(firstWeek.startDate, 'yyyy-MM-dd'),
+          forceOverride: true,
+        },
+      })
+    } else {
+      executeMoveAssignment(
+        pendingMove.assignment,
+        pendingMove.targetDeptId,
+        pendingMove.targetWeekNum,
+        true,
+      )
+    }
 
     toast.success(t('toast.overrideSuccess'))
     clearPendingMove()
@@ -293,10 +566,11 @@ export default function SchedulerPage() {
           </div>
           <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <SchedulerGrid
-              departments={departments ?? []}
+              departments={filteredDepartments}
               weeks={weeks}
               gridData={gridData}
               blockedCells={blockedCells}
+              blockGroups={blockGroups}
             />
             <DragOverlay>
               {draggedAssignment ? (
@@ -321,6 +595,7 @@ export default function SchedulerPage() {
         <ReplacementDialog
           open
           displacedAssignment={displacedAssignment}
+          displacedBlock={displacedBlock}
           suggestedWeeks={replacementSuggestedWeeks}
           allWeeks={weeks}
           onReplace={handleReplacementConfirm}

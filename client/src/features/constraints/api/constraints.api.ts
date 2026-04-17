@@ -75,3 +75,13 @@ export async function deleteDepartment(id: number) {
 export async function deleteUniversity(id: number) {
   await apiClient.delete(`/constraints/universities/${id}`)
 }
+
+export async function setDepartmentActive(id: number, isActive: boolean) {
+  const { data } = await apiClient.patch(`/constraints/departments/${id}/active`, { isActive })
+  return data
+}
+
+export async function setUniversityActive(id: number, isActive: boolean) {
+  const { data } = await apiClient.patch(`/constraints/universities/${id}/active`, { isActive })
+  return data
+}

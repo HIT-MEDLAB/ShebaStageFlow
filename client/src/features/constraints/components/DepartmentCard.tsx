@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { Trash2 } from 'lucide-react'
+import { Archive, ArchiveRestore, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -35,9 +36,11 @@ interface DepartmentCardProps {
   onCreate: (data: DepartmentFormValues) => void
   onUpdate: (id: number, data: DepartmentFormValues) => void
   onDelete: (id: number) => void
+  onArchive: (id: number, isActive: boolean) => void
   isCreatePending: boolean
   isUpdatePending: boolean
   isDeletePending: boolean
+  isArchivePending: boolean
 }
 
 export function DepartmentCard({
@@ -46,13 +49,21 @@ export function DepartmentCard({
   onCreate,
   onUpdate,
   onDelete,
+  onArchive,
   isCreatePending,
   isUpdatePending,
   isDeletePending,
+  isArchivePending,
 }: DepartmentCardProps) {
   const { t } = useTranslation('constraints')
   const [mode, setMode] = useState<'add' | 'edit'>('edit')
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [showArchived, setShowArchived] = useState(false)
+
+  const selectedDepartment = departments.find((d) => d.id === selectedId) ?? null
+  const visibleDepartments = showArchived
+    ? departments
+    : departments.filter((d) => d.isActive)
 
   const {
     register,
@@ -122,7 +133,7 @@ export function DepartmentCard({
         </CardHeader>
         <CardContent>
           <div className="text-sm text-muted-foreground space-y-2">
-            {departments.map((d) => {
+            {departments.filter((d) => d.isActive).map((d) => {
               const c = d.departmentConstraints[0]
               return (
                 <div key={d.id} className="flex justify-between border-b pb-2">
@@ -166,7 +177,31 @@ export function DepartmentCard({
 
         {mode === 'edit' && (
           <div className="mb-4">
-            <Label>{t('department.selectDepartment')}</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label>{t('department.selectDepartment')}</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-muted-foreground">
+                  {t('department.showArchived')}
+                </Label>
+                <Switch
+                  checked={showArchived}
+                  onCheckedChange={(val) => {
+                    setShowArchived(val)
+                    if (!val && selectedDepartment && !selectedDepartment.isActive) {
+                      setSelectedId(null)
+                      reset({
+                        name: '',
+                        hasMorningShift: true,
+                        hasEveningShift: false,
+                        morningCapacity: 1,
+                        eveningCapacity: 0,
+                        electiveCapacity: 0,
+                      })
+                    }
+                  }}
+                />
+              </div>
+            </div>
             <Select
               value={selectedId?.toString() ?? ''}
               onValueChange={handleSelectDepartment}
@@ -175,9 +210,14 @@ export function DepartmentCard({
                 <SelectValue placeholder={t('department.selectDepartment')} />
               </SelectTrigger>
               <SelectContent>
-                {departments.map((d) => (
+                {visibleDepartments.map((d) => (
                   <SelectItem key={d.id} value={d.id.toString()}>
-                    {d.name}
+                    <span className={d.isActive ? '' : 'opacity-60'}>{d.name}</span>
+                    {!d.isActive && (
+                      <Badge variant="secondary" className="ms-2">
+                        {t('department.archivedBadge')}
+                      </Badge>
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -231,44 +271,93 @@ export function DepartmentCard({
           </div>
 
           <div className="flex justify-between">
-            <div>
-              {mode === 'edit' && selectedId && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" type="button" disabled={isDeletePending}>
-                      <Trash2 className="size-4 me-2" />
-                      {t('actions.delete')}
+            <div className="flex gap-2">
+              {mode === 'edit' && selectedId && selectedDepartment && (
+                <>
+                  {selectedDepartment.isActive ? (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" type="button" disabled={isArchivePending}>
+                          <Archive className="size-4 me-2" />
+                          {t('actions.archive')}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{t('dialog.archiveDepartmentTitle')}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {t('dialog.archiveDepartmentConfirm')}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>{t('form.cancel')}</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              onArchive(selectedId, false)
+                              setSelectedId(null)
+                              reset({
+                                name: '',
+                                hasMorningShift: true,
+                                hasEveningShift: false,
+                                morningCapacity: 1,
+                                eveningCapacity: 0,
+                                electiveCapacity: 0,
+                              })
+                            }}
+                          >
+                            {t('actions.archive')}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      type="button"
+                      disabled={isArchivePending}
+                      onClick={() => onArchive(selectedId, true)}
+                    >
+                      <ArchiveRestore className="size-4 me-2" />
+                      {t('actions.unarchive')}
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{t('dialog.deleteDepartmentTitle')}</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {t('dialog.deleteDepartmentConfirm')}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>{t('form.cancel')}</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => {
-                          onDelete(selectedId)
-                          setSelectedId(null)
-                          reset({
-                            name: '',
-                            hasMorningShift: true,
-                            hasEveningShift: false,
-                            morningCapacity: 1,
-                            eveningCapacity: 0,
-                            electiveCapacity: 0,
-                          })
-                        }}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
+                  )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" type="button" disabled={isDeletePending}>
+                        <Trash2 className="size-4 me-2" />
                         {t('actions.delete')}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('dialog.deleteDepartmentTitle')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t('dialog.deleteDepartmentConfirm')}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('form.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            onDelete(selectedId)
+                            setSelectedId(null)
+                            reset({
+                              name: '',
+                              hasMorningShift: true,
+                              hasEveningShift: false,
+                              morningCapacity: 1,
+                              eveningCapacity: 0,
+                              electiveCapacity: 0,
+                            })
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {t('actions.delete')}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
               )}
             </div>
             <Button

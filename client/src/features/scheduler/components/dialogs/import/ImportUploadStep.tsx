@@ -87,7 +87,8 @@ export function ImportUploadStep({ onParsed }: ImportUploadStepProps) {
           return
         }
 
-        const rows: SmartImportRow[] = jsonData.map((rawRow) => {
+        const rows: SmartImportRow[] = []
+        jsonData.forEach((rawRow, originalIdx) => {
           const mapped: Record<string, unknown> = {}
           for (const [key, value] of Object.entries(rawRow)) {
             const trimmedKey = key.trim()
@@ -97,7 +98,7 @@ export function ImportUploadStep({ onParsed }: ImportUploadStepProps) {
             }
           }
 
-          return {
+          const baseRow = {
             departmentName: String(mapped.departmentName ?? ''),
             universityName: String(mapped.universityName ?? ''),
             startDate: excelDateToISO(mapped.startDate),
@@ -107,6 +108,31 @@ export function ImportUploadStep({ onParsed }: ImportUploadStepProps) {
             placementType: String(mapped.placementType ?? 'רגיל'),
             tutorName: mapped.tutorName ? String(mapped.tutorName) : null,
             shiftType: String(mapped.shiftType ?? 'בוקר'),
+          }
+
+          // Check if the row spans multiple weeks
+          const start = new Date(baseRow.startDate)
+          const end = new Date(baseRow.endDate)
+          const diffDays = Math.round((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000))
+          const weekCount = Math.floor(diffDays / 7) + 1
+
+          if (weekCount > 1) {
+            // Expand into individual weekly rows with shared blockKey
+            const blockKey = `block-${originalIdx}`
+            for (let i = 0; i < weekCount; i++) {
+              const weekStart = new Date(start)
+              weekStart.setUTCDate(weekStart.getUTCDate() + i * 7)
+              const weekEnd = new Date(weekStart)
+              weekEnd.setUTCDate(weekEnd.getUTCDate() + 4)
+              rows.push({
+                ...baseRow,
+                startDate: weekStart.toISOString(),
+                endDate: weekEnd.toISOString(),
+                blockKey,
+              })
+            }
+          } else {
+            rows.push(baseRow)
           }
         })
 

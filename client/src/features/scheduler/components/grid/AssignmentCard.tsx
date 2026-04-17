@@ -21,9 +21,10 @@ const UNIVERSITY_COLORS = [
 
 interface AssignmentCardProps {
   assignment: Assignment
+  blockInfo?: { position: number; total: number } | null
 }
 
-export function AssignmentCard({ assignment }: AssignmentCardProps) {
+export function AssignmentCard({ assignment, blockInfo }: AssignmentCardProps) {
   const { t } = useTranslation('scheduler')
   const isAdmin = useIsAdmin()
   const isPending = assignment.status === 'PENDING'
@@ -43,7 +44,6 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
   const handleClick = (e: React.MouseEvent) => {
     // Don't open dialog if we're dragging
     if (isDragging) return
-    console.log('Card clicked:', assignment.id, assignment.universityName)
     e.stopPropagation()
     useSchedulerStore.getState().openDialog('edit', assignment.id)
   }
@@ -85,6 +85,11 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
           >
             {isGroup ? t('card.group') : t('card.elective')}
           </span>
+          {blockInfo && (
+            <span className="rounded-full px-1.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+              {t('card.blockBadge', { position: blockInfo.position, total: blockInfo.total })}
+            </span>
+          )}
         </div>
       </div>
 

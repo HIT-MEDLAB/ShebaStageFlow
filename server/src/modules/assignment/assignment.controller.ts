@@ -13,6 +13,9 @@ import type {
   SmartImportValidateDto,
   SmartImportExecuteDto,
   ValidateDisplacementWeekDto,
+  CreateBlockDto,
+  MoveBlockDto,
+  FindBlockPositionsDto,
 } from './assignment.schema';
 
 export function createAssignmentController(service: AssignmentService) {
@@ -263,6 +266,57 @@ export function createAssignmentController(service: AssignmentService) {
         const userRole = req.currentUser!.role;
         const dto = req.body as SmartImportExecuteDto;
         const result = await service.executeSmartImport(dto, userId, userRole);
+        res.json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    // ── Block (multi-week) endpoints ──────────────────────────────
+
+    async createBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const userId = req.currentUser!.userId;
+        const userRole = req.currentUser!.role;
+        const dto = req.body as CreateBlockDto;
+        const result = await service.createBlock(dto, userId, userRole, dto.forceOverride);
+        res.status(201).json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async moveBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const userId = req.currentUser!.userId;
+        const userRole = req.currentUser!.role;
+        const dto = req.body as MoveBlockDto;
+        const result = await service.moveBlock(
+          req.params.groupId as string,
+          dto,
+          userId,
+          userRole,
+          dto.forceOverride,
+        );
+        res.json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async detachFromBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const result = await service.detachFromBlock(Number(req.params.id));
+        res.json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async findBlockPositions(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const dto = req.body as FindBlockPositionsDto;
+        const result = await service.findBlockPositions(dto);
         res.json(result);
       } catch (err) {
         next(err);

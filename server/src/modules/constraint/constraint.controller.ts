@@ -166,5 +166,27 @@ export function createConstraintController(service: ConstraintService) {
         next(err);
       }
     },
+
+    async setDepartmentActive(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const id = Number(req.params['id']);
+        const { isActive } = req.body;
+        const result = await service.setDepartmentActive(id, isActive);
+        res.json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async setUniversityActive(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const id = Number(req.params['id']);
+        const { isActive } = req.body;
+        const result = await service.setUniversityActive(id, isActive);
+        res.json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
   };
 }

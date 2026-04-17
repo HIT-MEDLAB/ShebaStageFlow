@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { CalendarIcon, ChevronDown, ChevronUp, Sun, Moon, Trash2 } from 'lucide-react'
+import { CalendarIcon, ChevronDown, ChevronUp, Sun, Moon, Trash2, Unlink } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -47,6 +47,7 @@ import { useDepartments } from '../../hooks/useDepartments'
 import { useUniversities } from '../../hooks/useUniversities'
 import { useAcademicYears } from '../../hooks/useAcademicYears'
 import { useSchedulerStore } from '../../stores/schedulerStore'
+import { useDetachFromBlock } from '../../hooks/useBlockActions'
 import { StudentListSection } from './StudentListSection'
 import type { Student } from '../../types/scheduler.types'
 
@@ -68,6 +69,7 @@ export function EditAssignmentDialog() {
   const { data: universities } = useUniversities()
   const updateAssignment = useUpdateAssignment()
   const deleteAssignment = useDeleteAssignment()
+  const detachFromBlock = useDetachFromBlock()
 
   const [showEditForm, setShowEditForm] = useState(false)
   const [startDateOpen, setStartDateOpen] = useState(false)
@@ -521,8 +523,24 @@ export function EditAssignmentDialog() {
 
         <Separator />
 
-        {/* Delete assignment */}
-        <div className="flex justify-end">
+        {/* Actions: detach from block + delete */}
+        <div className="flex justify-end gap-2">
+          {assignment.groupId && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                detachFromBlock.mutate(assignment.id, {
+                  onSuccess: () => handleClose(),
+                })
+              }}
+              disabled={detachFromBlock.isPending}
+            >
+              <Unlink className="size-4" />
+              {t('card.detachFromBlock')}
+            </Button>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button type="button" variant="destructive" size="sm">

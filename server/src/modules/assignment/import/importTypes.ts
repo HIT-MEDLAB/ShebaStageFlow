@@ -42,7 +42,7 @@ export interface ImportRowResult {
 }
 
 export type ImportAction =
-  | { type: 'create'; rowIndex: number; dto: CreateAssignmentDto }
+  | { type: 'create'; rowIndex: number; dto: CreateAssignmentDto; blockKey?: string }
   | {
       type: 'displace';
       rowIndex: number;
@@ -51,5 +51,6 @@ export type ImportAction =
       displacedDepartmentId: number;
       displacedStartDate: Date;
       displacedEndDate: Date;
+      blockKey?: string;
     }
-  | { type: 'force_create'; rowIndex: number; dto: CreateAssignmentDto };
+  | { type: 'force_create'; rowIndex: number; dto: CreateAssignmentDto; blockKey?: string };

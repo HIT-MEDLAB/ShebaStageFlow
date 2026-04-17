@@ -51,9 +51,35 @@ app.use('/api/home', homeRouter);
 // Error handler (must be last)
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+async function ensureAcademicYears() {
+  const START_YEAR = 2025;
+  const endYear = new Date().getFullYear() + 5;
+
+  for (let y = START_YEAR; y <= endYear; y++) {
+    const name = `${y}-${y + 1}`;
+    await prisma.academicYear.upsert({
+      where: { name },
+      update: {},
+      create: {
+        name,
+        startDate: new Date(`${y}-10-01`),
+        endDate: new Date(`${y + 1}-06-30`),
+      },
+    });
+  }
+  console.log(`Academic years ${START_YEAR}-${endYear + 1} ensured.`);
+}
+
+ensureAcademicYears()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to ensure academic years:', err);
+    process.exit(1);
+  });
 
 export { prisma };
 export default app;

@@ -15,7 +15,8 @@
     "allYears": "All Years",
     "allShifts": "All",
     "morning": "Morning",
-    "evening": "Evening"
+    "evening": "Evening",
+    "departmentName": "Search department"
   },
   "grid": {
     "departments": "Departments",
@@ -36,7 +37,8 @@
       "dateConstraint": "Date constraint — {{name}}",
       "studentDoubleBooking": "Student already assigned to {{departmentName}} during this period",
       "oneGroupPerShift": "Only one group allowed per department per shift per week",
-      "duplicateAssignment": "Duplicate — this assignment already exists in the system"
+      "duplicateAssignment": "Duplicate — this assignment already exists in the system",
+      "noSpace": "Not enough consecutive weeks available for this block"
     },
     "warning": {
       "firstClinicalRotation": "Year-1 students are recommended for Internal Medicine or Pediatrics (not {{departmentName}})",
@@ -50,7 +52,9 @@
     "group": "Group",
     "elective": "Elective",
     "noStudents": "-",
-    "pendingApproval": "Pending admin approval"
+    "pendingApproval": "Pending admin approval",
+    "blockBadge": "{{position}}/{{total}}",
+    "detachFromBlock": "Detach from block"
   },
   "status": {
     "approved": "Approved",
@@ -70,7 +74,10 @@
       "yearInProgram": "Year in Program",
       "tutorName": "Tutor Name",
       "save": "Save Assignment",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "perWeekShifts": "Shift per week ({{count}} weeks)",
+      "weekLabel": "Week {{num}}",
+      "multiWeekNotice": "Creating a {{count}}-week block"
     },
     "import": {
       "title": "Import from Excel",
@@ -106,7 +113,9 @@
     "replacement": {
       "title": "Replacement Required",
       "description": "A higher priority assignment is replacing {{university}} (Year {{year}}, {{shift}}). Choose a new week for the displaced assignment.",
+      "blockDescription": "A higher priority assignment is replacing {{university}} (Year {{year}}). Choose a new position for the {{weeks}}-week block.",
       "suggestedWeeks": "Suggested Weeks",
+      "weeks": "weeks",
       "chooseManually": "Choose Manually",
       "cancel": "Cancel",
       "confirm": "Confirm"
@@ -197,7 +206,12 @@
     "capacityExceeded": "Cannot add students — group capacity of {{capacity}} has been reached",
     "capacityExceededDetail": "Adding {{adding}} student(s) would exceed the group capacity ({{current}}/{{capacity}})",
     "replacementSuccess": "Assignments swapped successfully",
-    "overrideSuccess": "Assignment placed (admin override)"
+    "overrideSuccess": "Assignment placed (admin override)",
+    "blockCreated": "Multi-week block created successfully",
+    "blockMoved": "Block moved successfully",
+    "detachedFromBlock": "Week detached from block",
+    "detachFailed": "Failed to detach week from block",
+    "findPositionsFailed": "Failed to find available positions"
   },
   "approval": {
     "tab": "Approvals",

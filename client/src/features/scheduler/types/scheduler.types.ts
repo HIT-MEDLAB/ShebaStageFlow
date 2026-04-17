@@ -30,6 +30,8 @@ export interface Assignment {
   universityName: string
   departmentName: string
   createdByName?: string | null
+  groupId?: string | null
+  groupIndex?: number | null
 }
 
 export interface Department {
@@ -154,6 +156,38 @@ export interface CreateAssignmentDto {
   tutorName?: string | null
 }
 
+export interface CreateBlockDto {
+  departmentId: number
+  universityId: number
+  academicYearId: number
+  startDate: string
+  endDate: string
+  type: AssignmentType
+  shifts: ShiftType[]
+  studentCount?: number | null
+  yearInProgram: number
+  tutorName?: string | null
+  forceOverride?: boolean
+}
+
+export interface MoveBlockDto {
+  departmentId: number
+  startDate: string
+  forceOverride?: boolean
+}
+
+export interface FindBlockPositionsDto {
+  departmentId: number
+  academicYearId: number
+  blockSize: number
+  shifts: ShiftType[]
+  type: AssignmentType
+  universityId: number
+  studentCount?: number | null
+  yearInProgram: number
+  excludeGroupId?: string
+}
+
 export interface UpdateAssignmentDto {
   departmentId?: number
   universityId?: number
@@ -228,6 +262,7 @@ export interface SmartImportRow {
   placementType: string
   tutorName?: string | null
   shiftType: string
+  blockKey?: string
 }
 
 export interface ImportValidationResult {
@@ -260,7 +295,7 @@ export interface ImportRowResult {
 }
 
 export type ImportAction =
-  | { type: 'create'; rowIndex: number; dto: CreateAssignmentDto }
+  | { type: 'create'; rowIndex: number; dto: CreateAssignmentDto; blockKey?: string }
   | {
       type: 'displace'
       rowIndex: number
@@ -269,8 +304,9 @@ export type ImportAction =
       displacedDepartmentId: number
       displacedStartDate: string
       displacedEndDate: string
+      blockKey?: string
     }
-  | { type: 'force_create'; rowIndex: number; dto: CreateAssignmentDto }
+  | { type: 'force_create'; rowIndex: number; dto: CreateAssignmentDto; blockKey?: string }
 
 export type WizardStep = 'upload' | 'validating' | 'review' | 'executing' | 'complete'
 

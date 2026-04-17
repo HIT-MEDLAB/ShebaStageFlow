@@ -177,6 +177,8 @@ model Assignment {
   type          AssignmentType
   shiftType     ShiftType
   tutorName     String?
+  groupId       String?
+  groupIndex    Int?
   status          AssignmentStatus @default(PENDING)
   rejectionReason String?
   pendingMoveData Json?
@@ -198,6 +200,7 @@ model Assignment {
   @@index([universityId])
   @@index([status])
   @@index([academicYearId])
+  @@index([groupId])
 }
 
 model AssignmentStudent {

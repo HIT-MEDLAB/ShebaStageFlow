@@ -3,11 +3,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { Trash2 } from 'lucide-react'
+import { Archive, ArchiveRestore, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -35,9 +37,11 @@ interface UniversityCardProps {
   onCreate: (data: UniversityFormValues) => void
   onUpdate: (id: number, data: UniversityFormValues) => void
   onDelete: (id: number) => void
+  onArchive: (id: number, isActive: boolean) => void
   isCreatePending: boolean
   isUpdatePending: boolean
   isDeletePending: boolean
+  isArchivePending: boolean
 }
 
 export function UniversityCard({
@@ -46,13 +50,21 @@ export function UniversityCard({
   onCreate,
   onUpdate,
   onDelete,
+  onArchive,
   isCreatePending,
   isUpdatePending,
   isDeletePending,
+  isArchivePending,
 }: UniversityCardProps) {
   const { t } = useTranslation('constraints')
   const [mode, setMode] = useState<'add' | 'edit'>('edit')
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [showArchived, setShowArchived] = useState(false)
+
+  const selectedUniversity = universities.find((u) => u.id === selectedId) ?? null
+  const visibleUniversities = showArchived
+    ? universities
+    : universities.filter((u) => u.isActive)
 
   const {
     register,
@@ -111,7 +123,7 @@ export function UniversityCard({
         </CardHeader>
         <CardContent>
           <div className="text-sm text-muted-foreground space-y-2">
-            {universities.map((u) => {
+            {universities.filter((u) => u.isActive).map((u) => {
               const s = u.semesters[0]
               return (
                 <div key={u.id} className="flex justify-between border-b pb-2">
@@ -155,7 +167,29 @@ export function UniversityCard({
 
         {mode === 'edit' && (
           <div className="mb-4">
-            <Label>{t('university.selectUniversity')}</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label>{t('university.selectUniversity')}</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-muted-foreground">
+                  {t('university.showArchived')}
+                </Label>
+                <Switch
+                  checked={showArchived}
+                  onCheckedChange={(val) => {
+                    setShowArchived(val)
+                    if (!val && selectedUniversity && !selectedUniversity.isActive) {
+                      setSelectedId(null)
+                      reset({
+                        name: '',
+                        priority: 0,
+                        semesterStart: '',
+                        semesterEnd: '',
+                      })
+                    }
+                  }}
+                />
+              </div>
+            </div>
             <Select
               value={selectedId?.toString() ?? ''}
               onValueChange={handleSelectUniversity}
@@ -164,9 +198,14 @@ export function UniversityCard({
                 <SelectValue placeholder={t('university.selectUniversity')} />
               </SelectTrigger>
               <SelectContent>
-                {universities.map((u) => (
+                {visibleUniversities.map((u) => (
                   <SelectItem key={u.id} value={u.id.toString()}>
-                    {u.name}
+                    <span className={u.isActive ? '' : 'opacity-60'}>{u.name}</span>
+                    {!u.isActive && (
+                      <Badge variant="secondary" className="ms-2">
+                        {t('university.archivedBadge')}
+                      </Badge>
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -205,42 +244,89 @@ export function UniversityCard({
           </div>
 
           <div className="flex justify-between">
-            <div>
-              {mode === 'edit' && selectedId && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" type="button" disabled={isDeletePending}>
-                      <Trash2 className="size-4 me-2" />
-                      {t('actions.delete')}
+            <div className="flex gap-2">
+              {mode === 'edit' && selectedId && selectedUniversity && (
+                <>
+                  {selectedUniversity.isActive ? (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" type="button" disabled={isArchivePending}>
+                          <Archive className="size-4 me-2" />
+                          {t('actions.archive')}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{t('dialog.archiveUniversityTitle')}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {t('dialog.archiveUniversityConfirm')}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>{t('form.cancel')}</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              onArchive(selectedId, false)
+                              setSelectedId(null)
+                              reset({
+                                name: '',
+                                priority: 0,
+                                semesterStart: '',
+                                semesterEnd: '',
+                              })
+                            }}
+                          >
+                            {t('actions.archive')}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      type="button"
+                      disabled={isArchivePending}
+                      onClick={() => onArchive(selectedId, true)}
+                    >
+                      <ArchiveRestore className="size-4 me-2" />
+                      {t('actions.unarchive')}
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{t('dialog.deleteUniversityTitle')}</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {t('dialog.deleteUniversityConfirm')}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>{t('form.cancel')}</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => {
-                          onDelete(selectedId)
-                          setSelectedId(null)
-                          reset({
-                            name: '',
-                            priority: 0,
-                            semesterStart: '',
-                            semesterEnd: '',
-                          })
-                        }}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
+                  )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" type="button" disabled={isDeletePending}>
+                        <Trash2 className="size-4 me-2" />
                         {t('actions.delete')}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('dialog.deleteUniversityTitle')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t('dialog.deleteUniversityConfirm')}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('form.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            onDelete(selectedId)
+                            setSelectedId(null)
+                            reset({
+                              name: '',
+                              priority: 0,
+                              semesterStart: '',
+                              semesterEnd: '',
+                            })
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {t('actions.delete')}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
               )}
             </div>
             <Button

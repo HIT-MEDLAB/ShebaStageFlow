@@ -4,6 +4,7 @@ import {
   createDepartmentWithConstraint,
   updateDepartmentWithConstraint,
   deleteDepartment,
+  setDepartmentActive,
 } from '../api/constraints.api'
 import type { CreateDepartmentData, UpdateDepartmentData } from '../types/constraints.types'
 import { toast } from 'sonner'
@@ -54,5 +55,23 @@ export function useDepartmentMutation() {
     },
   })
 
-  return { createMutation, updateMutation, deleteMutation }
+  const archiveMutation = useMutation({
+    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
+      setDepartmentActive(id, isActive),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'departments'] })
+      toast.success(
+        variables.isActive
+          ? t('toast.departmentUnarchived')
+          : t('toast.departmentArchived'),
+      )
+    },
+    onError: () => {
+      toast.error(t('toast.archiveFailed'))
+    },
+  })
+
+  return { createMutation, updateMutation, deleteMutation, archiveMutation }
 }

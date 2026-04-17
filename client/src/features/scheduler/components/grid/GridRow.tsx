@@ -13,6 +13,7 @@ interface GridRowProps {
   weeks: WeekDefinition[]
   gridData: Map<number, Map<number, Assignment[]>>
   blockedCells: Map<string, BlockReason>
+  blockGroups?: Map<string, Assignment[]>
 }
 
 export function GridRow({
@@ -20,6 +21,7 @@ export function GridRow({
   weeks,
   gridData,
   blockedCells,
+  blockGroups,
 }: GridRowProps) {
   const { t } = useTranslation('scheduler')
   const constraint = department.departmentConstraints?.[0]
@@ -76,6 +78,7 @@ export function GridRow({
               weekNumber={week.weekNumber}
               assignments={assignments}
               blockReason={blockReason}
+              blockGroups={blockGroups}
             />
           </div>
         )

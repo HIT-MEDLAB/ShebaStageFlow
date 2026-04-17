@@ -25,7 +25,9 @@
   },
   "actions": {
     "addSoft": "הוספת אילוץ",
-    "delete": "מחיקה"
+    "delete": "מחיקה",
+    "archive": "ארכוב",
+    "unarchive": "שחזור מארכיון"
   },
   "dialog": {
     "addTitle": "הוספת אילוץ רך",
@@ -35,7 +37,11 @@
     "deleteDepartmentTitle": "מחיקת מחלקה",
     "deleteDepartmentConfirm": "האם אתה בטוח שברצונך למחוק מחלקה זו? כל אילוצי הקיבולת של המחלקה יימחקו. פעולה זו אינה ניתנת לביטול.",
     "deleteUniversityTitle": "מחיקת אוניברסיטה",
-    "deleteUniversityConfirm": "האם אתה בטוח שברצונך למחוק אוניברסיטה זו? נתוני הסמסטרים יימחקו. פעולה זו אינה ניתנת לביטול."
+    "deleteUniversityConfirm": "האם אתה בטוח שברצונך למחוק אוניברסיטה זו? נתוני הסמסטרים יימחקו. פעולה זו אינה ניתנת לביטול.",
+    "archiveDepartmentTitle": "ארכוב מחלקה",
+    "archiveDepartmentConfirm": "המחלקה תוסתר מהלוח אך כל השיבוצים והנתונים יישמרו. ניתן לשחזר בכל עת.",
+    "archiveUniversityTitle": "ארכוב אוניברסיטה",
+    "archiveUniversityConfirm": "האוניברסיטה תוסתר מהלוח אך כל הנתונים יישמרו. ניתן לשחזר בכל עת."
   },
   "form": {
     "name": "שם",
@@ -60,7 +66,9 @@
     "hasEveningShift": "משמרת ערב",
     "morningCapacity": "קיבולת בוקר",
     "eveningCapacity": "קיבולת ערב",
-    "electiveCapacity": "קיבולת אלקטיב"
+    "electiveCapacity": "קיבולת אלקטיב",
+    "showArchived": "הצג מארכיון",
+    "archivedBadge": "בארכיון"
   },
   "university": {
     "title": "ניהול אוניברסיטאות",
@@ -70,7 +78,9 @@
     "priority": "עדיפות",
     "semesterStart": "תחילת סמסטר",
     "semesterEnd": "סיום סמסטר",
-    "year": "שנה"
+    "year": "שנה",
+    "showArchived": "הצג מארכיון",
+    "archivedBadge": "בארכיון"
   },
   "toast": {
     "constraintCreated": "האילוץ נוצר בהצלחה",
@@ -84,8 +94,13 @@
     "universityDeleted": "האוניברסיטה נמחקה בהצלחה",
     "departmentHasAssignments": "לא ניתן למחוק מחלקה עם שיבוצים קיימים",
     "universityHasReferences": "לא ניתן למחוק אוניברסיטה עם סטודנטים או שיבוצים קיימים",
+    "departmentArchived": "המחלקה הועברה לארכיון",
+    "departmentUnarchived": "המחלקה שוחזרה מהארכיון",
+    "universityArchived": "האוניברסיטה הועברה לארכיון",
+    "universityUnarchived": "האוניברסיטה שוחזרה מהארכיון",
     "createFailed": "היצירה נכשלה",
     "updateFailed": "העדכון נכשל",
-    "deleteFailed": "המחיקה נכשלה"
+    "deleteFailed": "המחיקה נכשלה",
+    "archiveFailed": "פעולת הארכוב נכשלה"
   }
 }
