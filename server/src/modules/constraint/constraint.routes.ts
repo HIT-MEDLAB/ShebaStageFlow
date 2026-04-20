@@ -13,6 +13,9 @@ import {
   updateDepartmentSchema,
   createUniversityWithSemesterSchema,
   updateUniversityWithSemesterSchema,
+  setDepartmentActiveSchema,
+  setUniversityActiveSchema,
+  copyYearSchema,
 } from './constraint.schema';
 
 const repository = new ConstraintRepository();
@@ -49,11 +52,14 @@ constraintRouter.patch('/soft/:id/toggle', adminOnly, validateRequest(toggleCons
 // Departments (transactional)
 constraintRouter.post('/departments', adminOnly, validateRequest(createDepartmentSchema), controller.createDepartmentWithConstraint);
 constraintRouter.patch('/departments/:id', adminOnly, validateRequest(updateDepartmentSchema), controller.updateDepartmentWithConstraint);
-constraintRouter.patch('/departments/:id/active', adminOnly, validateRequest(toggleConstraintSchema), controller.setDepartmentActive);
+constraintRouter.patch('/departments/:id/active', adminOnly, validateRequest(setDepartmentActiveSchema), controller.setDepartmentActive);
 constraintRouter.delete('/departments/:id', adminOnly, controller.deleteDepartment);
 
 // Universities (transactional)
 constraintRouter.post('/universities', adminOnly, validateRequest(createUniversityWithSemesterSchema), controller.createUniversityWithSemester);
 constraintRouter.patch('/universities/:id', adminOnly, validateRequest(updateUniversityWithSemesterSchema), controller.updateUniversityWithSemester);
-constraintRouter.patch('/universities/:id/active', adminOnly, validateRequest(toggleConstraintSchema), controller.setUniversityActive);
+constraintRouter.patch('/universities/:id/active', adminOnly, validateRequest(setUniversityActiveSchema), controller.setUniversityActive);
 constraintRouter.delete('/universities/:id', adminOnly, controller.deleteUniversity);
+
+// Copy year constraints
+constraintRouter.post('/copy-year', adminOnly, validateRequest(copyYearSchema), controller.copyYear);

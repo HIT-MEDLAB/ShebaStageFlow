@@ -15,16 +15,19 @@ export function createConstraintController(service: ConstraintService) {
           res.status(400).json({ message: 'year must contain valid numbers' });
           return;
         }
-        const constraints = await service.getConstraintsForYears(years);
+        const academicYearId = req.query['academicYearId'] ? Number(req.query['academicYearId']) : undefined;
+        const constraints = await service.getConstraintsForYears(years, academicYearId);
         res.json(constraints);
       } catch (err) {
         next(err);
       }
     },
 
-    async getAllConstraints(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    async getAllConstraints(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
-        const data = await service.getAllConstraintsForManagement();
+        const academicYearId = req.query['academicYearId'] ? Number(req.query['academicYearId']) : undefined;
+        const year = req.query['year'] ? Number(req.query['year']) : undefined;
+        const data = await service.getAllConstraintsForManagement(academicYearId, year);
         res.json(data);
       } catch (err) {
         next(err);
@@ -140,6 +143,10 @@ export function createConstraintController(service: ConstraintService) {
         if (req.body.semesterStart) {
           data.year = new Date(req.body.semesterStart).getUTCFullYear();
         }
+        // Use calendarYear from query if no year derived from semesterStart
+        if (!data.year && req.query['calendarYear']) {
+          data.year = Number(req.query['calendarYear']);
+        }
         const result = await service.updateUniversityWithSemester(id, data);
         res.json(result);
       } catch (err) {
@@ -170,8 +177,8 @@ export function createConstraintController(service: ConstraintService) {
     async setDepartmentActive(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const id = Number(req.params['id']);
-        const { isActive } = req.body;
-        const result = await service.setDepartmentActive(id, isActive);
+        const { isActive, academicYearId } = req.body;
+        const result = await service.setDepartmentActive(id, academicYearId, isActive);
         res.json(result);
       } catch (err) {
         next(err);
@@ -181,9 +188,19 @@ export function createConstraintController(service: ConstraintService) {
     async setUniversityActive(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const id = Number(req.params['id']);
-        const { isActive } = req.body;
-        const result = await service.setUniversityActive(id, isActive);
+        const { isActive, year } = req.body;
+        const result = await service.setUniversityActive(id, year, isActive);
         res.json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async copyYear(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const { targetAcademicYearId, sourceAcademicYearId } = req.body;
+        await service.copyConstraintsToNewYear(targetAcademicYearId, sourceAcademicYearId);
+        res.json({ message: 'Constraints copied successfully' });
       } catch (err) {
         next(err);
       }

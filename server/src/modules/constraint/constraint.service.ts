@@ -12,11 +12,11 @@ import type {
 export class ConstraintService {
   constructor(private readonly repository: ConstraintRepository) {}
 
-  // ─── Scheduler (existing) ──────────────────────────────────
+  // ─── Scheduler (year-scoped) ──────────────────────────────
 
-  async getConstraintsForYears(years: number[]) {
+  async getConstraintsForYears(years: number[], academicYearId?: number) {
     const [departmentConstraints, ironConstraints, holidays, softConstraints, dateConstraints, universitySemesters] = await Promise.all([
-      this.repository.findDepartmentConstraints(),
+      this.repository.findDepartmentConstraints(academicYearId),
       this.repository.findIronConstraints(true),
       this.repository.findHolidays(years),
       this.repository.findActiveSoftConstraintsWithDates(),
@@ -27,17 +27,17 @@ export class ConstraintService {
     return { departmentConstraints, ironConstraints, holidays, softConstraints, dateConstraints, universitySemesters };
   }
 
-  // ─── Management (all constraint types) ─────────────────────
+  // ─── Management (all constraint types, year-scoped) ────────
 
-  async getAllConstraintsForManagement() {
+  async getAllConstraintsForManagement(academicYearId?: number, year?: number) {
     const [ironConstraints, dateConstraints, softConstraints, holidays, departments, universities] =
       await Promise.all([
         this.repository.findAllIronConstraints(),
         this.repository.findAllDateConstraints(),
         this.repository.findAllSoftConstraints(),
         this.repository.findAllHolidays(),
-        this.repository.findAllDepartmentsWithConstraints(),
-        this.repository.findAllUniversitiesWithSemesters(),
+        this.repository.findAllDepartmentsWithConstraints(academicYearId),
+        this.repository.findAllUniversitiesWithSemesters(year),
       ]);
 
     return { ironConstraints, dateConstraints, softConstraints, holidays, departments, universities };
@@ -105,8 +105,8 @@ export class ConstraintService {
     return this.repository.deleteDepartment(id);
   }
 
-  async setDepartmentActive(id: number, isActive: boolean) {
-    return this.repository.setDepartmentActive(id, isActive);
+  async setDepartmentActive(id: number, academicYearId: number, isActive: boolean) {
+    return this.repository.setDepartmentActive(id, academicYearId, isActive);
   }
 
   // ─── Universities ──────────────────────────────────────────
@@ -123,7 +123,16 @@ export class ConstraintService {
     return this.repository.deleteUniversity(id);
   }
 
-  async setUniversityActive(id: number, isActive: boolean) {
-    return this.repository.setUniversityActive(id, isActive);
+  async setUniversityActive(id: number, year: number, isActive: boolean) {
+    return this.repository.setUniversityActive(id, year, isActive);
+  }
+
+  // ─── Copy Year ─────────────────────────────────────────────
+
+  async copyConstraintsToNewYear(targetAcademicYearId: number, sourceAcademicYearId: number) {
+    if (sourceAcademicYearId === targetAcademicYearId) {
+      throw new AppError('Source and target academic years must be different', 400);
+    }
+    return this.repository.copyConstraintsFromYear(sourceAcademicYearId, targetAcademicYearId);
   }
 }

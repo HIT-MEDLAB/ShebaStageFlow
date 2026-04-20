@@ -93,6 +93,8 @@ model UniversitySemester {
   semesterStart DateTime
   semesterEnd   DateTime
   year          Int
+  priority      Int      @default(0)
+  isActive      Boolean  @default(true)
 
   university University @relation(fields: [universityId], references: [id])
 
@@ -110,7 +112,8 @@ model AcademicYear {
   endDate     DateTime
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  assignments Assignment[]
+  assignments             Assignment[]
+  departmentConstraints   DepartmentConstraint[]
 }
 
 // ─── Department ──────────────────────────────────────────
@@ -133,16 +136,23 @@ model Department {
 model DepartmentConstraint {
   id               Int       @id @default(autoincrement())
   departmentId     Int
+  academicYearId   Int
+  hasMorningShift  Boolean   @default(true)
+  hasEveningShift  Boolean   @default(false)
   morningCapacity  Int       @default(1)
   eveningCapacity  Int       @default(0)
   electiveCapacity Int       @default(0)
+  isActive         Boolean   @default(true)
   blockedStartDate DateTime?
   blockedEndDate   DateTime?
 
-  department Department @relation(fields: [departmentId], references: [id])
+  department   Department   @relation(fields: [departmentId], references: [id])
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([departmentId, academicYearId])
 }
 
 // ─── Student ─────────────────────────────────────────────

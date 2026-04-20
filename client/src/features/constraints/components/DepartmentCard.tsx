@@ -33,6 +33,7 @@ import type { DepartmentWithConstraint } from '../types/constraints.types'
 interface DepartmentCardProps {
   departments: DepartmentWithConstraint[]
   isAdmin: boolean
+  academicYearId: number | null
   onCreate: (data: DepartmentFormValues) => void
   onUpdate: (id: number, data: DepartmentFormValues) => void
   onDelete: (id: number) => void
@@ -46,6 +47,7 @@ interface DepartmentCardProps {
 export function DepartmentCard({
   departments,
   isAdmin,
+  academicYearId,
   onCreate,
   onUpdate,
   onDelete,
@@ -61,9 +63,17 @@ export function DepartmentCard({
   const [showArchived, setShowArchived] = useState(false)
 
   const selectedDepartment = departments.find((d) => d.id === selectedId) ?? null
+  const selectedConstraint = selectedDepartment?.departmentConstraints[0] ?? null
+
+  // Show all departments (even those without config for this year in edit mode)
+  // Filter by year-scoped isActive for archive display
   const visibleDepartments = showArchived
     ? departments
-    : departments.filter((d) => d.isActive)
+    : departments.filter((d) => {
+        const constraint = d.departmentConstraints[0]
+        // Show if no constraint (not configured) or if active
+        return !constraint || constraint.isActive
+      })
 
   const {
     register,
@@ -95,8 +105,8 @@ export function DepartmentCard({
       const constraint = dept.departmentConstraints[0]
       reset({
         name: dept.name,
-        hasMorningShift: dept.hasMorningShift,
-        hasEveningShift: dept.hasEveningShift,
+        hasMorningShift: constraint?.hasMorningShift ?? dept.hasMorningShift,
+        hasEveningShift: constraint?.hasEveningShift ?? dept.hasEveningShift,
         morningCapacity: constraint?.morningCapacity ?? 1,
         eveningCapacity: constraint?.eveningCapacity ?? 0,
         electiveCapacity: constraint?.electiveCapacity ?? 0,
@@ -125,6 +135,10 @@ export function DepartmentCard({
     }
   }
 
+  // Determine archive state from year-scoped constraint
+  const isArchivedForYear = selectedConstraint ? !selectedConstraint.isActive : false
+  const isNotConfigured = selectedDepartment && !selectedConstraint
+
   if (!isAdmin) {
     return (
       <Card>
@@ -133,14 +147,17 @@ export function DepartmentCard({
         </CardHeader>
         <CardContent>
           <div className="text-sm text-muted-foreground space-y-2">
-            {departments.filter((d) => d.isActive).map((d) => {
+            {departments.filter((d) => {
+              const c = d.departmentConstraints[0]
+              return c && c.isActive
+            }).map((d) => {
               const c = d.departmentConstraints[0]
               return (
                 <div key={d.id} className="flex justify-between border-b pb-2">
                   <span className="font-medium">{d.name}</span>
                   <span>
                     {t('department.morningCapacity')}: {c?.morningCapacity ?? '-'}
-                    {d.hasEveningShift && ` | ${t('department.eveningCapacity')}: ${c?.eveningCapacity ?? '-'}`}
+                    {c?.hasEveningShift && ` | ${t('department.eveningCapacity')}: ${c?.eveningCapacity ?? '-'}`}
                     {` | ${t('department.electiveCapacity')}: ${c?.electiveCapacity ?? '-'}`}
                   </span>
                 </div>
@@ -187,7 +204,7 @@ export function DepartmentCard({
                   checked={showArchived}
                   onCheckedChange={(val) => {
                     setShowArchived(val)
-                    if (!val && selectedDepartment && !selectedDepartment.isActive) {
+                    if (!val && selectedConstraint && !selectedConstraint.isActive) {
                       setSelectedId(null)
                       reset({
                         name: '',
@@ -210,18 +227,36 @@ export function DepartmentCard({
                 <SelectValue placeholder={t('department.selectDepartment')} />
               </SelectTrigger>
               <SelectContent>
-                {visibleDepartments.map((d) => (
-                  <SelectItem key={d.id} value={d.id.toString()}>
-                    <span className={d.isActive ? '' : 'opacity-60'}>{d.name}</span>
-                    {!d.isActive && (
-                      <Badge variant="secondary" className="ms-2">
-                        {t('department.archivedBadge')}
-                      </Badge>
-                    )}
-                  </SelectItem>
-                ))}
+                {visibleDepartments.map((d) => {
+                  const constraint = d.departmentConstraints[0]
+                  const archived = constraint && !constraint.isActive
+                  const notConfigured = !constraint
+                  return (
+                    <SelectItem key={d.id} value={d.id.toString()}>
+                      <span className={archived ? 'opacity-60' : ''}>{d.name}</span>
+                      {archived && (
+                        <Badge variant="secondary" className="ms-2">
+                          {t('department.archivedBadge')}
+                        </Badge>
+                      )}
+                      {notConfigured && (
+                        <Badge variant="outline" className="ms-2">
+                          {t('department.notConfigured')}
+                        </Badge>
+                      )}
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
+          </div>
+        )}
+
+        {mode === 'edit' && isNotConfigured && selectedId && (
+          <div className="mb-4 p-3 border rounded-lg bg-muted/50">
+            <p className="text-sm text-muted-foreground">
+              {t('department.notConfigured')}
+            </p>
           </div>
         )}
 
@@ -272,9 +307,9 @@ export function DepartmentCard({
 
           <div className="flex justify-between">
             <div className="flex gap-2">
-              {mode === 'edit' && selectedId && selectedDepartment && (
+              {mode === 'edit' && selectedId && selectedDepartment && selectedConstraint && (
                 <>
-                  {selectedDepartment.isActive ? (
+                  {!isArchivedForYear ? (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="outline" type="button" disabled={isArchivePending}>
@@ -362,7 +397,7 @@ export function DepartmentCard({
             </div>
             <Button
               type="submit"
-              disabled={isCreatePending || isUpdatePending || (mode === 'edit' && !selectedId)}
+              disabled={isCreatePending || isUpdatePending || (mode === 'edit' && !selectedId) || !academicYearId}
             >
               {mode === 'edit' ? t('form.save') : t('form.create')}
             </Button>

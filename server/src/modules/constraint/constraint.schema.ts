@@ -26,6 +26,7 @@ export const updateSoftConstraintSchema = z.object({
 
 export const createDepartmentSchema = z.object({
   name: z.string().min(1),
+  academicYearId: z.number().int().positive(),
   hasMorningShift: z.boolean().optional(),
   hasEveningShift: z.boolean().optional(),
   morningCapacity: z.number().int().min(0),
@@ -35,6 +36,7 @@ export const createDepartmentSchema = z.object({
 
 export const updateDepartmentSchema = z.object({
   name: z.string().min(1).optional(),
+  academicYearId: z.number().int().positive().optional(),
   hasMorningShift: z.boolean().optional(),
   hasEveningShift: z.boolean().optional(),
   morningCapacity: z.number().int().min(0).optional(),
@@ -56,6 +58,21 @@ export const updateUniversityWithSemesterSchema = z.object({
   semesterEnd: z.coerce.date().optional(),
 });
 
+export const setDepartmentActiveSchema = z.object({
+  isActive: z.boolean(),
+  academicYearId: z.number().int().positive(),
+});
+
+export const setUniversityActiveSchema = z.object({
+  isActive: z.boolean(),
+  year: z.number().int().positive(),
+});
+
+export const copyYearSchema = z.object({
+  targetAcademicYearId: z.number().int().positive(),
+  sourceAcademicYearId: z.number().int().positive(),
+});
+
 // Export inferred types
 export type ToggleConstraintDto = z.infer<typeof toggleConstraintSchema>;
 export type CreateSoftConstraintDto = z.infer<typeof createSoftConstraintSchema>;
@@ -64,3 +81,6 @@ export type CreateDepartmentDto = z.infer<typeof createDepartmentSchema>;
 export type UpdateDepartmentDto = z.infer<typeof updateDepartmentSchema>;
 export type CreateUniversityWithSemesterDto = z.infer<typeof createUniversityWithSemesterSchema>;
 export type UpdateUniversityWithSemesterDto = z.infer<typeof updateUniversityWithSemesterSchema>;
+export type SetDepartmentActiveDto = z.infer<typeof setDepartmentActiveSchema>;
+export type SetUniversityActiveDto = z.infer<typeof setUniversityActiveSchema>;
+export type CopyYearDto = z.infer<typeof copyYearSchema>;
