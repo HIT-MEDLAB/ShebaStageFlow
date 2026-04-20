@@ -6,19 +6,19 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart'
-import type { StudentEnrollment } from '../types/statistics.types'
+import type { UniversityWeekCount } from '../types/statistics.types'
 
-interface StudentEnrollmentChartProps {
-  data: StudentEnrollment[]
+interface UniversityWeekCountChartProps {
+  data: UniversityWeekCount[]
 }
 
-export function StudentEnrollmentChart({ data }: StudentEnrollmentChartProps) {
+export function UniversityWeekCountChart({ data }: UniversityWeekCountChartProps) {
   const { t } = useTranslation('statistics')
 
   const chartConfig: ChartConfig = {
-    studentCount: {
-      label: t('labels.students'),
-      color: '#0ea5e9',
+    weekCount: {
+      label: t('labels.weekCount'),
+      color: '#8b5cf6',
     },
   }
 
@@ -26,7 +26,7 @@ export function StudentEnrollmentChart({ data }: StudentEnrollmentChartProps) {
     <ChartContainer config={chartConfig} className="h-[300px] w-full">
       <BarChart data={data} layout="vertical" accessibilityLayer>
         <CartesianGrid horizontal={false} />
-        <XAxis type="number" tickLine={false} axisLine={false} />
+        <XAxis type="number" tickLine={false} axisLine={false} allowDecimals={false} />
         <YAxis
           dataKey="universityName"
           type="category"
@@ -36,8 +36,8 @@ export function StudentEnrollmentChart({ data }: StudentEnrollmentChartProps) {
         />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar
-          dataKey="studentCount"
-          fill="var(--color-studentCount)"
+          dataKey="weekCount"
+          fill="var(--color-weekCount)"
           radius={[0, 4, 4, 0]}
         />
       </BarChart>

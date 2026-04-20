@@ -64,9 +64,12 @@ export interface BlockReason {
 export interface DepartmentConstraintData {
   id: number
   departmentId: number
+  hasMorningShift: boolean
+  hasEveningShift: boolean
   morningCapacity: number
   eveningCapacity: number
   electiveCapacity: number
+  isActive: boolean
   blockedStartDate?: string | null
   blockedEndDate?: string | null
 }
@@ -119,6 +122,8 @@ export interface UniversitySemesterData {
   semesterStart: string
   semesterEnd: string
   year: number
+  priority: number
+  isActive: boolean
   university: { id: number; name: string }
 }
 

@@ -81,7 +81,7 @@ export default function SchedulerPage() {
         new Date(currentYear.endDate).getFullYear(),
       ])]
     : null
-  const { data: constraints } = useConstraints(constraintYears)
+  const { data: constraints } = useConstraints(constraintYears, academicYearId)
   const { data: universities } = useUniversities()
   const weeks = useAcademicYearWeeks(currentYear)
   const gridData = useGridData(assignments, weeks, {

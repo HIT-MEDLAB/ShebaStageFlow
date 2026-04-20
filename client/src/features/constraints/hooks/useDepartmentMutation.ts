@@ -56,8 +56,8 @@ export function useDepartmentMutation() {
   })
 
   const archiveMutation = useMutation({
-    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
-      setDepartmentActive(id, isActive),
+    mutationFn: ({ id, isActive, academicYearId }: { id: number; isActive: boolean; academicYearId: number }) =>
+      setDepartmentActive(id, isActive, academicYearId),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
       queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })

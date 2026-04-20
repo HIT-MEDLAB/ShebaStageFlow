@@ -29,6 +29,12 @@
     "archive": "ארכוב",
     "unarchive": "שחזור מארכיון"
   },
+  "yearSelector": {
+    "label": "שנה אקדמית",
+    "noConfig": "אין הגדרות לשנה אקדמית זו. ניתן להעתיק הגדרות מהשנה הקודמת.",
+    "copyFromPrevious": "העתק מ-",
+    "noYears": "לא נוצרו שנים אקדמיות עדיין. צור שנה אקדמית בלוח השיבוצים כדי להתחיל."
+  },
   "dialog": {
     "addTitle": "הוספת אילוץ רך",
     "editTitle": "עריכת אילוץ רך",
@@ -39,9 +45,9 @@
     "deleteUniversityTitle": "מחיקת אוניברסיטה",
     "deleteUniversityConfirm": "האם אתה בטוח שברצונך למחוק אוניברסיטה זו? נתוני הסמסטרים יימחקו. פעולה זו אינה ניתנת לביטול.",
     "archiveDepartmentTitle": "ארכוב מחלקה",
-    "archiveDepartmentConfirm": "המחלקה תוסתר מהלוח אך כל השיבוצים והנתונים יישמרו. ניתן לשחזר בכל עת.",
+    "archiveDepartmentConfirm": "המחלקה תוסתר מהלוח לשנה זו אך כל השיבוצים והנתונים יישמרו. ניתן לשחזר בכל עת.",
     "archiveUniversityTitle": "ארכוב אוניברסיטה",
-    "archiveUniversityConfirm": "האוניברסיטה תוסתר מהלוח אך כל הנתונים יישמרו. ניתן לשחזר בכל עת."
+    "archiveUniversityConfirm": "האוניברסיטה תוסתר מהלוח לשנה זו אך כל הנתונים יישמרו. ניתן לשחזר בכל עת."
   },
   "form": {
     "name": "שם",
@@ -68,7 +74,8 @@
     "eveningCapacity": "קיבולת ערב",
     "electiveCapacity": "קיבולת אלקטיב",
     "showArchived": "הצג מארכיון",
-    "archivedBadge": "בארכיון"
+    "archivedBadge": "בארכיון",
+    "notConfigured": "לא מוגדר לשנה זו"
   },
   "university": {
     "title": "ניהול אוניברסיטאות",
@@ -80,7 +87,8 @@
     "semesterEnd": "סיום סמסטר",
     "year": "שנה",
     "showArchived": "הצג מארכיון",
-    "archivedBadge": "בארכיון"
+    "archivedBadge": "בארכיון",
+    "notConfigured": "לא מוגדר לשנה זו"
   },
   "toast": {
     "constraintCreated": "האילוץ נוצר בהצלחה",
@@ -94,13 +102,15 @@
     "universityDeleted": "האוניברסיטה נמחקה בהצלחה",
     "departmentHasAssignments": "לא ניתן למחוק מחלקה עם שיבוצים קיימים",
     "universityHasReferences": "לא ניתן למחוק אוניברסיטה עם סטודנטים או שיבוצים קיימים",
-    "departmentArchived": "המחלקה הועברה לארכיון",
-    "departmentUnarchived": "המחלקה שוחזרה מהארכיון",
-    "universityArchived": "האוניברסיטה הועברה לארכיון",
-    "universityUnarchived": "האוניברסיטה שוחזרה מהארכיון",
+    "departmentArchived": "המחלקה הועברה לארכיון לשנה זו",
+    "departmentUnarchived": "המחלקה שוחזרה מהארכיון לשנה זו",
+    "universityArchived": "האוניברסיטה הועברה לארכיון לשנה זו",
+    "universityUnarchived": "האוניברסיטה שוחזרה מהארכיון לשנה זו",
     "createFailed": "היצירה נכשלה",
     "updateFailed": "העדכון נכשל",
     "deleteFailed": "המחיקה נכשלה",
-    "archiveFailed": "פעולת הארכוב נכשלה"
+    "archiveFailed": "פעולת הארכוב נכשלה",
+    "yearCopied": "ההגדרות הועתקו מהשנה הקודמת בהצלחה",
+    "copyYearFailed": "העתקת ההגדרות מהשנה הקודמת נכשלה"
   }
 }

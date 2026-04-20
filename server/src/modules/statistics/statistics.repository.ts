@@ -14,6 +14,8 @@ export interface AssignmentRow {
   departmentId: number;
   universityId: number;
   shiftType: string;
+  type: string;
+  startDate: Date;
   studentCount: number | null;
   department: { name: string };
   university: { name: string };
@@ -21,7 +23,7 @@ export interface AssignmentRow {
 }
 
 export interface IStatisticsRepository {
-  getDepartmentCapacities(): Promise<DepartmentWithCapacity[]>;
+  getDepartmentCapacities(academicYearId: number): Promise<DepartmentWithCapacity[]>;
   getApprovedAssignments(
     academicYearId: number,
     startDate?: Date,
@@ -30,15 +32,14 @@ export interface IStatisticsRepository {
 }
 
 export class StatisticsRepository implements IStatisticsRepository {
-  async getDepartmentCapacities(): Promise<DepartmentWithCapacity[]> {
+  async getDepartmentCapacities(academicYearId: number): Promise<DepartmentWithCapacity[]> {
     return prisma.department.findMany({
       where: { isActive: true },
       select: {
         id: true,
         name: true,
         departmentConstraints: {
-          where: { blockedStartDate: null },
-          orderBy: { id: 'desc' },
+          where: { blockedStartDate: null, academicYearId },
           take: 1,
           select: {
             morningCapacity: true,
@@ -72,6 +73,8 @@ export class StatisticsRepository implements IStatisticsRepository {
         departmentId: true,
         universityId: true,
         shiftType: true,
+        type: true,
+        startDate: true,
         studentCount: true,
         department: { select: { name: true } },
         university: { select: { name: true } },

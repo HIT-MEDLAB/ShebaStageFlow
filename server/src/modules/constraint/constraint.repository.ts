@@ -17,7 +17,7 @@ import type {
 } from './constraint.schema';
 
 export interface IConstraintRepository {
-  findDepartmentConstraints(): Promise<(DepartmentConstraint & { department: { id: number; name: string } })[]>;
+  findDepartmentConstraints(academicYearId?: number): Promise<(DepartmentConstraint & { department: { id: number; name: string } })[]>;
   findIronConstraints(activeOnly?: boolean): Promise<IronConstraint[]>;
   findHolidays(years: number[]): Promise<Holiday[]>;
 }
@@ -41,8 +41,9 @@ export class ConstraintRepository implements IConstraintRepository {
 
   // ─── Existing Methods (kept for scheduler) ─────────────────
 
-  async findDepartmentConstraints() {
+  async findDepartmentConstraints(academicYearId?: number) {
     return prisma.departmentConstraint.findMany({
+      where: academicYearId ? { academicYearId } : undefined,
       include: { department: { select: { id: true, name: true } } },
     });
   }
@@ -148,12 +149,16 @@ export class ConstraintRepository implements IConstraintRepository {
     return prisma.holiday.findUnique({ where: { id } });
   }
 
-  // ─── Departments (transactional) ───────────────────────────
+  // ─── Departments (transactional, year-scoped) ──────────────
 
-  async findAllDepartmentsWithConstraints() {
+  async findAllDepartmentsWithConstraints(academicYearId?: number) {
     return prisma.department.findMany({
       orderBy: { name: 'asc' },
-      include: { departmentConstraints: true },
+      include: {
+        departmentConstraints: academicYearId
+          ? { where: { academicYearId } }
+          : true,
+      },
     });
   }
 
@@ -173,6 +178,9 @@ export class ConstraintRepository implements IConstraintRepository {
       await tx.departmentConstraint.create({
         data: {
           departmentId: department.id,
+          academicYearId: data.academicYearId,
+          hasMorningShift: hasMorning,
+          hasEveningShift: hasEvening,
           morningCapacity: hasMorning ? data.morningCapacity : 0,
           eveningCapacity: hasEvening ? (data.eveningCapacity ?? 0) : 0,
           electiveCapacity: data.electiveCapacity ?? 0,
@@ -181,63 +189,96 @@ export class ConstraintRepository implements IConstraintRepository {
 
       return tx.department.findUniqueOrThrow({
         where: { id: department.id },
-        include: { departmentConstraints: true },
+        include: { departmentConstraints: { where: { academicYearId: data.academicYearId } } },
       });
     });
   }
 
   async updateDepartmentWithConstraint(id: number, data: UpdateDepartmentDto) {
+    const academicYearId = data.academicYearId;
     return prisma.$transaction(async (tx) => {
-      await tx.department.update({
-        where: { id },
-        data: {
-          ...(data.name !== undefined && { name: data.name }),
-          ...(data.hasMorningShift !== undefined && { hasMorningShift: data.hasMorningShift }),
-          ...(data.hasEveningShift !== undefined && { hasEveningShift: data.hasEveningShift }),
-        },
-      });
+      // Update department name if provided
+      if (data.name !== undefined) {
+        await tx.department.update({
+          where: { id },
+          data: { name: data.name },
+        });
+      }
 
-      // Read back the current shift flags to enforce capacity consistency
-      const dept = await tx.department.findUniqueOrThrow({ where: { id } });
+      if (!academicYearId) {
+        return tx.department.findUniqueOrThrow({
+          where: { id },
+          include: { departmentConstraints: true },
+        });
+      }
 
-      const constraintData: Record<string, number> = {};
+      const hasMorning = data.hasMorningShift;
+      const hasEvening = data.hasEveningShift;
+
+      const constraintData: Record<string, unknown> = {};
+      if (hasMorning !== undefined) constraintData['hasMorningShift'] = hasMorning;
+      if (hasEvening !== undefined) constraintData['hasEveningShift'] = hasEvening;
       if (data.morningCapacity !== undefined) constraintData['morningCapacity'] = data.morningCapacity;
       if (data.eveningCapacity !== undefined) constraintData['eveningCapacity'] = data.eveningCapacity;
       if (data.electiveCapacity !== undefined) constraintData['electiveCapacity'] = data.electiveCapacity;
 
       // Force capacity to 0 when the shift is disabled
-      if (!dept.hasMorningShift) constraintData['morningCapacity'] = 0;
-      if (!dept.hasEveningShift) constraintData['eveningCapacity'] = 0;
+      if (hasMorning === false) constraintData['morningCapacity'] = 0;
+      if (hasEvening === false) constraintData['eveningCapacity'] = 0;
 
       if (Object.keys(constraintData).length > 0) {
-        const existing = await tx.departmentConstraint.findFirst({ where: { departmentId: id } });
+        const existing = await tx.departmentConstraint.findUnique({
+          where: { departmentId_academicYearId: { departmentId: id, academicYearId } },
+        });
         if (existing) {
           await tx.departmentConstraint.update({ where: { id: existing.id }, data: constraintData });
         } else {
+          // Create new year-scoped constraint
           await tx.departmentConstraint.create({
             data: {
               departmentId: id,
-              morningCapacity: dept.hasMorningShift ? (data.morningCapacity ?? 1) : 0,
-              eveningCapacity: dept.hasEveningShift ? (data.eveningCapacity ?? 0) : 0,
+              academicYearId,
+              hasMorningShift: hasMorning ?? true,
+              hasEveningShift: hasEvening ?? false,
+              morningCapacity: (hasMorning !== false) ? (data.morningCapacity ?? 1) : 0,
+              eveningCapacity: (hasEvening === true) ? (data.eveningCapacity ?? 0) : 0,
               electiveCapacity: data.electiveCapacity ?? 0,
             },
           });
         }
       }
 
+      // Also sync the Department model's shift flags for backward compat
+      const constraint = await tx.departmentConstraint.findUnique({
+        where: { departmentId_academicYearId: { departmentId: id, academicYearId } },
+      });
+      if (constraint) {
+        await tx.department.update({
+          where: { id },
+          data: {
+            hasMorningShift: constraint.hasMorningShift,
+            hasEveningShift: constraint.hasEveningShift,
+          },
+        });
+      }
+
       return tx.department.findUniqueOrThrow({
         where: { id },
-        include: { departmentConstraints: true },
+        include: { departmentConstraints: { where: { academicYearId } } },
       });
     });
   }
 
   // ─── Universities (transactional) ──────────────────────────
 
-  async findAllUniversitiesWithSemesters() {
+  async findAllUniversitiesWithSemesters(year?: number) {
     return prisma.university.findMany({
       orderBy: { priority: 'asc' },
-      include: { semesters: { orderBy: { year: 'desc' } } },
+      include: {
+        semesters: year
+          ? { where: { year }, orderBy: { year: 'desc' } }
+          : { orderBy: { year: 'desc' } },
+      },
     });
   }
 
@@ -256,68 +297,95 @@ export class ConstraintRepository implements IConstraintRepository {
           semesterStart: data.semesterStart,
           semesterEnd: data.semesterEnd,
           year: data.year,
+          priority: data.priority ?? 0,
+          isActive: true,
         },
       });
 
       return tx.university.findUniqueOrThrow({
         where: { id: university.id },
-        include: { semesters: { orderBy: { year: 'desc' } } },
+        include: { semesters: { where: { year: data.year }, orderBy: { year: 'desc' } } },
       });
     });
   }
 
   async updateUniversityWithSemester(id: number, data: UpdateUniversityWithSemesterDto & { year?: number }) {
     return prisma.$transaction(async (tx) => {
-      const universityData: Record<string, unknown> = {};
-      if (data.name !== undefined) universityData['name'] = data.name;
-      if (data.priority !== undefined) universityData['priority'] = data.priority;
-
-      if (Object.keys(universityData).length > 0) {
-        await tx.university.update({ where: { id }, data: universityData });
+      // Update university name if provided (priority is now per-semester)
+      if (data.name !== undefined) {
+        await tx.university.update({ where: { id }, data: { name: data.name } });
       }
 
-      if (data.semesterStart !== undefined || data.semesterEnd !== undefined || data.year !== undefined) {
+      if (data.semesterStart !== undefined || data.semesterEnd !== undefined || data.year !== undefined || data.priority !== undefined) {
         const year = data.year;
         if (year) {
-          // Remove all existing semesters for this university, then upsert the current one.
-          // This avoids unique-constraint conflicts from duplicate semesters
-          // that may have been created by earlier bugs.
-          await tx.universitySemester.deleteMany({
-            where: { universityId: id },
+          // Upsert the semester for this university + year
+          const existing = await tx.universitySemester.findUnique({
+            where: { universityId_year: { universityId: id, year } },
           });
 
-          if (data.semesterStart && data.semesterEnd) {
+          if (existing) {
+            await tx.universitySemester.update({
+              where: { id: existing.id },
+              data: {
+                ...(data.semesterStart && { semesterStart: data.semesterStart }),
+                ...(data.semesterEnd && { semesterEnd: data.semesterEnd }),
+                ...(data.priority !== undefined && { priority: data.priority }),
+              },
+            });
+          } else if (data.semesterStart && data.semesterEnd) {
             await tx.universitySemester.create({
               data: {
                 universityId: id,
                 semesterStart: data.semesterStart,
                 semesterEnd: data.semesterEnd,
                 year,
+                priority: data.priority ?? 0,
               },
             });
           }
         }
       }
 
+      // Sync priority to university model for backward compat
+      if (data.priority !== undefined) {
+        await tx.university.update({ where: { id }, data: { priority: data.priority } });
+      }
+
+      const filterYear = data.year;
       return tx.university.findUniqueOrThrow({
         where: { id },
-        include: { semesters: { orderBy: { year: 'desc' } } },
+        include: {
+          semesters: filterYear
+            ? { where: { year: filterYear }, orderBy: { year: 'desc' } }
+            : { orderBy: { year: 'desc' } },
+        },
       });
     });
   }
 
-  // ─── Archive / Unarchive ───────────────────────────────────
+  // ─── Archive / Unarchive (year-scoped) ─────────────────────
 
-  async setDepartmentActive(id: number, isActive: boolean) {
-    const dept = await prisma.department.findUnique({ where: { id } });
-    if (!dept) throw new AppError('Department not found', 404);
-    return prisma.department.update({ where: { id }, data: { isActive } });
+  async setDepartmentActive(id: number, academicYearId: number, isActive: boolean) {
+    const constraint = await prisma.departmentConstraint.findUnique({
+      where: { departmentId_academicYearId: { departmentId: id, academicYearId } },
+    });
+    if (!constraint) throw new AppError('Department constraint not found for this year', 404);
+    return prisma.departmentConstraint.update({
+      where: { id: constraint.id },
+      data: { isActive },
+    });
   }
 
-  async setUniversityActive(id: number, isActive: boolean) {
-    const uni = await prisma.university.findUnique({ where: { id } });
-    if (!uni) throw new AppError('University not found', 404);
-    return prisma.university.update({ where: { id }, data: { isActive } });
+  async setUniversityActive(id: number, year: number, isActive: boolean) {
+    const semester = await prisma.universitySemester.findUnique({
+      where: { universityId_year: { universityId: id, year } },
+    });
+    if (!semester) throw new AppError('University semester not found for this year', 404);
+    return prisma.universitySemester.update({
+      where: { id: semester.id },
+      data: { isActive },
+    });
   }
 
   // ─── Delete Department (transactional) ─────────────────────
@@ -352,6 +420,74 @@ export class ConstraintRepository implements IConstraintRepository {
       await tx.universitySemester.deleteMany({ where: { universityId: id } });
       await tx.softConstraint.updateMany({ where: { universityId: id }, data: { universityId: null } });
       await tx.university.delete({ where: { id } });
+    });
+  }
+
+  // ─── Copy Year Constraints ────────────────────────────────
+
+  async copyConstraintsFromYear(sourceAcademicYearId: number, targetAcademicYearId: number) {
+    return prisma.$transaction(async (tx) => {
+      // Copy department constraints
+      const sourceDeptConstraints = await tx.departmentConstraint.findMany({
+        where: { academicYearId: sourceAcademicYearId },
+      });
+
+      for (const dc of sourceDeptConstraints) {
+        const existing = await tx.departmentConstraint.findUnique({
+          where: { departmentId_academicYearId: { departmentId: dc.departmentId, academicYearId: targetAcademicYearId } },
+        });
+        if (!existing) {
+          await tx.departmentConstraint.create({
+            data: {
+              departmentId: dc.departmentId,
+              academicYearId: targetAcademicYearId,
+              hasMorningShift: dc.hasMorningShift,
+              hasEveningShift: dc.hasEveningShift,
+              morningCapacity: dc.morningCapacity,
+              eveningCapacity: dc.eveningCapacity,
+              electiveCapacity: dc.electiveCapacity,
+              isActive: dc.isActive,
+            },
+          });
+        }
+      }
+
+      // Copy university semesters: adjust dates by +1 year
+      const sourceYear = await tx.academicYear.findUnique({ where: { id: sourceAcademicYearId } });
+      const targetYear = await tx.academicYear.findUnique({ where: { id: targetAcademicYearId } });
+      if (!sourceYear || !targetYear) throw new AppError('Academic year not found', 404);
+
+      const sourceCalendarYear = new Date(sourceYear.startDate).getUTCFullYear();
+      const targetCalendarYear = new Date(targetYear.startDate).getUTCFullYear();
+
+      const sourceSemesters = await tx.universitySemester.findMany({
+        where: { year: sourceCalendarYear },
+      });
+
+      for (const sem of sourceSemesters) {
+        const targetSemYear = targetCalendarYear;
+        const existing = await tx.universitySemester.findUnique({
+          where: { universityId_year: { universityId: sem.universityId, year: targetSemYear } },
+        });
+        if (!existing) {
+          const yearDiff = targetCalendarYear - sourceCalendarYear;
+          const newStart = new Date(sem.semesterStart);
+          newStart.setUTCFullYear(newStart.getUTCFullYear() + yearDiff);
+          const newEnd = new Date(sem.semesterEnd);
+          newEnd.setUTCFullYear(newEnd.getUTCFullYear() + yearDiff);
+
+          await tx.universitySemester.create({
+            data: {
+              universityId: sem.universityId,
+              semesterStart: newStart,
+              semesterEnd: newEnd,
+              year: targetSemYear,
+              priority: sem.priority,
+              isActive: sem.isActive,
+            },
+          });
+        }
+      }
     });
   }
 }

@@ -29,6 +29,12 @@
     "archive": "Archive",
     "unarchive": "Unarchive"
   },
+  "yearSelector": {
+    "label": "Academic Year",
+    "noConfig": "No configuration exists for this academic year. You can copy settings from the previous year.",
+    "copyFromPrevious": "Copy from",
+    "noYears": "No academic years have been created yet. Create an academic year in the scheduler to get started."
+  },
   "dialog": {
     "addTitle": "Add Soft Constraint",
     "editTitle": "Edit Soft Constraint",
@@ -39,9 +45,9 @@
     "deleteUniversityTitle": "Delete University",
     "deleteUniversityConfirm": "Are you sure you want to delete this university? Semester data will be removed. This action cannot be undone.",
     "archiveDepartmentTitle": "Archive Department",
-    "archiveDepartmentConfirm": "The department will be hidden from the scheduler but all assignments and data are preserved. You can restore it anytime.",
+    "archiveDepartmentConfirm": "The department will be hidden from the scheduler for this year but all assignments and data are preserved. You can restore it anytime.",
     "archiveUniversityTitle": "Archive University",
-    "archiveUniversityConfirm": "The university will be hidden from the scheduler but all data is preserved. You can restore it anytime."
+    "archiveUniversityConfirm": "The university will be hidden from the scheduler for this year but all data is preserved. You can restore it anytime."
   },
   "form": {
     "name": "Name",
@@ -68,7 +74,8 @@
     "eveningCapacity": "Evening Capacity",
     "electiveCapacity": "Elective Capacity",
     "showArchived": "Show archived",
-    "archivedBadge": "Archived"
+    "archivedBadge": "Archived",
+    "notConfigured": "Not configured for this year"
   },
   "university": {
     "title": "University Management",
@@ -80,7 +87,8 @@
     "semesterEnd": "Semester End",
     "year": "Year",
     "showArchived": "Show archived",
-    "archivedBadge": "Archived"
+    "archivedBadge": "Archived",
+    "notConfigured": "Not configured for this year"
   },
   "toast": {
     "constraintCreated": "Constraint created successfully",
@@ -94,13 +102,15 @@
     "universityDeleted": "University deleted successfully",
     "departmentHasAssignments": "Cannot delete a department with existing assignments",
     "universityHasReferences": "Cannot delete a university with existing students or assignments",
-    "departmentArchived": "Department archived",
-    "departmentUnarchived": "Department restored from archive",
-    "universityArchived": "University archived",
-    "universityUnarchived": "University restored from archive",
+    "departmentArchived": "Department archived for this year",
+    "departmentUnarchived": "Department restored for this year",
+    "universityArchived": "University archived for this year",
+    "universityUnarchived": "University restored for this year",
     "createFailed": "Failed to create",
     "updateFailed": "Failed to update",
     "deleteFailed": "Failed to delete",
-    "archiveFailed": "Archive action failed"
+    "archiveFailed": "Archive action failed",
+    "yearCopied": "Settings copied from previous year successfully",
+    "copyYearFailed": "Failed to copy settings from previous year"
   }
 }

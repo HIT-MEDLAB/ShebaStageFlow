@@ -9,8 +9,11 @@ import type {
   UpdateUniversityData,
 } from '../types/constraints.types'
 
-export async function fetchAllConstraints(): Promise<AllConstraintsResponse> {
-  const { data } = await apiClient.get<AllConstraintsResponse>('/constraints/management')
+export async function fetchAllConstraints(academicYearId?: number, year?: number): Promise<AllConstraintsResponse> {
+  const params: Record<string, unknown> = {}
+  if (academicYearId) params.academicYearId = academicYearId
+  if (year) params.year = year
+  const { data } = await apiClient.get<AllConstraintsResponse>('/constraints/management', { params })
   return data
 }
 
@@ -63,8 +66,10 @@ export async function createUniversityWithSemester(payload: CreateUniversityData
   return data
 }
 
-export async function updateUniversityWithSemester(id: number, payload: UpdateUniversityData) {
-  const { data } = await apiClient.patch(`/constraints/universities/${id}`, payload)
+export async function updateUniversityWithSemester(id: number, payload: UpdateUniversityData, calendarYear?: number) {
+  const params: Record<string, unknown> = {}
+  if (calendarYear) params.calendarYear = calendarYear
+  const { data } = await apiClient.patch(`/constraints/universities/${id}`, payload, { params })
   return data
 }
 
@@ -76,12 +81,17 @@ export async function deleteUniversity(id: number) {
   await apiClient.delete(`/constraints/universities/${id}`)
 }
 
-export async function setDepartmentActive(id: number, isActive: boolean) {
-  const { data } = await apiClient.patch(`/constraints/departments/${id}/active`, { isActive })
+export async function setDepartmentActive(id: number, isActive: boolean, academicYearId: number) {
+  const { data } = await apiClient.patch(`/constraints/departments/${id}/active`, { isActive, academicYearId })
   return data
 }
 
-export async function setUniversityActive(id: number, isActive: boolean) {
-  const { data } = await apiClient.patch(`/constraints/universities/${id}/active`, { isActive })
+export async function setUniversityActive(id: number, isActive: boolean, year: number) {
+  const { data } = await apiClient.patch(`/constraints/universities/${id}/active`, { isActive, year })
+  return data
+}
+
+export async function copyConstraintsToYear(targetAcademicYearId: number, sourceAcademicYearId: number) {
+  const { data } = await apiClient.post('/constraints/copy-year', { targetAcademicYearId, sourceAcademicYearId })
   return data
 }

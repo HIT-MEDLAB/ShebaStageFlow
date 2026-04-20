@@ -9,10 +9,10 @@ import {
   ChartContainer,
   type ChartConfig,
 } from '@/components/ui/chart'
-import type { UtilizationGauge } from '../types/statistics.types'
+import type { DepartmentCapacityPercentage } from '../types/statistics.types'
 
-interface UtilizationGaugeChartProps {
-  data: UtilizationGauge[]
+interface DepartmentCapacityPercentageChartProps {
+  data: DepartmentCapacityPercentage[]
 }
 
 function getGaugeColor(percentage: number): string {
@@ -21,7 +21,7 @@ function getGaugeColor(percentage: number): string {
   return '#22c55e'
 }
 
-export function UtilizationGaugeChart({ data }: UtilizationGaugeChartProps) {
+export function DepartmentCapacityPercentageChart({ data }: DepartmentCapacityPercentageChartProps) {
   const { t } = useTranslation('statistics')
 
   return (
@@ -30,7 +30,7 @@ export function UtilizationGaugeChart({ data }: UtilizationGaugeChartProps) {
         const color = getGaugeColor(dept.percentage)
         const chartConfig: ChartConfig = {
           percentage: {
-            label: t('labels.utilization'),
+            label: t('labels.capacityPercentage'),
             color,
           },
         }

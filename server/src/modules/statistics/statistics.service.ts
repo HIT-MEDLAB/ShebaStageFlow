@@ -1,42 +1,36 @@
 import type { IStatisticsRepository, DepartmentWithCapacity, AssignmentRow } from './statistics.repository';
 
-export interface DepartmentCapacityDto {
+export interface DepartmentScheduledWeeksDto {
   departmentId: number;
   departmentName: string;
-  morningCapacity: number;
-  eveningCapacity: number;
-  electiveCapacity: number;
-  totalCapacity: number;
+  scheduledWeeks: number;
 }
 
-export interface DepartmentUtilizationDto {
+export interface DepartmentStudentCountDto {
   departmentId: number;
   departmentName: string;
-  morningActual: number;
-  eveningActual: number;
-  morningCapacity: number;
-  eveningCapacity: number;
-}
-
-export interface StudentEnrollmentDto {
-  universityId: number;
-  universityName: string;
   studentCount: number;
 }
 
-export interface UtilizationGaugeDto {
+export interface DepartmentCapacityPercentageDto {
   departmentId: number;
   departmentName: string;
   percentage: number;
-  actual: number;
-  capacity: number;
+  scheduledWeeks: number;
+  totalCapacity: number;
+}
+
+export interface UniversityWeekCountDto {
+  universityId: number;
+  universityName: string;
+  weekCount: number;
 }
 
 export interface StatisticsResponse {
-  departmentCapacities: DepartmentCapacityDto[];
-  departmentUtilization: DepartmentUtilizationDto[];
-  studentEnrollment: StudentEnrollmentDto[];
-  utilizationGauges: UtilizationGaugeDto[];
+  departmentScheduledWeeks: DepartmentScheduledWeeksDto[];
+  departmentStudentCount: DepartmentStudentCountDto[];
+  departmentCapacityPercentage: DepartmentCapacityPercentageDto[];
+  universityWeekCount: UniversityWeekCountDto[];
 }
 
 export class StatisticsService {
@@ -52,114 +46,122 @@ export class StatisticsService {
     const endDate = weekEnd ? new Date(weekEnd) : undefined;
 
     const [departments, assignments] = await Promise.all([
-      this.repository.getDepartmentCapacities(),
+      this.repository.getDepartmentCapacities(academicYearId),
       this.repository.getApprovedAssignments(academicYearId, startDate, endDate),
     ]);
 
-    const departmentCapacities = this.formatCapacities(departments);
-    const departmentUtilization = this.formatUtilization(departments, assignments);
-    const studentEnrollment = this.formatStudentEnrollment(assignments);
-    const utilizationGauges = this.computeUtilizationGauges(departments, assignments);
+    const totalWeeks = startDate && endDate
+      ? this.computeTotalWeeksInPeriod(startDate, endDate)
+      : 0;
 
     return {
-      departmentCapacities,
-      departmentUtilization,
-      studentEnrollment,
-      utilizationGauges,
+      departmentScheduledWeeks: this.computeDepartmentScheduledWeeks(departments, assignments),
+      departmentStudentCount: this.computeDepartmentStudentCount(departments, assignments),
+      departmentCapacityPercentage: this.computeCapacityPercentage(departments, assignments, totalWeeks),
+      universityWeekCount: this.computeUniversityWeekCount(assignments),
     };
   }
 
-  private formatCapacities(departments: DepartmentWithCapacity[]): DepartmentCapacityDto[] {
-    return departments.map((dept) => {
-      const constraint = dept.departmentConstraints[0];
-      const morning = constraint?.morningCapacity ?? 0;
-      const evening = constraint?.eveningCapacity ?? 0;
-      const elective = constraint?.electiveCapacity ?? 0;
-
-      return {
-        departmentId: dept.id,
-        departmentName: dept.name,
-        morningCapacity: morning,
-        eveningCapacity: evening,
-        electiveCapacity: elective,
-        totalCapacity: morning + evening + elective,
-      };
-    });
+  private computeTotalWeeksInPeriod(start: Date, end: Date): number {
+    const d = new Date(start);
+    while (d.getDay() !== 0) d.setDate(d.getDate() + 1);
+    let count = 0;
+    while (d <= end) {
+      count++;
+      d.setDate(d.getDate() + 7);
+    }
+    return count;
   }
 
-  private formatUtilization(
+  private computeDepartmentScheduledWeeks(
     departments: DepartmentWithCapacity[],
     assignments: AssignmentRow[],
-  ): DepartmentUtilizationDto[] {
-    const countMap = new Map<number, { morning: number; evening: number }>();
+  ): DepartmentScheduledWeeksDto[] {
+    const weekMap = new Map<number, Set<string>>();
 
     for (const a of assignments) {
-      const existing = countMap.get(a.departmentId) ?? { morning: 0, evening: 0 };
-      if (a.shiftType === 'MORNING') {
-        existing.morning++;
-      } else if (a.shiftType === 'EVENING') {
-        existing.evening++;
-      }
-      countMap.set(a.departmentId, existing);
+      if (a.type !== 'GROUP') continue;
+      const key = new Date(a.startDate).toISOString().split('T')[0];
+      if (!weekMap.has(a.departmentId)) weekMap.set(a.departmentId, new Set());
+      weekMap.get(a.departmentId)!.add(key);
     }
 
-    return departments.map((dept) => {
-      const constraint = dept.departmentConstraints[0];
-      const counts = countMap.get(dept.id) ?? { morning: 0, evening: 0 };
-
-      return {
-        departmentId: dept.id,
-        departmentName: dept.name,
-        morningActual: counts.morning,
-        eveningActual: counts.evening,
-        morningCapacity: constraint?.morningCapacity ?? 0,
-        eveningCapacity: constraint?.eveningCapacity ?? 0,
-      };
-    });
+    return departments.map((dept) => ({
+      departmentId: dept.id,
+      departmentName: dept.name,
+      scheduledWeeks: weekMap.get(dept.id)?.size ?? 0,
+    }));
   }
 
-  private formatStudentEnrollment(assignments: AssignmentRow[]): StudentEnrollmentDto[] {
-    const universityMap = new Map<number, { name: string; count: number }>();
-
-    for (const a of assignments) {
-      const existing = universityMap.get(a.universityId) ?? { name: a.university.name, count: 0 };
-      const studentCount = a._count.students > 0 ? a._count.students : (a.studentCount ?? 0);
-      existing.count += studentCount;
-      universityMap.set(a.universityId, existing);
-    }
-
-    return Array.from(universityMap.entries())
-      .map(([universityId, { name, count }]) => ({
-        universityId,
-        universityName: name,
-        studentCount: count,
-      }))
-      .sort((a, b) => b.studentCount - a.studentCount);
-  }
-
-  private computeUtilizationGauges(
+  private computeDepartmentStudentCount(
     departments: DepartmentWithCapacity[],
     assignments: AssignmentRow[],
-  ): UtilizationGaugeDto[] {
+  ): DepartmentStudentCountDto[] {
     const countMap = new Map<number, number>();
 
     for (const a of assignments) {
-      countMap.set(a.departmentId, (countMap.get(a.departmentId) ?? 0) + 1);
+      const students = a._count.students > 0 ? a._count.students : (a.studentCount ?? 0);
+      countMap.set(a.departmentId, (countMap.get(a.departmentId) ?? 0) + students);
+    }
+
+    return departments.map((dept) => ({
+      departmentId: dept.id,
+      departmentName: dept.name,
+      studentCount: countMap.get(dept.id) ?? 0,
+    }));
+  }
+
+  private computeCapacityPercentage(
+    departments: DepartmentWithCapacity[],
+    assignments: AssignmentRow[],
+    totalWeeks: number,
+  ): DepartmentCapacityPercentageDto[] {
+    const weekMap = new Map<number, Set<string>>();
+
+    for (const a of assignments) {
+      if (a.type !== 'GROUP') continue;
+      const key = new Date(a.startDate).toISOString().split('T')[0];
+      if (!weekMap.has(a.departmentId)) weekMap.set(a.departmentId, new Set());
+      weekMap.get(a.departmentId)!.add(key);
     }
 
     return departments.map((dept) => {
       const constraint = dept.departmentConstraints[0];
-      const capacity = (constraint?.morningCapacity ?? 0) + (constraint?.eveningCapacity ?? 0);
-      const actual = countMap.get(dept.id) ?? 0;
-      const percentage = capacity > 0 ? Math.round((actual / capacity) * 100) : 0;
+      const morningCap = constraint?.morningCapacity ?? 0;
+      const eveningCap = constraint?.eveningCapacity ?? 0;
+      const totalCapacity = totalWeeks * (morningCap + eveningCap);
+      const scheduledWeeks = weekMap.get(dept.id)?.size ?? 0;
+      const percentage = totalCapacity > 0
+        ? Math.round((scheduledWeeks / totalCapacity) * 100)
+        : 0;
 
       return {
         departmentId: dept.id,
         departmentName: dept.name,
         percentage: Math.min(percentage, 100),
-        actual,
-        capacity,
+        scheduledWeeks,
+        totalCapacity,
       };
     });
+  }
+
+  private computeUniversityWeekCount(assignments: AssignmentRow[]): UniversityWeekCountDto[] {
+    const uniMap = new Map<number, { name: string; weeks: Set<string> }>();
+
+    for (const a of assignments) {
+      const key = new Date(a.startDate).toISOString().split('T')[0];
+      if (!uniMap.has(a.universityId)) {
+        uniMap.set(a.universityId, { name: a.university.name, weeks: new Set() });
+      }
+      uniMap.get(a.universityId)!.weeks.add(key);
+    }
+
+    return Array.from(uniMap.entries())
+      .map(([universityId, { name, weeks }]) => ({
+        universityId,
+        universityName: name,
+        weekCount: weeks.size,
+      }))
+      .sort((a, b) => b.weekCount - a.weekCount);
   }
 }

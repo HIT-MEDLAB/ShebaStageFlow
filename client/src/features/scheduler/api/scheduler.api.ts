@@ -87,10 +87,10 @@ export async function fetchUniversities() {
   return data
 }
 
-export async function fetchConstraints(years: number[]) {
-  const { data } = await apiClient.get<ConstraintsResponse>('/constraints', {
-    params: { year: years.join(',') },
-  })
+export async function fetchConstraints(years: number[], academicYearId?: number) {
+  const params: Record<string, unknown> = { year: years.join(',') }
+  if (academicYearId) params.academicYearId = academicYearId
+  const { data } = await apiClient.get<ConstraintsResponse>('/constraints', { params })
   return data
 }
 

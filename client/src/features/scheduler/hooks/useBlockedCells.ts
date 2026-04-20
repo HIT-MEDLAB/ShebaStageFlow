@@ -31,8 +31,9 @@ export function useBlockedCells(
       }
     }
 
-    // Department date blocks
+    // Department date blocks (skip archived departments)
     for (const dc of constraints.departmentConstraints) {
+      if (!dc.isActive) continue
       if (dc.blockedStartDate && dc.blockedEndDate) {
         const blockStart = startOfDay(new Date(dc.blockedStartDate))
         const blockEnd = startOfDay(new Date(dc.blockedEndDate))

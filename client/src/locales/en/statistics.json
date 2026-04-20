@@ -6,20 +6,16 @@
     "academicYear": "Academic Year"
   },
   "charts": {
-    "departmentCapacity": "Department Capacities",
-    "departmentUtilization": "Department Utilization",
-    "studentEnrollment": "Student Enrollment",
-    "utilizationGauges": "Utilization Rate"
+    "departmentScheduledWeeks": "Department Scheduled Weeks",
+    "departmentStudentCount": "Department Student Count",
+    "departmentCapacityPercentage": "Department Capacity Percentage",
+    "universityWeekCount": "University Week Count"
   },
   "labels": {
-    "morningCapacity": "Morning Capacity",
-    "eveningCapacity": "Evening Capacity",
-    "electiveCapacity": "Elective Capacity",
-    "morningActual": "Morning Actual",
-    "eveningActual": "Evening Actual",
-    "remaining": "Remaining",
-    "students": "Students",
-    "utilization": "Utilization",
+    "scheduledWeeks": "Scheduled Weeks",
+    "studentCount": "Student Count",
+    "weekCount": "Week Count",
+    "capacityPercentage": "Capacity %",
     "departments": "Departments",
     "universities": "Universities",
     "percentage": "{{value}}%"

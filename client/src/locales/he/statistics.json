@@ -6,20 +6,16 @@
     "academicYear": "שנה אקדמית"
   },
   "charts": {
-    "departmentCapacity": "קיבולת מחלקות",
-    "departmentUtilization": "ניצולת מחלקות",
-    "studentEnrollment": "רישום סטודנטים",
-    "utilizationGauges": "אחוז ניצולת"
+    "departmentScheduledWeeks": "שבועות מתוזמנים לפי מחלקה",
+    "departmentStudentCount": "מספר סטודנטים לפי מחלקה",
+    "departmentCapacityPercentage": "אחוז ניצולת מחלקה",
+    "universityWeekCount": "מספר שבועות לפי אוניברסיטה"
   },
   "labels": {
-    "morningCapacity": "קיבולת בוקר",
-    "eveningCapacity": "קיבולת ערב",
-    "electiveCapacity": "קיבולת אלקטיב",
-    "morningActual": "בוקר בפועל",
-    "eveningActual": "ערב בפועל",
-    "remaining": "נותר",
-    "students": "סטודנטים",
-    "utilization": "ניצולת",
+    "scheduledWeeks": "שבועות מתוזמנים",
+    "studentCount": "מספר סטודנטים",
+    "weekCount": "מספר שבועות",
+    "capacityPercentage": "% ניצולת",
     "departments": "מחלקות",
     "universities": "אוניברסיטאות",
     "percentage": "{{value}}%"

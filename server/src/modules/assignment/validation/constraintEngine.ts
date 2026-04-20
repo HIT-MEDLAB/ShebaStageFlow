@@ -20,8 +20,17 @@ const ruleRegistry = new Map<string, RuleFunction>();
 
 // ─── SEMESTER_BOUNDARY ──────────────────────────────────────────
 ruleRegistry.set('SEMESTER_BOUNDARY', async (ctx) => {
+  // Scope by the assignment's academic year when available
+  const calendarYear = ctx.academicYearId
+    ? (await prisma.academicYear.findUnique({ where: { id: ctx.academicYearId }, select: { startDate: true } }))
+        ?.startDate.getUTCFullYear()
+    : undefined;
+
   const semester = await prisma.universitySemester.findFirst({
-    where: { universityId: ctx.universityId },
+    where: {
+      universityId: ctx.universityId,
+      ...(calendarYear ? { year: calendarYear } : {}),
+    },
     orderBy: { year: 'desc' },
   });
 
@@ -78,7 +87,11 @@ ruleRegistry.set('ONE_GROUP_PER_SHIFT', async (ctx) => {
 // ─── CAPACITY_LIMIT ─────────────────────────────────────────────
 ruleRegistry.set('CAPACITY_LIMIT', async (ctx) => {
   const deptConstraint = await prisma.departmentConstraint.findFirst({
-    where: { departmentId: ctx.departmentId },
+    where: {
+      departmentId: ctx.departmentId,
+      ...(ctx.academicYearId ? { academicYearId: ctx.academicYearId } : {}),
+    },
+    orderBy: { createdAt: 'desc' },
   });
 
   if (!deptConstraint) {

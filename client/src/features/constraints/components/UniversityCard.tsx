@@ -34,6 +34,7 @@ import type { UniversityWithSemester } from '../types/constraints.types'
 interface UniversityCardProps {
   universities: UniversityWithSemester[]
   isAdmin: boolean
+  calendarYear?: number
   onCreate: (data: UniversityFormValues) => void
   onUpdate: (id: number, data: UniversityFormValues) => void
   onDelete: (id: number) => void
@@ -47,6 +48,7 @@ interface UniversityCardProps {
 export function UniversityCard({
   universities,
   isAdmin,
+  calendarYear,
   onCreate,
   onUpdate,
   onDelete,
@@ -62,9 +64,14 @@ export function UniversityCard({
   const [showArchived, setShowArchived] = useState(false)
 
   const selectedUniversity = universities.find((u) => u.id === selectedId) ?? null
+  const selectedSemester = selectedUniversity?.semesters[0] ?? null
+
   const visibleUniversities = showArchived
     ? universities
-    : universities.filter((u) => u.isActive)
+    : universities.filter((u) => {
+        const semester = u.semesters[0]
+        return !semester || semester.isActive
+      })
 
   const {
     register,
@@ -89,7 +96,7 @@ export function UniversityCard({
       const semester = uni.semesters[0]
       reset({
         name: uni.name,
-        priority: uni.priority,
+        priority: semester?.priority ?? uni.priority,
         semesterStart: semester ? format(new Date(semester.semesterStart), 'yyyy-MM-dd') : '',
         semesterEnd: semester ? format(new Date(semester.semesterEnd), 'yyyy-MM-dd') : '',
       })
@@ -115,6 +122,9 @@ export function UniversityCard({
     }
   }
 
+  const isArchivedForYear = selectedSemester ? !selectedSemester.isActive : false
+  const isNotConfigured = selectedUniversity && !selectedSemester
+
   if (!isAdmin) {
     return (
       <Card>
@@ -123,7 +133,10 @@ export function UniversityCard({
         </CardHeader>
         <CardContent>
           <div className="text-sm text-muted-foreground space-y-2">
-            {universities.filter((u) => u.isActive).map((u) => {
+            {universities.filter((u) => {
+              const s = u.semesters[0]
+              return s && s.isActive
+            }).map((u) => {
               const s = u.semesters[0]
               return (
                 <div key={u.id} className="flex justify-between border-b pb-2">
@@ -177,7 +190,7 @@ export function UniversityCard({
                   checked={showArchived}
                   onCheckedChange={(val) => {
                     setShowArchived(val)
-                    if (!val && selectedUniversity && !selectedUniversity.isActive) {
+                    if (!val && selectedSemester && !selectedSemester.isActive) {
                       setSelectedId(null)
                       reset({
                         name: '',
@@ -198,18 +211,36 @@ export function UniversityCard({
                 <SelectValue placeholder={t('university.selectUniversity')} />
               </SelectTrigger>
               <SelectContent>
-                {visibleUniversities.map((u) => (
-                  <SelectItem key={u.id} value={u.id.toString()}>
-                    <span className={u.isActive ? '' : 'opacity-60'}>{u.name}</span>
-                    {!u.isActive && (
-                      <Badge variant="secondary" className="ms-2">
-                        {t('university.archivedBadge')}
-                      </Badge>
-                    )}
-                  </SelectItem>
-                ))}
+                {visibleUniversities.map((u) => {
+                  const semester = u.semesters[0]
+                  const archived = semester && !semester.isActive
+                  const notConfigured = !semester
+                  return (
+                    <SelectItem key={u.id} value={u.id.toString()}>
+                      <span className={archived ? 'opacity-60' : ''}>{u.name}</span>
+                      {archived && (
+                        <Badge variant="secondary" className="ms-2">
+                          {t('university.archivedBadge')}
+                        </Badge>
+                      )}
+                      {notConfigured && (
+                        <Badge variant="outline" className="ms-2">
+                          {t('university.notConfigured')}
+                        </Badge>
+                      )}
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
+          </div>
+        )}
+
+        {mode === 'edit' && isNotConfigured && selectedId && (
+          <div className="mb-4 p-3 border rounded-lg bg-muted/50">
+            <p className="text-sm text-muted-foreground">
+              {t('university.notConfigured')}
+            </p>
           </div>
         )}
 
@@ -245,9 +276,9 @@ export function UniversityCard({
 
           <div className="flex justify-between">
             <div className="flex gap-2">
-              {mode === 'edit' && selectedId && selectedUniversity && (
+              {mode === 'edit' && selectedId && selectedUniversity && selectedSemester && (
                 <>
-                  {selectedUniversity.isActive ? (
+                  {!isArchivedForYear ? (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="outline" type="button" disabled={isArchivePending}>

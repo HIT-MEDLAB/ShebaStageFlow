@@ -27,8 +27,8 @@ export function useUniversityMutation() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateUniversityData }) =>
-      updateUniversityWithSemester(id, data),
+    mutationFn: ({ id, data, calendarYear }: { id: number; data: UpdateUniversityData; calendarYear?: number }) =>
+      updateUniversityWithSemester(id, data, calendarYear),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
       queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
@@ -56,8 +56,8 @@ export function useUniversityMutation() {
   })
 
   const archiveMutation = useMutation({
-    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
-      setUniversityActive(id, isActive),
+    mutationFn: ({ id, isActive, year }: { id: number; isActive: boolean; year: number }) =>
+      setUniversityActive(id, isActive, year),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
       queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })

@@ -40,9 +40,13 @@ export interface Holiday {
 export interface DepartmentConstraintData {
   id: number
   departmentId: number
+  academicYearId: number
+  hasMorningShift: boolean
+  hasEveningShift: boolean
   morningCapacity: number
   eveningCapacity: number
   electiveCapacity: number
+  isActive: boolean
   blockedStartDate: string | null
   blockedEndDate: string | null
 }
@@ -62,6 +66,8 @@ export interface UniversitySemesterData {
   semesterStart: string
   semesterEnd: string
   year: number
+  priority: number
+  isActive: boolean
 }
 
 export interface UniversityWithSemester {
@@ -103,6 +109,7 @@ export interface UpdateSoftConstraintData {
 
 export interface CreateDepartmentData {
   name: string
+  academicYearId: number
   hasMorningShift?: boolean
   hasEveningShift?: boolean
   morningCapacity: number
@@ -112,6 +119,7 @@ export interface CreateDepartmentData {
 
 export interface UpdateDepartmentData {
   name?: string
+  academicYearId?: number
   hasMorningShift?: boolean
   hasEveningShift?: boolean
   morningCapacity?: number

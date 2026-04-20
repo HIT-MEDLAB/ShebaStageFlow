@@ -20,12 +20,21 @@ function mapShift(shift: string): string {
 export function exportSchedulerToExcel(assignments: ExportAssignment[]) {
   const wb = XLSX.utils.book_new()
 
+  // Build groupId → week count map for block size calculation
+  const groupWeekCount = new Map<string, number>()
+  for (const a of assignments) {
+    if (a.groupId) {
+      groupWeekCount.set(a.groupId, (groupWeekCount.get(a.groupId) ?? 0) + 1)
+    }
+  }
+
   // Sheet 1: שיבוצים (Assignments)
   const assignmentRows = assignments.map((a) => ({
     'מחלקה': a.department.name,
     'מוסד אקדמי': a.university.name,
     'תאריך התחלה': formatDate(a.startDate),
     'תאריך סיום': formatDate(a.endDate),
+    'כמות שבועות': a.groupId ? (groupWeekCount.get(a.groupId) ?? 1) : 1,
     'מספר סטודנטים': a.studentCount ?? '',
     'שנת לימוד': a.yearInProgram,
     'סוג שיבוץ': mapType(a.type),
