@@ -1,40 +1,34 @@
 export type Timeframe = 'weekly' | 'calendarYear' | 'academicYear'
 
-export interface DepartmentCapacity {
+export interface DepartmentScheduledWeeks {
   departmentId: number
   departmentName: string
-  morningCapacity: number
-  eveningCapacity: number
-  electiveCapacity: number
-  totalCapacity: number
+  scheduledWeeks: number
 }
 
-export interface DepartmentUtilization {
+export interface DepartmentStudentCount {
   departmentId: number
   departmentName: string
-  morningActual: number
-  eveningActual: number
-  morningCapacity: number
-  eveningCapacity: number
-}
-
-export interface StudentEnrollment {
-  universityId: number
-  universityName: string
   studentCount: number
 }
 
-export interface UtilizationGauge {
+export interface DepartmentCapacityPercentage {
   departmentId: number
   departmentName: string
   percentage: number
-  actual: number
-  capacity: number
+  scheduledWeeks: number
+  totalCapacity: number
+}
+
+export interface UniversityWeekCount {
+  universityId: number
+  universityName: string
+  weekCount: number
 }
 
 export interface StatisticsData {
-  departmentCapacities: DepartmentCapacity[]
-  departmentUtilization: DepartmentUtilization[]
-  studentEnrollment: StudentEnrollment[]
-  utilizationGauges: UtilizationGauge[]
+  departmentScheduledWeeks: DepartmentScheduledWeeks[]
+  departmentStudentCount: DepartmentStudentCount[]
+  departmentCapacityPercentage: DepartmentCapacityPercentage[]
+  universityWeekCount: UniversityWeekCount[]
 }

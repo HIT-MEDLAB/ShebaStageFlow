@@ -22,10 +22,10 @@ import { useStatistics } from '../hooks/useStatistics'
 import { TimeframeToggle } from '../components/TimeframeToggle'
 import { StatisticsWeekSelector } from '../components/StatisticsWeekSelector'
 import { ChartExportButton } from '../components/ChartExportButton'
-import { DepartmentCapacityChart } from '../components/DepartmentCapacityChart'
-import { DepartmentUtilizationChart } from '../components/DepartmentUtilizationChart'
-import { StudentEnrollmentChart } from '../components/StudentEnrollmentChart'
-import { UtilizationGaugeChart } from '../components/UtilizationGaugeChart'
+import { DepartmentScheduledWeeksChart } from '../components/DepartmentScheduledWeeksChart'
+import { DepartmentStudentCountChart } from '../components/DepartmentStudentCountChart'
+import { DepartmentCapacityPercentageChart } from '../components/DepartmentCapacityPercentageChart'
+import { UniversityWeekCountChart } from '../components/UniversityWeekCountChart'
 import { StatisticsPageSkeleton } from '../components/StatisticsPageSkeleton'
 import type { Timeframe } from '../types/statistics.types'
 
@@ -134,67 +134,67 @@ export function StatisticsPage() {
         <StatisticsPageSkeleton />
       ) : data ? (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Department Capacities */}
+          {/* Department Scheduled Weeks */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('charts.departmentCapacity')}</CardTitle>
+              <CardTitle>{t('charts.departmentScheduledWeeks')}</CardTitle>
               <CardAction>
                 <ChartExportButton
-                  data={data.departmentCapacities}
-                  filename="department-capacities"
+                  data={data.departmentScheduledWeeks}
+                  filename="department-scheduled-weeks"
                 />
               </CardAction>
             </CardHeader>
             <CardContent>
-              <DepartmentCapacityChart data={data.departmentCapacities} />
+              <DepartmentScheduledWeeksChart data={data.departmentScheduledWeeks} />
             </CardContent>
           </Card>
 
-          {/* Department Utilization */}
+          {/* Department Student Count */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('charts.departmentUtilization')}</CardTitle>
+              <CardTitle>{t('charts.departmentStudentCount')}</CardTitle>
               <CardAction>
                 <ChartExportButton
-                  data={data.departmentUtilization}
-                  filename="department-utilization"
+                  data={data.departmentStudentCount}
+                  filename="department-student-count"
                 />
               </CardAction>
             </CardHeader>
             <CardContent>
-              <DepartmentUtilizationChart data={data.departmentUtilization} />
+              <DepartmentStudentCountChart data={data.departmentStudentCount} />
             </CardContent>
           </Card>
 
-          {/* Student Enrollment */}
+          {/* Department Capacity Percentage */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('charts.studentEnrollment')}</CardTitle>
+              <CardTitle>{t('charts.departmentCapacityPercentage')}</CardTitle>
               <CardAction>
                 <ChartExportButton
-                  data={data.studentEnrollment}
-                  filename="student-enrollment"
+                  data={data.departmentCapacityPercentage}
+                  filename="department-capacity-percentage"
                 />
               </CardAction>
             </CardHeader>
             <CardContent>
-              <StudentEnrollmentChart data={data.studentEnrollment} />
+              <DepartmentCapacityPercentageChart data={data.departmentCapacityPercentage} />
             </CardContent>
           </Card>
 
-          {/* Utilization Gauges */}
+          {/* University Week Count */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('charts.utilizationGauges')}</CardTitle>
+              <CardTitle>{t('charts.universityWeekCount')}</CardTitle>
               <CardAction>
                 <ChartExportButton
-                  data={data.utilizationGauges}
-                  filename="utilization-rates"
+                  data={data.universityWeekCount}
+                  filename="university-week-count"
                 />
               </CardAction>
             </CardHeader>
             <CardContent>
-              <UtilizationGaugeChart data={data.utilizationGauges} />
+              <UniversityWeekCountChart data={data.universityWeekCount} />
             </CardContent>
           </Card>
         </div>
