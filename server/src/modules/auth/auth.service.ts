@@ -5,7 +5,7 @@ import { AppError } from '../../shared/errors/AppError';
 import { sendOtpEmail } from '../../shared/utils/email';
 import type { IAuthRepository } from './auth.repository';
 import type { IOtpRepository } from './otp.repository';
-import type { LoginDto, UpdateProfileDto } from './auth.schema';
+import type { LoginDto, UpdateProfileDto, ForgotPasswordDto, ResetPasswordDto } from './auth.schema';
 
 interface UserShape {
   id: string;
@@ -17,6 +17,11 @@ interface UserShape {
 
 interface LoginOtpResult {
   requiresOtp: true;
+  otpToken: string;
+  email: string;
+}
+
+interface ForgotPasswordResult {
   otpToken: string;
   email: string;
 }
@@ -169,5 +174,39 @@ export class AuthService {
       phone: updated.phone ?? null,
       role: updated.role,
     };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto): Promise<ForgotPasswordResult | null> {
+    const user = await this.repository.findByEmail(dto.email);
+    if (!user || !user.isActive) {
+      // Don't reveal whether the email exists
+      return null;
+    }
+
+    await this.otpRepository.invalidateAllForUser(user.id);
+
+    const code = crypto.randomInt(100000, 1000000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const otpToken = crypto.randomBytes(32).toString('hex');
+
+    await this.otpRepository.create(user.id, code, otpToken, expiresAt);
+    await sendOtpEmail(user.email, code);
+
+    return {
+      otpToken,
+      email: maskEmail(user.email),
+    };
+  }
+
+  async resetPassword(dto: ResetPasswordDto): Promise<void> {
+    const otp = await this.otpRepository.findByToken(dto.otpToken, dto.code);
+    if (!otp) {
+      throw new AppError('Invalid or expired OTP code', 401);
+    }
+
+    await this.otpRepository.markUsed(otp.id);
+
+    const hashPassword = await bcrypt.hash(dto.newPassword, 10);
+    await this.repository.updateProfile(otp.userId, { hashPassword });
   }
 }
