@@ -26,3 +26,17 @@ export const updateProfileSchema = z.object({
 );
 
 export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  otpToken: z.string().min(1),
+  code: z.string().length(6),
+  newPassword: z.string().min(6),
+});
+
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;

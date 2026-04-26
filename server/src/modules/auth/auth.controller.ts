@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthService } from './auth.service';
-import type { LoginDto, VerifyOtpDto, UpdateProfileDto } from './auth.schema';
+import type { LoginDto, VerifyOtpDto, UpdateProfileDto, ForgotPasswordDto, ResetPasswordDto } from './auth.schema';
 import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, AUTH_COOKIE_CLEAR_OPTIONS } from '../../shared/utils/cookie';
 
 export function createAuthController(service: AuthService) {
@@ -40,6 +40,29 @@ export function createAuthController(service: AuthService) {
       try {
         const user = await service.updateProfile(req.currentUser!.userId, req.body as UpdateProfileDto);
         res.json({ user });
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const result = await service.forgotPassword(req.body as ForgotPasswordDto);
+        // Always return 200 to not reveal if email exists
+        if (result) {
+          res.json(result);
+        } else {
+          res.json({ otpToken: '', email: '' });
+        }
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        await service.resetPassword(req.body as ResetPasswordDto);
+        res.json({ message: 'Password has been reset successfully' });
       } catch (err) {
         next(err);
       }

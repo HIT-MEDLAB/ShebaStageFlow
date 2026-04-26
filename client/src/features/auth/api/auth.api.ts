@@ -31,8 +31,18 @@ export async function logoutUser(): Promise<void> {
   await apiClient.post('/auth/logout')
 }
 
-export async function forgotPassword(data: { email: string }): Promise<void> {
-  await apiClient.post('/auth/forgot-password', data)
+export interface ForgotPasswordResponse {
+  otpToken: string
+  email: string
+}
+
+export async function forgotPassword(data: { email: string }): Promise<ForgotPasswordResponse> {
+  const response = await apiClient.post<ForgotPasswordResponse>('/auth/forgot-password', data)
+  return response.data
+}
+
+export async function resetPassword(data: { otpToken: string; code: string; newPassword: string }): Promise<void> {
+  await apiClient.post('/auth/reset-password', data)
 }
 
 export interface UpdateProfileData {

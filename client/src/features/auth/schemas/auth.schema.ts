@@ -26,3 +26,15 @@ export function createOtpSchema(t: TFunction) {
 }
 
 export type OtpFormData = z.infer<ReturnType<typeof createOtpSchema>>
+
+export function createResetPasswordSchema(t: TFunction) {
+  return z.object({
+    newPassword: z.string().min(6, t('auth:validation.passwordMin')),
+    confirmPassword: z.string().min(6, t('auth:validation.passwordMin')),
+  }).refine((data) => data.newPassword === data.confirmPassword, {
+    message: t('auth:validation.passwordsMismatch'),
+    path: ['confirmPassword'],
+  })
+}
+
+export type ResetPasswordFormData = z.infer<ReturnType<typeof createResetPasswordSchema>>
