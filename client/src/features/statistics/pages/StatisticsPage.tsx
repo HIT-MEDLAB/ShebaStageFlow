@@ -108,7 +108,9 @@ export function StatisticsPage() {
               <SelectContent>
                 {academicYears.map((year) => (
                   <SelectItem key={year.id} value={String(year.id)}>
-                    {year.name}
+                    {timeframe === 'calendarYear'
+                      ? new Date(year.startDate).getFullYear()
+                      : year.name}
                   </SelectItem>
                 ))}
               </SelectContent>

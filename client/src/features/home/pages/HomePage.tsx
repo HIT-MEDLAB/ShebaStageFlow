@@ -140,7 +140,9 @@ export function HomePage() {
             <SelectContent>
               {academicYears.map((year) => (
                 <SelectItem key={year.id} value={String(year.id)}>
-                  {year.name}
+                  {viewMode === 'calendarYear'
+                    ? new Date(year.startDate).getFullYear()
+                    : year.name}
                 </SelectItem>
               ))}
             </SelectContent>
