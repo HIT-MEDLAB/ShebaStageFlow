@@ -71,6 +71,14 @@ export function GridRow({
           blockedCells.get(softDeptKey) ??
           blockedCells.get(softGlobalKey)
 
+        const holidayNoticeKey = `holidayNotice:week:${week.weekNumber}`
+        const softNoticeDeptKey = `softNotice:dept:${department.id}:week:${week.weekNumber}`
+        const softNoticeGlobalKey = `softNotice:week:${week.weekNumber}`
+        const holidayNotice =
+          blockedCells.get(holidayNoticeKey) ??
+          blockedCells.get(softNoticeDeptKey) ??
+          blockedCells.get(softNoticeGlobalKey)
+
         return (
           <div key={week.weekNumber} className="min-w-[200px] flex-1">
             <GridCell
@@ -78,6 +86,7 @@ export function GridRow({
               weekNumber={week.weekNumber}
               assignments={assignments}
               blockReason={blockReason}
+              notice={holidayNotice}
               blockGroups={blockGroups}
             />
           </div>

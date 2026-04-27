@@ -7,6 +7,7 @@ import { ConstraintService } from './constraint.service';
 import { createConstraintController } from './constraint.controller';
 import {
   toggleConstraintSchema,
+  toggleHolidaySchema,
   createSoftConstraintSchema,
   updateSoftConstraintSchema,
   createDepartmentSchema,
@@ -41,13 +42,13 @@ constraintRouter.patch('/iron/:id/toggle', adminOnly, validateRequest(toggleCons
 constraintRouter.patch('/date/:id/toggle', adminOnly, validateRequest(toggleConstraintSchema), controller.toggleDateConstraint);
 
 // Holidays
-constraintRouter.patch('/holidays/:id/toggle', adminOnly, validateRequest(toggleConstraintSchema), controller.toggleHoliday);
+constraintRouter.patch('/holidays/:id/toggle', adminOnly, validateRequest(toggleHolidaySchema), controller.toggleHoliday);
 
 // Soft constraints
 constraintRouter.post('/soft', adminOnly, validateRequest(createSoftConstraintSchema), controller.createSoftConstraint);
 constraintRouter.patch('/soft/:id', adminOnly, validateRequest(updateSoftConstraintSchema), controller.updateSoftConstraint);
 constraintRouter.delete('/soft/:id', adminOnly, controller.deleteSoftConstraint);
-constraintRouter.patch('/soft/:id/toggle', adminOnly, validateRequest(toggleConstraintSchema), controller.toggleSoftConstraint);
+constraintRouter.patch('/soft/:id/toggle', adminOnly, validateRequest(toggleHolidaySchema), controller.toggleSoftConstraint);
 
 // Departments (transactional)
 constraintRouter.post('/departments', adminOnly, validateRequest(createDepartmentSchema), controller.createDepartmentWithConstraint);

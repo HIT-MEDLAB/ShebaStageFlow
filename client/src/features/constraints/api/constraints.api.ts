@@ -27,13 +27,13 @@ export async function toggleDateConstraint(id: number, isActive: boolean) {
   return data
 }
 
-export async function toggleSoftConstraint(id: number, isActive: boolean) {
-  const { data } = await apiClient.patch(`/constraints/soft/${id}/toggle`, { isActive })
+export async function toggleSoftConstraint(id: number, isActive: boolean, blocksWeek?: boolean) {
+  const { data } = await apiClient.patch(`/constraints/soft/${id}/toggle`, { isActive, blocksWeek })
   return data
 }
 
-export async function toggleHoliday(id: number, isActive: boolean) {
-  const { data } = await apiClient.patch(`/constraints/holidays/${id}/toggle`, { isActive })
+export async function toggleHoliday(id: number, isActive: boolean, blocksWeek?: boolean) {
+  const { data } = await apiClient.patch(`/constraints/holidays/${id}/toggle`, { isActive, blocksWeek })
   return data
 }
 

@@ -181,6 +181,9 @@ export function SoftConstraintDialog({
                 type="date"
                 {...register('endDate')}
               />
+              {errors.endDate && (
+                <p className="text-sm text-destructive">{t(`validation.${errors.endDate.message}`)}</p>
+              )}
             </div>
           </div>
 

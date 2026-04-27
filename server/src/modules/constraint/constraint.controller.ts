@@ -59,8 +59,8 @@ export function createConstraintController(service: ConstraintService) {
     async toggleSoftConstraint(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const id = Number(req.params['id']);
-        const { isActive } = req.body;
-        const result = await service.toggleSoftConstraint(id, isActive);
+        const { isActive, blocksWeek } = req.body;
+        const result = await service.toggleSoftConstraint(id, isActive, blocksWeek);
         res.json(result);
       } catch (err) {
         next(err);
@@ -70,8 +70,8 @@ export function createConstraintController(service: ConstraintService) {
     async toggleHoliday(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const id = Number(req.params['id']);
-        const { isActive } = req.body;
-        const result = await service.toggleHoliday(id, isActive);
+        const { isActive, blocksWeek } = req.body;
+        const result = await service.toggleHoliday(id, isActive, blocksWeek);
         res.json(result);
       } catch (err) {
         next(err);

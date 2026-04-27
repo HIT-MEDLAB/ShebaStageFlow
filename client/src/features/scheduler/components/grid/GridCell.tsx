@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { AssignmentCard } from './AssignmentCard'
 import { BlockedOverlay } from './BlockedOverlay'
 import { WarningOverlay } from './WarningOverlay'
+import { HolidayNoticeOverlay } from './HolidayNoticeOverlay'
 import type { Assignment, BlockReason } from '../../types/scheduler.types'
 
 interface GridCellProps {
@@ -10,6 +11,7 @@ interface GridCellProps {
   weekNumber: number
   assignments: Assignment[]
   blockReason?: BlockReason
+  notice?: BlockReason
   blockGroups?: Map<string, Assignment[]>
 }
 
@@ -18,6 +20,7 @@ export function GridCell({
   weekNumber,
   assignments,
   blockReason,
+  notice,
   blockGroups,
 }: GridCellProps) {
   const isWarning = blockReason?.type === 'warning'
@@ -44,7 +47,8 @@ export function GridCell({
       ) : (
         <>
           {isWarning && <WarningOverlay reason={blockReason} />}
-          <div className="flex flex-col gap-1">
+          {notice && <HolidayNoticeOverlay reason={notice} />}
+          <div className={cn('flex flex-col gap-1', notice && 'pt-5')}>
             {assignments.map((assignment) => {
               const blockInfo = assignment.groupId && blockGroups
                 ? (() => {

@@ -1,14 +1,27 @@
 import { z } from 'zod'
 
-export const softConstraintFormSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().min(1),
-  priority: z.coerce.number().int().min(0).optional(),
-  departmentId: z.coerce.number().int().positive().nullable().optional(),
-  universityId: z.coerce.number().int().positive().nullable().optional(),
-  startDate: z.string().nullable().optional(),
-  endDate: z.string().nullable().optional(),
-})
+export const softConstraintFormSchema = z
+  .object({
+    name: z.string().min(1),
+    description: z.string().min(1),
+    priority: z.coerce.number().int().min(0).optional(),
+    departmentId: z.coerce.number().int().positive().nullable().optional(),
+    universityId: z.coerce.number().int().positive().nullable().optional(),
+    startDate: z.string().nullable().optional(),
+    endDate: z.string().nullable().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.startDate && data.endDate) {
+        return data.endDate >= data.startDate
+      }
+      return true
+    },
+    {
+      message: 'endBeforeStart',
+      path: ['endDate'],
+    },
+  )
 
 export type SoftConstraintFormValues = z.infer<typeof softConstraintFormSchema>
 

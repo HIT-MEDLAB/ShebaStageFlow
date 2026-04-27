@@ -77,18 +77,18 @@ export class ConstraintService {
     return this.repository.deleteSoftConstraint(id);
   }
 
-  async toggleSoftConstraint(id: number, isActive: boolean) {
+  async toggleSoftConstraint(id: number, isActive: boolean, blocksWeek?: boolean) {
     const existing = await this.repository.findSoftConstraintById(id);
     if (!existing) throw new AppError('Soft constraint not found', 404);
-    return this.repository.toggleSoftConstraint(id, isActive);
+    return this.repository.toggleSoftConstraint(id, isActive, blocksWeek);
   }
 
   // ─── Holidays ──────────────────────────────────────────────
 
-  async toggleHoliday(id: number, isActive: boolean) {
+  async toggleHoliday(id: number, isActive: boolean, blocksWeek?: boolean) {
     const existing = await this.repository.findHolidayById(id);
     if (!existing) throw new AppError('Holiday not found', 404);
-    return this.repository.toggleHoliday(id, isActive);
+    return this.repository.toggleHoliday(id, isActive, blocksWeek);
   }
 
   // ─── Departments ───────────────────────────────────────────
