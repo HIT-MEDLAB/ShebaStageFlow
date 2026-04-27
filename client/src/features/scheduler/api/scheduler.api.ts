@@ -21,6 +21,7 @@ import type {
   CreateBlockDto,
   MoveBlockDto,
   FindBlockPositionsDto,
+  ConvertToBlockDto,
 } from '../types/scheduler.types'
 
 // Raw shape from the API (Prisma includes nested relations)
@@ -184,6 +185,17 @@ export async function smartImportExecute(
 export async function createBlock(dto: CreateBlockDto) {
   const { data } = await apiClient.post<{ assignments: RawAssignment[]; warnings: unknown[] }>(
     '/assignments/block',
+    dto,
+  )
+  return {
+    assignments: data.assignments.map(mapAssignment),
+    warnings: data.warnings,
+  }
+}
+
+export async function convertToBlock(assignmentId: number, dto: ConvertToBlockDto) {
+  const { data } = await apiClient.post<{ assignments: RawAssignment[]; warnings: unknown[] }>(
+    `/assignments/${assignmentId}/convert-to-block`,
     dto,
   )
   return {

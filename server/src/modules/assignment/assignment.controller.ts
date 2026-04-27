@@ -16,6 +16,7 @@ import type {
   CreateBlockDto,
   MoveBlockDto,
   FindBlockPositionsDto,
+  ConvertToBlockDto,
 } from './assignment.schema';
 
 export function createAssignmentController(service: AssignmentService) {
@@ -286,6 +287,19 @@ export function createAssignmentController(service: AssignmentService) {
         const userRole = req.currentUser!.role;
         const dto = req.body as CreateBlockDto;
         const result = await service.createBlock(dto, userId, userRole, dto.forceOverride);
+        res.status(201).json(result);
+      } catch (err) {
+        next(err);
+      }
+    },
+
+    async convertToBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const id = Number(req.params.id);
+        const userId = req.currentUser!.userId;
+        const userRole = req.currentUser!.role;
+        const dto = req.body as ConvertToBlockDto;
+        const result = await service.convertToBlock(id, dto, userId, userRole, dto.forceOverride);
         res.status(201).json(result);
       } catch (err) {
         next(err);

@@ -15,6 +15,7 @@ import type {
   CreateBlockDto,
   MoveBlockDto,
   FindBlockPositionsDto,
+  ConvertToBlockDto,
 } from './assignment.schema';
 import { ConstraintEngine, validateStudentLink } from './validation/constraintEngine';
 import { ConstraintValidationError, type ConstraintViolation } from '../../shared/errors/ConstraintValidationError';
@@ -505,6 +506,146 @@ export class AssignmentService {
         });
         results.push(assignment);
       }
+      return results;
+    });
+
+    return { assignments, warnings: allWarnings };
+  }
+
+  async convertToBlock(id: number, dto: ConvertToBlockDto, userId: number, userRole: string, forceOverride?: boolean) {
+    const existing = await this.getById(id) as {
+      id: number; academicYearId: number; groupId: string | null; groupIndex: number | null;
+    };
+
+    const canForce = this.isAdmin(userRole) && forceOverride;
+    const weekCount = dto.shifts.length;
+    if (weekCount < 2) {
+      throw new AppError('Block must have at least 2 weeks', 400);
+    }
+
+    const weeks = this.computeBlockWeeks(dto.startDate, weekCount);
+
+    // Validate each week
+    const allWarnings: Array<{ weekIndex: number; warnings: unknown[] }> = [];
+    for (let i = 0; i < weeks.length; i++) {
+      const fullCheck = await validateWeekForDisplacement(
+        dto.departmentId,
+        dto.shifts[i],
+        dto.type,
+        dto.universityId,
+        weeks[i].startDate,
+        weeks[i].endDate,
+        dto.studentCount ?? null,
+        dto.yearInProgram,
+        [id],
+      );
+      if (!fullCheck.valid && !canForce) {
+        throw new AppError(
+          fullCheck.failureReason ?? 'Constraint violation on week ' + (i + 1),
+          422,
+        );
+      }
+
+      const warnings = await this.engine.validate({
+        departmentId: dto.departmentId,
+        universityId: dto.universityId,
+        startDate: weeks[i].startDate,
+        endDate: weeks[i].endDate,
+        type: dto.type,
+        shiftType: dto.shifts[i],
+        studentCount: dto.studentCount,
+        yearInProgram: dto.yearInProgram,
+        excludeAssignmentIds: [id],
+        academicYearId: existing.academicYearId,
+      }, true);
+      if (warnings.length > 0) {
+        allWarnings.push({ weekIndex: i, warnings });
+      }
+    }
+
+    const newGroupId = crypto.randomUUID();
+    const status = this.determineStatus(userRole);
+    const approvedById = this.isAdmin(userRole) ? userId : undefined;
+
+    const assignments = await prisma.$transaction(async (tx) => {
+      // 1. Collect student IDs before deleting the old assignment
+      const studentLinks = await tx.assignmentStudent.findMany({
+        where: { assignmentId: id },
+        select: { studentId: true },
+      });
+      const studentIds = studentLinks.map((l) => l.studentId);
+
+      // 2. If old assignment was part of a block, clean up the old block
+      if (existing.groupId) {
+        const siblings = await tx.assignment.findMany({
+          where: { groupId: existing.groupId },
+          orderBy: { groupIndex: 'asc' },
+        });
+        const remaining = siblings.filter((s) => s.id !== id);
+
+        if (remaining.length <= 1) {
+          // Dissolve the old block
+          for (const s of remaining) {
+            await tx.assignment.update({
+              where: { id: s.id },
+              data: { groupId: null, groupIndex: null },
+            });
+          }
+        } else {
+          // Re-index remaining siblings
+          for (let i = 0; i < remaining.length; i++) {
+            await tx.assignment.update({
+              where: { id: remaining[i].id },
+              data: { groupIndex: i },
+            });
+          }
+        }
+      }
+
+      // 3. Delete the old assignment (cascades AssignmentStudent links)
+      await tx.assignment.delete({ where: { id } });
+
+      // 4. Create the new block assignments
+      const results = [];
+      for (let i = 0; i < weeks.length; i++) {
+        const assignment = await tx.assignment.create({
+          data: {
+            departmentId: dto.departmentId,
+            universityId: dto.universityId,
+            academicYearId: existing.academicYearId,
+            startDate: weeks[i].startDate,
+            endDate: weeks[i].endDate,
+            type: dto.type,
+            shiftType: dto.shifts[i],
+            studentCount: dto.studentCount ?? null,
+            yearInProgram: dto.yearInProgram,
+            tutorName: dto.tutorName ?? null,
+            createdById: userId,
+            status,
+            ...(approvedById ? { approvedById } : {}),
+            groupId: newGroupId,
+            groupIndex: i,
+          },
+          include: {
+            university: { select: { name: true } },
+            department: { select: { name: true } },
+          },
+        });
+        results.push(assignment);
+      }
+
+      // 5. Re-create student links on the first assignment of the new block
+      if (studentIds.length > 0 && results.length > 0) {
+        for (const studentId of studentIds) {
+          await tx.assignmentStudent.create({
+            data: {
+              assignmentId: results[0].id,
+              studentId,
+            },
+          });
+        }
+      }
+
       return results;
     });
 

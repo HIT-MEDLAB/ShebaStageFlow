@@ -176,6 +176,19 @@ export interface CreateBlockDto {
   forceOverride?: boolean
 }
 
+export interface ConvertToBlockDto {
+  departmentId: number
+  universityId: number
+  startDate: string
+  endDate: string
+  type: AssignmentType
+  shifts: ShiftType[]
+  studentCount?: number | null
+  yearInProgram: number
+  tutorName?: string | null
+  forceOverride?: boolean
+}
+
 export interface MoveBlockDto {
   departmentId: number
   startDate: string

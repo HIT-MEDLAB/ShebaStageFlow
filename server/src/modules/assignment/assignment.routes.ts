@@ -17,6 +17,7 @@ import {
   createBlockSchema,
   moveBlockSchema,
   findBlockPositionsSchema,
+  convertToBlockSchema,
 } from './assignment.schema';
 import { AssignmentRepository } from './assignment.repository';
 import { AssignmentService } from './assignment.service';
@@ -53,6 +54,7 @@ assignmentRouter.patch('/:id/approve', adminOnly, controller.approve);
 assignmentRouter.patch('/:id/reject', adminOnly, validateRequest(rejectAssignmentSchema), controller.reject);
 assignmentRouter.patch('/:id/move', validateRequest(moveAssignmentSchema), controller.move);
 assignmentRouter.patch('/:id/displace', validateRequest(displaceAssignmentSchema), controller.displace);
+assignmentRouter.post('/:id/convert-to-block', validateRequest(convertToBlockSchema), controller.convertToBlock);
 assignmentRouter.patch('/:id/detach', adminOnly, controller.detachFromBlock);
 assignmentRouter.delete('/:id', controller.remove);
 assignmentRouter.post('/:id/students', validateRequest(addStudentSchema), controller.addStudent);
