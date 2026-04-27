@@ -282,7 +282,7 @@ export class ConstraintRepository implements IConstraintRepository {
     });
   }
 
-  async createUniversityWithSemester(data: CreateUniversityWithSemesterDto & { year: number }) {
+  async createUniversityWithSemester(data: CreateUniversityWithSemesterDto & { year?: number }) {
     return prisma.$transaction(async (tx) => {
       const university = await tx.university.create({
         data: {
@@ -291,20 +291,22 @@ export class ConstraintRepository implements IConstraintRepository {
         },
       });
 
-      await tx.universitySemester.create({
-        data: {
-          universityId: university.id,
-          semesterStart: data.semesterStart,
-          semesterEnd: data.semesterEnd,
-          year: data.year,
-          priority: data.priority ?? 0,
-          isActive: true,
-        },
-      });
+      if (data.semesterStart && data.semesterEnd && data.year) {
+        await tx.universitySemester.create({
+          data: {
+            universityId: university.id,
+            semesterStart: data.semesterStart,
+            semesterEnd: data.semesterEnd,
+            year: data.year,
+            priority: data.priority ?? 0,
+            isActive: true,
+          },
+        });
+      }
 
       return tx.university.findUniqueOrThrow({
         where: { id: university.id },
-        include: { semesters: { where: { year: data.year }, orderBy: { year: 'desc' } } },
+        include: { semesters: { where: { ...(data.year ? { year: data.year } : {}) }, orderBy: { year: 'desc' } } },
       });
     });
   }

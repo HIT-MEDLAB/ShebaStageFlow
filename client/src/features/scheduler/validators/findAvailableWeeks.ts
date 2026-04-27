@@ -11,6 +11,9 @@ export function findAvailableWeeks(
   context: ValidationContext,
   maxResults = 3,
 ): WeekDefinition[] {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
   // Sort weeks by distance from origin (closest first)
   const sortedWeeks = [...context.weeks].sort(
     (a, b) =>
@@ -23,6 +26,9 @@ export function findAvailableWeeks(
   for (const week of sortedWeeks) {
     // Skip the origin week itself
     if (week.weekNumber === originWeekNum) continue
+
+    // Skip weeks in the past
+    if (week.startDate < today) continue
 
     const result = validateDrop(
       displacedAssignment,
@@ -69,6 +75,9 @@ export function findAvailableBlockWeeks(
     ),
   }
 
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
   const available: WeekDefinition[] = []
 
   // Try all possible starting positions, sorted by distance from origin
@@ -81,6 +90,8 @@ export function findAvailableBlockWeeks(
     )
 
   for (const startWeek of startPositions) {
+    // Skip windows that start in the past
+    if (startWeek.startDate < today) continue
     const startIdx = weeks.findIndex((w) => w.weekNumber === startWeek.weekNumber)
     if (startIdx === -1) continue
 

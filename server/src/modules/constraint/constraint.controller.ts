@@ -128,8 +128,11 @@ export function createConstraintController(service: ConstraintService) {
 
     async createUniversityWithSemester(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
-        const year = new Date(req.body.semesterStart).getUTCFullYear();
-        const result = await service.createUniversityWithSemester({ ...req.body, year });
+        const data = { ...req.body };
+        if (req.body.semesterStart) {
+          data.year = new Date(req.body.semesterStart).getUTCFullYear();
+        }
+        const result = await service.createUniversityWithSemester(data);
         res.status(201).json(result);
       } catch (err) {
         next(err);

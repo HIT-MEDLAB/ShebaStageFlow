@@ -23,11 +23,24 @@ export const departmentFormSchema = z.object({
 
 export type DepartmentFormValues = z.infer<typeof departmentFormSchema>
 
-export const universityFormSchema = z.object({
-  name: z.string().min(1),
-  priority: z.coerce.number().int().min(0).optional(),
-  semesterStart: z.string().min(1),
-  semesterEnd: z.string().min(1),
-})
+export const universityFormSchema = z
+  .object({
+    name: z.string().min(1),
+    priority: z.coerce.number().int().min(0).optional(),
+    semesterStart: z.string().optional().default(''),
+    semesterEnd: z.string().optional().default(''),
+  })
+  .refine(
+    (data) => {
+      if (data.semesterStart && data.semesterEnd) {
+        return data.semesterEnd >= data.semesterStart
+      }
+      return true
+    },
+    {
+      message: 'endBeforeStart',
+      path: ['semesterEnd'],
+    },
+  )
 
 export type UniversityFormValues = z.infer<typeof universityFormSchema>

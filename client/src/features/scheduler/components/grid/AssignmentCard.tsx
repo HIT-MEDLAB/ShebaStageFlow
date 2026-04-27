@@ -113,8 +113,8 @@ export function AssignmentCard({ assignment, blockInfo }: AssignmentCardProps) {
       </div>
 
       <div className="mt-1 text-[#1E2A5E]/60 text-xs">
-        {assignment.studentCount
-          ? `${assignment.studentCount}`
+        {assignment.assignedStudentCount > 0
+          ? `${assignment.assignedStudentCount}`
           : t('card.noStudents')}
       </div>
     </div>

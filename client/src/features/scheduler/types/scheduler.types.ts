@@ -32,6 +32,7 @@ export interface Assignment {
   createdByName?: string | null
   groupId?: string | null
   groupIndex?: number | null
+  assignedStudentCount: number
 }
 
 export interface Department {
@@ -165,6 +166,19 @@ export interface CreateBlockDto {
   departmentId: number
   universityId: number
   academicYearId: number
+  startDate: string
+  endDate: string
+  type: AssignmentType
+  shifts: ShiftType[]
+  studentCount?: number | null
+  yearInProgram: number
+  tutorName?: string | null
+  forceOverride?: boolean
+}
+
+export interface ConvertToBlockDto {
+  departmentId: number
+  universityId: number
   startDate: string
   endDate: string
   type: AssignmentType
