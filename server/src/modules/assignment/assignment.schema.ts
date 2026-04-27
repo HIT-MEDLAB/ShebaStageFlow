@@ -20,14 +20,23 @@ export const createAssignmentSchema = z.object({
 export const updateAssignmentSchema = z.object({
   departmentId: z.number().int().positive().optional(),
   universityId: z.number().int().positive().optional(),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
+  startDate: z.coerce.date().refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' }).optional(),
+  endDate: z.coerce.date().refine((d) => d.getUTCDay() === 4, { message: 'End date must be a Thursday' }).optional(),
   type: z.enum(['GROUP', 'ELECTIVE']).optional(),
   shiftType: z.enum(['MORNING', 'EVENING']).optional(),
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
   studentCount: z.number().int().positive().optional().nullable(),
   yearInProgram: z.number().int().min(1).max(6).optional(),
   tutorName: z.string().optional().nullable(),
+  forceOverride: z.boolean().optional(),
+}).refine((data) => {
+  if (data.startDate && data.endDate) {
+    return data.endDate > data.startDate;
+  }
+  return true;
+}, {
+  message: 'End date must be after start date',
+  path: ['endDate'],
 });
 
 export const moveAssignmentSchema = z.object({

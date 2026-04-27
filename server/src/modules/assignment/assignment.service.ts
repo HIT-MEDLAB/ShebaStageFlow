@@ -75,9 +75,29 @@ export class AssignmentService {
     return { ...result, warnings };
   }
 
-  async update(id: number, dto: UpdateAssignmentDto) {
-    await this.getById(id);
-    return this.repository.update(id, dto);
+  async update(id: number, dto: UpdateAssignmentDto, userId: number, userRole: string, forceOverride?: boolean) {
+    const existing = await this.getById(id) as {
+      departmentId: number; universityId: number; startDate: Date; endDate: Date;
+      type: 'GROUP' | 'ELECTIVE'; shiftType: 'MORNING' | 'EVENING';
+      studentCount: number | null; yearInProgram: number | null; academicYearId: number | null;
+    };
+
+    const canForce = this.isAdmin(userRole) && forceOverride;
+    const warnings = await this.engine.validate({
+      departmentId: dto.departmentId ?? existing.departmentId,
+      universityId: dto.universityId ?? existing.universityId,
+      startDate: dto.startDate ?? existing.startDate,
+      endDate: dto.endDate ?? existing.endDate,
+      type: dto.type ?? existing.type,
+      shiftType: dto.shiftType ?? existing.shiftType,
+      studentCount: dto.studentCount !== undefined ? dto.studentCount : existing.studentCount,
+      yearInProgram: dto.yearInProgram ?? existing.yearInProgram,
+      excludeAssignmentIds: [id],
+      academicYearId: existing.academicYearId,
+    }, canForce);
+
+    const result = await this.repository.update(id, dto);
+    return { ...result, warnings };
   }
 
   async move(id: number, dto: MoveAssignmentDto, userId: number, userRole: string, forceOverride?: boolean) {

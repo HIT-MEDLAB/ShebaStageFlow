@@ -129,9 +129,15 @@ export function createAssignmentController(service: AssignmentService) {
 
     async update(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
+        const userId = req.currentUser!.userId;
+        const userRole = req.currentUser!.role;
+        const dto = req.body as UpdateAssignmentDto;
         const assignment = await service.update(
           Number(req.params.id),
-          req.body as UpdateAssignmentDto,
+          dto,
+          userId,
+          userRole,
+          dto.forceOverride,
         );
         res.json(assignment);
       } catch (err) {
