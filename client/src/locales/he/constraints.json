@@ -90,6 +90,9 @@
     "archivedBadge": "בארכיון",
     "notConfigured": "לא מוגדר לשנה זו"
   },
+  "validation": {
+    "endBeforeStart": "תאריך הסיום לא יכול להיות לפני תאריך ההתחלה"
+  },
   "toast": {
     "constraintCreated": "האילוץ נוצר בהצלחה",
     "constraintUpdated": "האילוץ עודכן בהצלחה",

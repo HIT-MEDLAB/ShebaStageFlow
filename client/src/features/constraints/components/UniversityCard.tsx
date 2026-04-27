@@ -269,7 +269,11 @@ export function UniversityCard({
               <Label>{t('university.semesterEnd')}</Label>
               <Input type="date" {...register('semesterEnd')} />
               {errors.semesterEnd && (
-                <p className="text-sm text-destructive">{errors.semesterEnd.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.semesterEnd.message === 'endBeforeStart'
+                    ? t('validation.endBeforeStart')
+                    : errors.semesterEnd.message}
+                </p>
               )}
             </div>
           </div>

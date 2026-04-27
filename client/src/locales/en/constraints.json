@@ -90,6 +90,9 @@
     "archivedBadge": "Archived",
     "notConfigured": "Not configured for this year"
   },
+  "validation": {
+    "endBeforeStart": "End date cannot be before start date"
+  },
   "toast": {
     "constraintCreated": "Constraint created successfully",
     "constraintUpdated": "Constraint updated successfully",

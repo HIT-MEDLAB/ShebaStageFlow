@@ -130,8 +130,8 @@ export interface UpdateDepartmentData {
 export interface CreateUniversityData {
   name: string
   priority?: number
-  semesterStart: string
-  semesterEnd: string
+  semesterStart?: string
+  semesterEnd?: string
 }
 
 export interface UpdateUniversityData {

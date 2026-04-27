@@ -44,19 +44,39 @@ export const updateDepartmentSchema = z.object({
   electiveCapacity: z.number().int().min(0).optional(),
 });
 
-export const createUniversityWithSemesterSchema = z.object({
-  name: z.string().min(1),
-  priority: z.number().int().min(0).optional(),
-  semesterStart: z.coerce.date(),
-  semesterEnd: z.coerce.date(),
-});
+export const createUniversityWithSemesterSchema = z
+  .object({
+    name: z.string().min(1),
+    priority: z.number().int().min(0).optional(),
+    semesterStart: z.coerce.date().optional(),
+    semesterEnd: z.coerce.date().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.semesterStart && data.semesterEnd) {
+        return data.semesterEnd >= data.semesterStart;
+      }
+      return true;
+    },
+    { message: 'End date cannot be before start date', path: ['semesterEnd'] },
+  );
 
-export const updateUniversityWithSemesterSchema = z.object({
-  name: z.string().min(1).optional(),
-  priority: z.number().int().min(0).optional(),
-  semesterStart: z.coerce.date().optional(),
-  semesterEnd: z.coerce.date().optional(),
-});
+export const updateUniversityWithSemesterSchema = z
+  .object({
+    name: z.string().min(1).optional(),
+    priority: z.number().int().min(0).optional(),
+    semesterStart: z.coerce.date().optional(),
+    semesterEnd: z.coerce.date().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.semesterStart && data.semesterEnd) {
+        return data.semesterEnd >= data.semesterStart;
+      }
+      return true;
+    },
+    { message: 'End date cannot be before start date', path: ['semesterEnd'] },
+  );
 
 export const setDepartmentActiveSchema = z.object({
   isActive: z.boolean(),

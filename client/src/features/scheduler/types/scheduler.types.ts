@@ -32,6 +32,7 @@ export interface Assignment {
   createdByName?: string | null
   groupId?: string | null
   groupIndex?: number | null
+  assignedStudentCount: number
 }
 
 export interface Department {

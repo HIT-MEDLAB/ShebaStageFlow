@@ -24,19 +24,21 @@ import type {
 } from '../types/scheduler.types'
 
 // Raw shape from the API (Prisma includes nested relations)
-interface RawAssignment extends Omit<Assignment, 'universityName' | 'departmentName' | 'createdByName'> {
+interface RawAssignment extends Omit<Assignment, 'universityName' | 'departmentName' | 'createdByName' | 'assignedStudentCount'> {
   university: { name: string }
   department: { name: string }
   createdBy?: { name: string | null; email: string }
+  _count?: { students: number }
 }
 
 function mapAssignment(raw: RawAssignment): Assignment {
-  const { university, department, createdBy, ...rest } = raw
+  const { university, department, createdBy, _count, ...rest } = raw
   return {
     ...rest,
     universityName: university.name,
     departmentName: department.name,
     createdByName: createdBy?.name ?? createdBy?.email ?? null,
+    assignedStudentCount: _count?.students ?? 0,
   }
 }
 

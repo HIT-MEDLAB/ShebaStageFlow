@@ -78,6 +78,7 @@ export class AssignmentRepository implements IAssignmentRepository {
         university: { select: { name: true } },
         department: { select: { name: true } },
         createdBy: { select: { name: true, email: true } },
+        _count: { select: { students: true } },
       },
       orderBy: { startDate: 'asc' },
     });
