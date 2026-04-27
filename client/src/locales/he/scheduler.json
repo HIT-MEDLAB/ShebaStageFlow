@@ -46,6 +46,9 @@
       "noSemesterDefined": "לא הוגדר סמסטר לאוניברסיטה זו",
       "noCapacityDefined": "לא הוגדרה מגבלת קיבולת למחלקה זו",
       "noConstraintsConfigured": "לא הוגדרו אילוצים פעילים במערכת"
+    },
+    "notice": {
+      "shortenedWeek": "שבוע מקוצר — {{name}}"
     }
   },
   "card": {

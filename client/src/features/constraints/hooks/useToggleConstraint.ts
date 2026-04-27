@@ -39,8 +39,8 @@ export function useToggleConstraint() {
   })
 
   const softMutation = useMutation({
-    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
-      toggleSoftConstraint(id, isActive),
+    mutationFn: ({ id, isActive, blocksWeek }: { id: number; isActive: boolean; blocksWeek?: boolean }) =>
+      toggleSoftConstraint(id, isActive, blocksWeek),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
       queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })
@@ -52,8 +52,8 @@ export function useToggleConstraint() {
   })
 
   const holidayMutation = useMutation({
-    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
-      toggleHoliday(id, isActive),
+    mutationFn: ({ id, isActive, blocksWeek }: { id: number; isActive: boolean; blocksWeek?: boolean }) =>
+      toggleHoliday(id, isActive, blocksWeek),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
       queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })

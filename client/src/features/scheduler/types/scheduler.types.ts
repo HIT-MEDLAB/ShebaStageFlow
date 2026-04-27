@@ -57,7 +57,7 @@ export interface WeekDefinition {
 }
 
 export interface BlockReason {
-  type: 'holiday' | 'dateBlock' | 'capacityFull' | 'softConstraint' | 'dateConstraint' | 'warning'
+  type: 'holiday' | 'holidayNotice' | 'dateBlock' | 'capacityFull' | 'softConstraint' | 'dateConstraint' | 'warning'
   description: string
   constraintName?: string
 }
@@ -87,6 +87,7 @@ export interface Holiday {
   name: string
   date: string
   year: number
+  blocksWeek: boolean
 }
 
 export interface Student {
@@ -106,6 +107,7 @@ export interface SoftConstraintData {
   departmentId: number | null
   startDate: string
   endDate: string
+  blocksWeek: boolean
 }
 
 export interface DateConstraintData {

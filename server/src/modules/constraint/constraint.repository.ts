@@ -131,8 +131,12 @@ export class ConstraintRepository implements IConstraintRepository {
     return prisma.softConstraint.delete({ where: { id } });
   }
 
-  async toggleSoftConstraint(id: number, isActive: boolean) {
-    return prisma.softConstraint.update({ where: { id }, data: { isActive } });
+  async toggleSoftConstraint(id: number, isActive: boolean, blocksWeek?: boolean) {
+    const data: { isActive: boolean; blocksWeek?: boolean } = { isActive };
+    if (blocksWeek !== undefined) {
+      data.blocksWeek = blocksWeek;
+    }
+    return prisma.softConstraint.update({ where: { id }, data });
   }
 
   // ─── Holidays ──────────────────────────────────────────────
@@ -141,8 +145,12 @@ export class ConstraintRepository implements IConstraintRepository {
     return prisma.holiday.findMany({ orderBy: { date: 'asc' } });
   }
 
-  async toggleHoliday(id: number, isActive: boolean) {
-    return prisma.holiday.update({ where: { id }, data: { isActive } });
+  async toggleHoliday(id: number, isActive: boolean, blocksWeek?: boolean) {
+    const data: { isActive: boolean; blocksWeek?: boolean } = { isActive };
+    if (blocksWeek !== undefined) {
+      data.blocksWeek = blocksWeek;
+    }
+    return prisma.holiday.update({ where: { id }, data });
   }
 
   async findHolidayById(id: number) {

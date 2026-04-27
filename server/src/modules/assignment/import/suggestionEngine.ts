@@ -48,10 +48,11 @@ export async function validateWeekForDisplacement(
   yearInProgram: number,
   excludeAssignmentIds: number[],
 ): Promise<{ valid: boolean; failureReason?: string; failureParams?: Record<string, string | number> }> {
-  // Check holidays
+  // Check holidays (only block when blocksWeek is true)
   const holiday = await prisma.holiday.findFirst({
     where: {
       isActive: true,
+      blocksWeek: true,
       date: { gte: startDate, lte: endDate },
     },
   });

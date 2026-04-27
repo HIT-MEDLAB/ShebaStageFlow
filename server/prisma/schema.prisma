@@ -254,6 +254,7 @@ model SoftConstraint {
   description  String
   priority     Int         @default(0)
   isActive     Boolean     @default(true)
+  blocksWeek   Boolean     @default(true)
   departmentId Int?
   universityId Int?
   startDate    DateTime?
@@ -274,7 +275,8 @@ model Holiday {
   date      DateTime
   isFullDay Boolean  @default(true)
   year      Int
-  isActive  Boolean  @default(true)
+  isActive   Boolean  @default(true)
+  blocksWeek Boolean  @default(true)
 
   createdAt DateTime @default(now())
 

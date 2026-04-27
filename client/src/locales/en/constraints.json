@@ -93,6 +93,14 @@
   "validation": {
     "endBeforeStart": "End date cannot be before start date"
   },
+  "holidayToggle": {
+    "title": "Activate Constraint: {{name}}",
+    "description": "How should this constraint affect the scheduler?",
+    "blockWeek": "Block entire week",
+    "keepOpen": "Keep week open (shortened)",
+    "blocksWeekBadge": "Blocks week",
+    "shortenedWeekBadge": "Shortened week"
+  },
   "toast": {
     "constraintCreated": "Constraint created successfully",
     "constraintUpdated": "Constraint updated successfully",

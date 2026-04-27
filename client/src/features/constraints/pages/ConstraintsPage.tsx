@@ -252,7 +252,7 @@ export function ConstraintsPage() {
             isAdmin={isAdmin}
             onToggleIron={(id, isActive) => ironMutation.mutate({ id, isActive })}
             onToggleDate={(id, isActive) => dateMutation.mutate({ id, isActive })}
-            onToggleHoliday={(id, isActive) => holidayMutation.mutate({ id, isActive })}
+            onToggleHoliday={(id, isActive, blocksWeek) => holidayMutation.mutate({ id, isActive, blocksWeek })}
           />
         </TabsContent>
 
@@ -262,7 +262,7 @@ export function ConstraintsPage() {
             departments={data.departments}
             universities={data.universities}
             isAdmin={isAdmin}
-            onToggle={(id, isActive) => softMutation.mutate({ id, isActive })}
+            onToggle={(id, isActive, blocksWeek) => softMutation.mutate({ id, isActive, blocksWeek })}
             onCreate={handleCreateSoft}
             onUpdate={handleUpdateSoft}
             onDelete={(id) => deleteMutation.mutate(id)}

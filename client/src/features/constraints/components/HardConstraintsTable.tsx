@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import {
@@ -10,6 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConstraintToggle } from './ConstraintToggle'
+import { HolidayToggleDialog } from './HolidayToggleDialog'
 import type { IronConstraint, DateConstraint, Holiday } from '../types/constraints.types'
 
 interface HardConstraintsTableProps {
@@ -19,7 +21,7 @@ interface HardConstraintsTableProps {
   isAdmin: boolean
   onToggleIron: (id: number, isActive: boolean) => void
   onToggleDate: (id: number, isActive: boolean) => void
-  onToggleHoliday: (id: number, isActive: boolean) => void
+  onToggleHoliday: (id: number, isActive: boolean, blocksWeek?: boolean) => void
 }
 
 export function HardConstraintsTable({
@@ -32,6 +34,24 @@ export function HardConstraintsTable({
   onToggleHoliday,
 }: HardConstraintsTableProps) {
   const { t } = useTranslation('constraints')
+  const [pendingHoliday, setPendingHoliday] = useState<Holiday | null>(null)
+
+  function handleHolidayToggle(holiday: Holiday, checked: boolean) {
+    if (checked) {
+      // Show dialog to ask admin about blocking behavior
+      setPendingHoliday(holiday)
+    } else {
+      // Deactivating — no dialog needed
+      onToggleHoliday(holiday.id, false)
+    }
+  }
+
+  function handleDialogConfirm(blocksWeek: boolean) {
+    if (pendingHoliday) {
+      onToggleHoliday(pendingHoliday.id, true, blocksWeek)
+    }
+    setPendingHoliday(null)
+  }
 
   return (
     <Card>
@@ -86,7 +106,22 @@ export function HardConstraintsTable({
 
         {holidays.map((h) => (
           <TableRow key={`holiday-${h.id}`}>
-            <TableCell className="font-medium">{h.name}</TableCell>
+            <TableCell className="font-medium">
+              {h.name}
+              {h.isActive && (
+                <span
+                  className={`ms-2 inline-block text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                    h.blocksWeek
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-amber-100 text-amber-700'
+                  }`}
+                >
+                  {h.blocksWeek
+                    ? t('holidayToggle.blocksWeekBadge')
+                    : t('holidayToggle.shortenedWeekBadge')}
+                </span>
+              )}
+            </TableCell>
             <TableCell>
               {format(new Date(h.date), 'dd/MM/yyyy')}
               <span className="text-xs text-muted-foreground ms-2">
@@ -98,7 +133,7 @@ export function HardConstraintsTable({
               <ConstraintToggle
                 checked={h.isActive}
                 disabled={!isAdmin}
-                onToggle={(checked) => onToggleHoliday(h.id, checked)}
+                onToggle={(checked) => handleHolidayToggle(h, checked)}
               />
             </TableCell>
           </TableRow>
@@ -113,6 +148,13 @@ export function HardConstraintsTable({
         )}
       </TableBody>
     </Table>
+
+    <HolidayToggleDialog
+      open={!!pendingHoliday}
+      onOpenChange={(open) => { if (!open) setPendingHoliday(null) }}
+      constraintName={pendingHoliday?.name ?? null}
+      onConfirm={handleDialogConfirm}
+    />
       </CardContent>
     </Card>
   )

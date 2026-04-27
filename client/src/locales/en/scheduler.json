@@ -46,6 +46,9 @@
       "noSemesterDefined": "No semester defined for this university",
       "noCapacityDefined": "No capacity limit defined for this department",
       "noConstraintsConfigured": "No active constraints configured in the system"
+    },
+    "notice": {
+      "shortenedWeek": "Shortened week — {{name}}"
     }
   },
   "card": {

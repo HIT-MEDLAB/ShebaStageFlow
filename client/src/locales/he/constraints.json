@@ -93,6 +93,14 @@
   "validation": {
     "endBeforeStart": "תאריך הסיום לא יכול להיות לפני תאריך ההתחלה"
   },
+  "holidayToggle": {
+    "title": "הפעלת אילוץ: {{name}}",
+    "description": "כיצד האילוץ ישפיע על לוח השיבוצים?",
+    "blockWeek": "חסום את כל השבוע",
+    "keepOpen": "השאר שבוע פתוח (מקוצר)",
+    "blocksWeekBadge": "חוסם שבוע",
+    "shortenedWeekBadge": "שבוע מקוצר"
+  },
   "toast": {
     "constraintCreated": "האילוץ נוצר בהצלחה",
     "constraintUpdated": "האילוץ עודכן בהצלחה",

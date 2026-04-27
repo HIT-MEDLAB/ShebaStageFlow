@@ -4,6 +4,11 @@ export const toggleConstraintSchema = z.object({
   isActive: z.boolean(),
 });
 
+export const toggleHolidaySchema = z.object({
+  isActive: z.boolean(),
+  blocksWeek: z.boolean().optional(),
+});
+
 export const createSoftConstraintSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
@@ -12,7 +17,15 @@ export const createSoftConstraintSchema = z.object({
   universityId: z.number().int().positive().optional().nullable(),
   startDate: z.coerce.date().optional().nullable(),
   endDate: z.coerce.date().optional().nullable(),
-});
+}).refine(
+  (data) => {
+    if (data.startDate && data.endDate) {
+      return data.endDate >= data.startDate;
+    }
+    return true;
+  },
+  { message: 'End date cannot be before start date', path: ['endDate'] },
+);
 
 export const updateSoftConstraintSchema = z.object({
   name: z.string().min(1).optional(),
@@ -95,6 +108,7 @@ export const copyYearSchema = z.object({
 
 // Export inferred types
 export type ToggleConstraintDto = z.infer<typeof toggleConstraintSchema>;
+export type ToggleHolidayDto = z.infer<typeof toggleHolidaySchema>;
 export type CreateSoftConstraintDto = z.infer<typeof createSoftConstraintSchema>;
 export type UpdateSoftConstraintDto = z.infer<typeof updateSoftConstraintSchema>;
 export type CreateDepartmentDto = z.infer<typeof createDepartmentSchema>;

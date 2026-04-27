@@ -129,10 +129,11 @@ export class ImportValidationService {
       tutorName: row.tutorName ?? null,
     };
 
-    // 2. Check holidays
+    // 2. Check holidays (only block when blocksWeek is true)
     const holiday = await prisma.holiday.findFirst({
       where: {
         isActive: true,
+        blocksWeek: true,
         date: { gte: dto.startDate, lte: dto.endDate },
       },
     });

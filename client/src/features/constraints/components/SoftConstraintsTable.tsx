@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConstraintToggle } from './ConstraintToggle'
 import { SoftConstraintDialog } from './SoftConstraintDialog'
+import { HolidayToggleDialog } from './HolidayToggleDialog'
 import type { SoftConstraint, DepartmentWithConstraint, UniversityWithSemester } from '../types/constraints.types'
 import type { SoftConstraintFormValues } from '../schemas/constraints.schemas'
 
@@ -33,7 +34,7 @@ interface SoftConstraintsTableProps {
   departments: DepartmentWithConstraint[]
   universities: UniversityWithSemester[]
   isAdmin: boolean
-  onToggle: (id: number, isActive: boolean) => void
+  onToggle: (id: number, isActive: boolean, blocksWeek?: boolean) => void
   onCreate: (data: SoftConstraintFormValues) => void
   onUpdate: (id: number, data: SoftConstraintFormValues) => void
   onDelete: (id: number) => void
@@ -56,6 +57,7 @@ export function SoftConstraintsTable({
   const { t } = useTranslation('constraints')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingConstraint, setEditingConstraint] = useState<SoftConstraint | null>(null)
+  const [pendingToggle, setPendingToggle] = useState<SoftConstraint | null>(null)
 
   function handleAdd() {
     setEditingConstraint(null)
@@ -65,6 +67,21 @@ export function SoftConstraintsTable({
   function handleEdit(constraint: SoftConstraint) {
     setEditingConstraint(constraint)
     setDialogOpen(true)
+  }
+
+  function handleToggle(constraint: SoftConstraint, checked: boolean) {
+    if (checked) {
+      setPendingToggle(constraint)
+    } else {
+      onToggle(constraint.id, false)
+    }
+  }
+
+  function handleToggleConfirm(blocksWeek: boolean) {
+    if (pendingToggle) {
+      onToggle(pendingToggle.id, true, blocksWeek)
+    }
+    setPendingToggle(null)
   }
 
   function handleSubmit(data: SoftConstraintFormValues) {
@@ -105,7 +122,22 @@ export function SoftConstraintsTable({
         <TableBody>
           {softConstraints.map((c) => (
             <TableRow key={c.id}>
-              <TableCell className="font-medium">{c.name}</TableCell>
+              <TableCell className="font-medium">
+                {c.name}
+                {c.isActive && (
+                  <span
+                    className={`ms-2 inline-block text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                      c.blocksWeek
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-amber-100 text-amber-700'
+                    }`}
+                  >
+                    {c.blocksWeek
+                      ? t('holidayToggle.blocksWeekBadge')
+                      : t('holidayToggle.shortenedWeekBadge')}
+                  </span>
+                )}
+              </TableCell>
               <TableCell>{c.description}</TableCell>
               <TableCell>
                 <Badge variant="secondary">{c.priority}</Badge>
@@ -119,7 +151,7 @@ export function SoftConstraintsTable({
                 <ConstraintToggle
                   checked={c.isActive}
                   disabled={!isAdmin}
-                  onToggle={(checked) => onToggle(c.id, checked)}
+                  onToggle={(checked) => handleToggle(c, checked)}
                 />
               </TableCell>
               {isAdmin && (
@@ -183,6 +215,13 @@ export function SoftConstraintsTable({
         universities={universities}
         onSubmit={handleSubmit}
         isPending={editingConstraint ? isUpdatePending : isCreatePending}
+      />
+
+      <HolidayToggleDialog
+        open={!!pendingToggle}
+        onOpenChange={(open) => { if (!open) setPendingToggle(null) }}
+        constraintName={pendingToggle?.name ?? null}
+        onConfirm={handleToggleConfirm}
       />
     </>
   )

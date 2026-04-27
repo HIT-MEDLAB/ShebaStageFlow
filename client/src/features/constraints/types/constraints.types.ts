@@ -20,6 +20,7 @@ export interface SoftConstraint {
   description: string
   priority: number
   isActive: boolean
+  blocksWeek: boolean
   departmentId: number | null
   universityId: number | null
   startDate: string | null
@@ -35,6 +36,7 @@ export interface Holiday {
   isFullDay: boolean
   year: number
   isActive: boolean
+  blocksWeek: boolean
 }
 
 export interface DepartmentConstraintData {

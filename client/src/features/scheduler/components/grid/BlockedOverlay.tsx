@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { CalendarOff, Lock, AlertTriangle, ShieldAlert } from 'lucide-react'
+import { CalendarOff, CalendarDays, Lock, AlertTriangle, ShieldAlert } from 'lucide-react'
 import {
   Tooltip,
   TooltipContent,
@@ -42,6 +42,11 @@ const blockConfig: Record<string, {
     icon: ShieldAlert,
     bgClass: 'bg-[#f1f5f9] border-dashed border-slate-300',
     textKey: 'grid.blocked.softConstraint',
+  },
+  holidayNotice: {
+    icon: CalendarDays,
+    bgClass: 'bg-amber-50/50 border-dashed border-amber-200',
+    textKey: 'grid.notice.shortenedWeek',
   },
 }
 

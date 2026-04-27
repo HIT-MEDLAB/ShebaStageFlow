@@ -18,15 +18,22 @@ export function useBlockedCells(
     if (!constraints || !weeks.length) return blocked
 
     // Holiday blocking: if any holiday date falls within a week's Sun-Thu range,
-    // block ALL departments for that week (hospital-wide closure)
+    // either block the week (blocksWeek=true) or show a notice (blocksWeek=false)
     for (const week of weeks) {
       for (const holiday of constraints.holidays) {
         const holidayDate = startOfDay(new Date(holiday.date))
         if (holidayDate >= week.startDate && holidayDate <= week.endDate) {
-          blocked.set(`holiday:week:${week.weekNumber}`, {
-            type: 'holiday',
-            description: holiday.name,
-          })
+          if (holiday.blocksWeek !== false) {
+            blocked.set(`holiday:week:${week.weekNumber}`, {
+              type: 'holiday',
+              description: holiday.name,
+            })
+          } else {
+            blocked.set(`holidayNotice:week:${week.weekNumber}`, {
+              type: 'holidayNotice',
+              description: holiday.name,
+            })
+          }
         }
       }
     }
@@ -69,30 +76,54 @@ export function useBlockedCells(
       }
     }
 
-    // Soft constraint blocks (treated as hard blocks — cells are disabled)
+    // Soft constraint blocks — hard block when blocksWeek=true, notice when false
     if (constraints.softConstraints) {
       for (const sc of constraints.softConstraints) {
         const scStart = startOfDay(new Date(sc.startDate))
         const scEnd = startOfDay(new Date(sc.endDate))
         for (const week of weeks) {
           if (week.startDate <= scEnd && week.endDate >= scStart) {
-            if (sc.departmentId) {
-              const key = `soft:dept:${sc.departmentId}:week:${week.weekNumber}`
-              if (!blocked.has(key)) {
-                blocked.set(key, {
-                  type: 'softConstraint',
-                  description: sc.description,
-                  constraintName: sc.name,
-                })
+            if (sc.blocksWeek !== false) {
+              // Hard block
+              if (sc.departmentId) {
+                const key = `soft:dept:${sc.departmentId}:week:${week.weekNumber}`
+                if (!blocked.has(key)) {
+                  blocked.set(key, {
+                    type: 'softConstraint',
+                    description: sc.description,
+                    constraintName: sc.name,
+                  })
+                }
+              } else {
+                const key = `soft:week:${week.weekNumber}`
+                if (!blocked.has(key)) {
+                  blocked.set(key, {
+                    type: 'softConstraint',
+                    description: sc.description,
+                    constraintName: sc.name,
+                  })
+                }
               }
             } else {
-              const key = `soft:week:${week.weekNumber}`
-              if (!blocked.has(key)) {
-                blocked.set(key, {
-                  type: 'softConstraint',
-                  description: sc.description,
-                  constraintName: sc.name,
-                })
+              // Notice — week is shortened but open
+              if (sc.departmentId) {
+                const key = `softNotice:dept:${sc.departmentId}:week:${week.weekNumber}`
+                if (!blocked.has(key)) {
+                  blocked.set(key, {
+                    type: 'holidayNotice',
+                    description: sc.name,
+                    constraintName: sc.name,
+                  })
+                }
+              } else {
+                const key = `softNotice:week:${week.weekNumber}`
+                if (!blocked.has(key)) {
+                  blocked.set(key, {
+                    type: 'holidayNotice',
+                    description: sc.name,
+                    constraintName: sc.name,
+                  })
+                }
               }
             }
           }
