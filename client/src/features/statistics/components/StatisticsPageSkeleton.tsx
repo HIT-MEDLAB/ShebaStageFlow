@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function StatisticsPageSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6">
       {Array.from({ length: 4 }).map((_, i) => (
         <Card key={i}>
           <CardHeader className="flex flex-row items-center justify-between">

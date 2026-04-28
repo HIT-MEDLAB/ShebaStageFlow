@@ -24,21 +24,20 @@ export function UniversityWeekCountChart({ data }: UniversityWeekCountChartProps
 
   return (
     <ChartContainer config={chartConfig} className="h-[300px] w-full">
-      <BarChart data={data} layout="vertical" accessibilityLayer>
-        <CartesianGrid horizontal={false} />
-        <XAxis type="number" tickLine={false} axisLine={false} allowDecimals={false} />
-        <YAxis
+      <BarChart data={data} accessibilityLayer>
+        <CartesianGrid vertical={false} />
+        <XAxis
           dataKey="universityName"
-          type="category"
           tickLine={false}
+          tickMargin={10}
           axisLine={false}
-          width={120}
         />
+        <YAxis tickLine={false} axisLine={false} allowDecimals={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar
           dataKey="weekCount"
           fill="var(--color-weekCount)"
-          radius={[0, 4, 4, 0]}
+          radius={[4, 4, 0, 0]}
         />
       </BarChart>
     </ChartContainer>
