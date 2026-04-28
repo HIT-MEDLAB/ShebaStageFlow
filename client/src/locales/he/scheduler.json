@@ -5,7 +5,9 @@
     "importExcel": "ייבוא מאקסל",
     "smartImport": "ייבוא חכם מאקסל",
     "exportExcel": "ייצוא לאקסל",
-    "academicYear": "שנת לימודים"
+    "academicYear": "שנת לימודים",
+    "clearAll": "מחק הכל",
+    "clearAllConfirm": "האם אתה בטוח שברצונך למחוק את כל השיבוצים? לא ניתן לבטל פעולה זו."
   },
   "filters": {
     "university": "אוניברסיטה",
@@ -212,6 +214,8 @@
     "overrideSuccess": "השיבוץ בוצע (דריסת מנהל)",
     "blockCreated": "בלוק רב-שבועי נוצר בהצלחה",
     "blockMoved": "הבלוק הועבר בהצלחה",
+    "allAssignmentsCleared": "כל השיבוצים נמחקו ({{count}} נמחקו)",
+    "clearAllFailed": "מחיקת השיבוצים נכשלה",
     "detachedFromBlock": "השבוע הופרד מהבלוק",
     "detachFailed": "הפרדת השבוע מהבלוק נכשלה",
     "findPositionsFailed": "חיפוש מיקומים זמינים נכשל"

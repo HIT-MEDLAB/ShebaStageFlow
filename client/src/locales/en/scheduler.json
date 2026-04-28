@@ -5,7 +5,9 @@
     "importExcel": "Import from Excel",
     "smartImport": "Smart Import from Excel",
     "exportExcel": "Export to Excel",
-    "academicYear": "Academic Year"
+    "academicYear": "Academic Year",
+    "clearAll": "Clear All",
+    "clearAllConfirm": "Are you sure you want to delete ALL schedules? This cannot be undone."
   },
   "filters": {
     "university": "University",
@@ -212,6 +214,8 @@
     "overrideSuccess": "Assignment placed (admin override)",
     "blockCreated": "Multi-week block created successfully",
     "blockMoved": "Block moved successfully",
+    "allAssignmentsCleared": "All assignments cleared ({{count}} deleted)",
+    "clearAllFailed": "Failed to clear assignments",
     "detachedFromBlock": "Week detached from block",
     "detachFailed": "Failed to detach week from block",
     "findPositionsFailed": "Failed to find available positions"

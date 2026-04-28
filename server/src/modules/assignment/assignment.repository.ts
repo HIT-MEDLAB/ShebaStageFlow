@@ -53,6 +53,7 @@ export interface IAssignmentRepository {
   findOverlapping(departmentId: number, startDate: Date, endDate: Date, shiftType: 'MORNING' | 'EVENING', excludeId?: number): Promise<Assignment[]>;
   findStudentAssignments(studentId: number, excludeAssignmentId?: number): Promise<Assignment[]>;
   findStudentByNationalId?(nationalId: string): Promise<{ id: number } | null>;
+  removeAll(): Promise<number>;
 }
 
 export class AssignmentRepository implements IAssignmentRepository {
@@ -397,6 +398,15 @@ export class AssignmentRepository implements IAssignmentRepository {
     return prisma.student.findUnique({
       where: { nationalId },
       select: { id: true },
+    });
+  }
+
+  async removeAll(): Promise<number> {
+    return prisma.$transaction(async (tx) => {
+      await tx.assignmentStudent.deleteMany();
+      await tx.student.deleteMany();
+      const { count } = await tx.assignment.deleteMany();
+      return count;
     });
   }
 

@@ -164,6 +164,15 @@ export function createAssignmentController(service: AssignmentService) {
       }
     },
 
+    async removeAll(_req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const deleted = await service.removeAll();
+        res.json({ deleted });
+      } catch (err) {
+        next(err);
+      }
+    },
+
     async remove(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         await service.remove(Number(req.params.id));
