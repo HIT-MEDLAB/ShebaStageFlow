@@ -638,15 +638,17 @@ export class AssignmentService {
         results.push(assignment);
       }
 
-      // 5. Re-create student links on the first assignment of the new block
+      // 5. Re-create student links on all assignments of the new block
       if (studentIds.length > 0 && results.length > 0) {
-        for (const studentId of studentIds) {
-          await tx.assignmentStudent.create({
-            data: {
-              assignmentId: results[0].id,
-              studentId,
-            },
-          });
+        for (const result of results) {
+          for (const studentId of studentIds) {
+            await tx.assignmentStudent.create({
+              data: {
+                assignmentId: result.id,
+                studentId,
+              },
+            });
+          }
         }
       }
 
