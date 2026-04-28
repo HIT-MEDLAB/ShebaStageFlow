@@ -24,7 +24,7 @@ export class AdminService {
 
   async create(dto: CreateAdminDto) {
     const existing = await this.repository.findByEmail(dto.email);
-    if (existing) {
+    if (existing && existing.isActive) {
       throw new AppError('A user with this email already exists', 409);
     }
 
@@ -32,12 +32,12 @@ export class AdminService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const name = `${dto.firstName} ${dto.lastName}`;
 
-    const user = await this.repository.create({
-      name,
-      email: dto.email,
-      phone: dto.phone,
-      hashPassword: hashedPassword,
-    });
+    let user;
+    if (existing) {
+      user = await this.repository.reactivate(existing.id, { name, email: dto.email, phone: dto.phone, hashPassword: hashedPassword });
+    } else {
+      user = await this.repository.create({ name, email: dto.email, phone: dto.phone, hashPassword: hashedPassword });
+    }
 
     await sendWelcomeEmail(dto.email, password);
 
@@ -53,7 +53,7 @@ export class AdminService {
 
     if (dto.email && dto.email !== user.email) {
       const existing = await this.repository.findByEmail(dto.email);
-      if (existing) {
+      if (existing && existing.isActive) {
         throw new AppError('A user with this email already exists', 409);
       }
     }
