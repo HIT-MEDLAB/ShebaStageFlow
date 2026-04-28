@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { useAcademicYears } from '@/features/scheduler/hooks/useAcademicYears'
+import { getCurrentAcademicYearName } from '@/features/scheduler/utils/getCurrentAcademicYearName'
 import { useAcademicYearWeeks } from '@/features/scheduler/hooks/useAcademicYearWeeks'
 import { useStatistics } from '../hooks/useStatistics'
 import { TimeframeToggle } from '../components/TimeframeToggle'
@@ -41,7 +42,9 @@ export function StatisticsPage() {
 
   useEffect(() => {
     if (academicYears?.length && !academicYearId) {
-      setAcademicYearId(academicYears[0].id)
+      const currentName = getCurrentAcademicYearName()
+      const current = academicYears.find((y) => y.name === currentName)
+      setAcademicYearId(current?.id ?? academicYears[0].id)
     }
   }, [academicYears, academicYearId])
 
@@ -135,7 +138,7 @@ export function StatisticsPage() {
       {isLoading ? (
         <StatisticsPageSkeleton />
       ) : data ? (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6">
           {/* Department Scheduled Weeks */}
           <Card>
             <CardHeader>

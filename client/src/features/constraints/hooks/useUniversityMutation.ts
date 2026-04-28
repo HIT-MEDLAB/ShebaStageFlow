@@ -15,7 +15,8 @@ export function useUniversityMutation() {
   const { t } = useTranslation('constraints')
 
   const createMutation = useMutation({
-    mutationFn: (data: CreateUniversityData) => createUniversityWithSemester(data),
+    mutationFn: ({ data, calendarYear }: { data: CreateUniversityData; calendarYear?: number }) =>
+      createUniversityWithSemester(data, calendarYear),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['constraints'] })
       queryClient.invalidateQueries({ queryKey: ['scheduler', 'constraints'] })

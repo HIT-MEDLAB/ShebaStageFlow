@@ -61,8 +61,10 @@ export async function updateDepartmentWithConstraint(id: number, payload: Update
   return data
 }
 
-export async function createUniversityWithSemester(payload: CreateUniversityData) {
-  const { data } = await apiClient.post('/constraints/universities', payload)
+export async function createUniversityWithSemester(payload: CreateUniversityData, calendarYear?: number) {
+  const params: Record<string, unknown> = {}
+  if (calendarYear) params.calendarYear = calendarYear
+  const { data } = await apiClient.post('/constraints/universities', payload, { params })
   return data
 }
 

@@ -129,7 +129,9 @@ export function createConstraintController(service: ConstraintService) {
     async createUniversityWithSemester(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const data = { ...req.body };
-        if (req.body.semesterStart) {
+        if (req.query['calendarYear']) {
+          data.year = Number(req.query['calendarYear']);
+        } else if (req.body.semesterStart) {
           data.year = new Date(req.body.semesterStart).getUTCFullYear();
         }
         const result = await service.createUniversityWithSemester(data);
@@ -143,12 +145,10 @@ export function createConstraintController(service: ConstraintService) {
       try {
         const id = Number(req.params['id']);
         const data = { ...req.body };
-        if (req.body.semesterStart) {
-          data.year = new Date(req.body.semesterStart).getUTCFullYear();
-        }
-        // Use calendarYear from query if no year derived from semesterStart
-        if (!data.year && req.query['calendarYear']) {
+        if (req.query['calendarYear']) {
           data.year = Number(req.query['calendarYear']);
+        } else if (req.body.semesterStart) {
+          data.year = new Date(req.body.semesterStart).getUTCFullYear();
         }
         const result = await service.updateUniversityWithSemester(id, data);
         res.json(result);

@@ -161,7 +161,7 @@ export function ConstraintsPage() {
   }
 
   function handleCreateUniversity(formData: UniversityFormValues) {
-    universityMutation.createMutation.mutate(formData)
+    universityMutation.createMutation.mutate({ data: formData, calendarYear })
   }
 
   function handleUpdateUniversity(id: number, formData: UniversityFormValues) {
