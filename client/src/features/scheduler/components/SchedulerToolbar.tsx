@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, Upload, Download } from 'lucide-react'
+import { Plus, Upload, Download, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -9,9 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { useSchedulerStore } from '../stores/schedulerStore'
 import { useAcademicYears } from '../hooks/useAcademicYears'
-import { fetchAssignmentsForExport } from '../api/scheduler.api'
+import { fetchAssignmentsForExport, clearAllAssignments } from '../api/scheduler.api'
 import { exportSchedulerToExcel } from '../utils/exportSchedulerToExcel'
 import { getCurrentAcademicYearName } from '../utils/getCurrentAcademicYearName'
 
@@ -27,6 +29,24 @@ export function SchedulerToolbar() {
   } = useSchedulerStore()
   const { data: academicYears } = useAcademicYears()
   const [exporting, setExporting] = useState(false)
+  const queryClient = useQueryClient()
+
+  const clearAllMutation = useMutation({
+    mutationFn: clearAllAssignments,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['scheduler', 'assignments'] })
+      toast.success(t('toast.allAssignmentsCleared', { count: data.deleted }))
+    },
+    onError: () => {
+      toast.error(t('toast.clearAllFailed'))
+    },
+  })
+
+  const handleClearAll = () => {
+    if (window.confirm(t('toolbar.clearAllConfirm'))) {
+      clearAllMutation.mutate()
+    }
+  }
 
   const handleExport = async () => {
     if (!academicYearId) return
@@ -71,6 +91,15 @@ export function SchedulerToolbar() {
       </Select>
 
       <div className="flex items-center gap-2 ms-auto">
+        <Button
+          variant="destructive"
+          onClick={handleClearAll}
+          disabled={clearAllMutation.isPending}
+        >
+          <Trash2 />
+          {t('toolbar.clearAll')}
+        </Button>
+
         <Button
           variant="outline"
           onClick={handleExport}

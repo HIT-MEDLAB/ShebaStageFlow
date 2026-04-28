@@ -122,6 +122,10 @@ export class AssignmentService {
     return this.repository.move(id, dto.departmentId, dto.startDate, dto.endDate, status, approvedById);
   }
 
+  async removeAll() {
+    return this.repository.removeAll();
+  }
+
   async remove(id: number) {
     await this.getById(id);
     return this.repository.remove(id);

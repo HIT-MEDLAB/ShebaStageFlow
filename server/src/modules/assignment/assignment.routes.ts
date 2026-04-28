@@ -42,6 +42,9 @@ assignmentRouter.post('/import/validate-displacement-week', validateRequest(vali
 assignmentRouter.post('/import/execute', validateRequest(smartImportExecuteSchema), controller.smartImportExecute);
 assignmentRouter.post('/import', validateRequest(importAssignmentsSchema), controller.importAssignments);
 
+// Temporary: clear all assignments
+assignmentRouter.delete('/clear-all', adminOnly, controller.removeAll);
+
 // Block (multi-week) routes
 assignmentRouter.post('/block', validateRequest(createBlockSchema), controller.createBlock);
 assignmentRouter.post('/block/find-positions', validateRequest(findBlockPositionsSchema), controller.findBlockPositions);

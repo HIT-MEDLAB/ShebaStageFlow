@@ -126,6 +126,11 @@ export async function deleteAssignment(id: number) {
   await apiClient.delete(`/assignments/${id}`)
 }
 
+export async function clearAllAssignments() {
+  const { data } = await apiClient.delete<{ deleted: number }>('/assignments/clear-all')
+  return data
+}
+
 export async function approveAssignment(id: number) {
   const { data } = await apiClient.patch<RawAssignment>(`/assignments/${id}/approve`, {})
   return mapAssignment(data)
