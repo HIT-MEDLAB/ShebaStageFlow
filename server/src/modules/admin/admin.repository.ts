@@ -32,6 +32,20 @@ export class AdminRepository {
     return prisma.user.update({ where: { id }, data });
   }
 
+  async reactivate(id: number, data: { name: string; email: string; phone?: string; hashPassword: string }) {
+    return prisma.user.update({
+      where: { id },
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone ?? null,
+        hashPassword: data.hashPassword,
+        role: 'ADMIN',
+        isActive: true,
+      },
+    });
+  }
+
   async softDelete(id: number) {
     return prisma.user.update({ where: { id }, data: { isActive: false } });
   }
