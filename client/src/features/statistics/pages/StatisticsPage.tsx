@@ -69,7 +69,7 @@ export function StatisticsPage() {
       }
     }
     if (timeframe === 'calendarYear' && currentYear) {
-      const year = new Date(currentYear.startDate).getFullYear()
+      const year = new Date(currentYear.endDate).getFullYear()
       return {
         startDate: `${year}-01-01`,
         endDate: `${year}-12-31`,
@@ -112,7 +112,7 @@ export function StatisticsPage() {
                 {academicYears.map((year) => (
                   <SelectItem key={year.id} value={String(year.id)}>
                     {timeframe === 'calendarYear'
-                      ? new Date(year.startDate).getFullYear()
+                      ? new Date(year.endDate).getFullYear()
                       : year.name}
                   </SelectItem>
                 ))}
