@@ -64,7 +64,7 @@ export function HomePage() {
       }
     }
     if (viewMode === 'calendarYear' && academicYear) {
-      const year = new Date(academicYear.startDate).getFullYear()
+      const year = new Date(academicYear.endDate).getFullYear()
       return {
         startDate: `${year}-01-01`,
         endDate: `${year}-12-31`,
@@ -141,7 +141,7 @@ export function HomePage() {
               {academicYears.map((year) => (
                 <SelectItem key={year.id} value={String(year.id)}>
                   {viewMode === 'calendarYear'
-                    ? new Date(year.startDate).getFullYear()
+                    ? new Date(year.endDate).getFullYear()
                     : year.name}
                 </SelectItem>
               ))}
