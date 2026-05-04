@@ -12,6 +12,7 @@ import { useAcademicYearWeeks } from '../hooks/useAcademicYearWeeks'
 import { useGridData } from '../hooks/useGridData'
 import { useBlockedCells } from '../hooks/useBlockedCells'
 import { useMoveAssignment } from '../hooks/useMoveAssignment'
+import { useCreateAssignment } from '../hooks/useCreateAssignment'
 import { useBlockGroups } from '../hooks/useBlockGroups'
 import { useMoveBlock } from '../hooks/useBlockActions'
 import { useDisplaceAssignment } from '../hooks/useDisplaceAssignment'
@@ -35,7 +36,7 @@ import { AdminOverrideDialog } from '../components/dialogs/AdminOverrideDialog'
 import { WarningConfirmDialog } from '../components/dialogs/WarningConfirmDialog'
 import { ApprovalTab } from '../components/approval/ApprovalTab'
 import { format } from 'date-fns'
-import type { Assignment, WeekDefinition } from '../types/scheduler.types'
+import type { Assignment, CreateAssignmentDto, WeekDefinition } from '../types/scheduler.types'
 
 export default function SchedulerPage() {
   const { t } = useTranslation('scheduler')
@@ -94,6 +95,7 @@ export default function SchedulerPage() {
   const moveMutation = useMoveAssignment()
   const moveBlockMutation = useMoveBlock()
   const displaceMutation = useDisplaceAssignment()
+  const createMutation = useCreateAssignment()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   )
@@ -133,6 +135,22 @@ export default function SchedulerPage() {
 
   function handleDragStart(event: DragStartEvent) {
     setActiveDragId(event.active.id as number)
+  }
+
+  function buildCreateDto(a: Assignment, forceOverride: boolean): CreateAssignmentDto {
+    return {
+      departmentId: a.departmentId,
+      universityId: a.universityId,
+      academicYearId: a.academicYearId,
+      startDate: a.startDate,
+      endDate: a.endDate,
+      type: a.type,
+      shiftType: a.shiftType,
+      studentCount: a.studentCount,
+      yearInProgram: a.yearInProgram,
+      tutorName: a.tutorName ?? null,
+      forceOverride,
+    }
   }
 
   function executeMoveAssignment(
@@ -411,6 +429,42 @@ export default function SchedulerPage() {
       : undefined
     const isIncomingBlock = !!(incomingBlock && incomingBlock.length > 1 && pendingMove.assignment.groupId)
     const isDisplacedBlock = !!(displacedBlock && displacedBlock.length > 1 && displacedAssignment.groupId)
+    const isNewAssignment = pendingMove.assignment.id === 0
+
+    // New assignment from ManualAssignmentDialog — move displaced first, then CREATE incoming
+    if (isNewAssignment) {
+      const createIncoming = () => {
+        createMutation.mutate(buildCreateDto(pendingMove.assignment, true))
+      }
+
+      if (isDisplacedBlock) {
+        moveBlockMutation.mutate(
+          {
+            groupId: displacedAssignment.groupId!,
+            data: {
+              departmentId: displacedAssignment.departmentId,
+              startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+            },
+          },
+          { onSuccess: createIncoming },
+        )
+      } else {
+        moveMutation.mutate(
+          {
+            id: displacedAssignment.id,
+            data: {
+              departmentId: displacedAssignment.departmentId,
+              startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+              endDate: format(targetWeek.endDate, 'yyyy-MM-dd'),
+            },
+          },
+          { onSuccess: createIncoming },
+        )
+      }
+
+      clearPendingMove()
+      return
+    }
 
     // Helper: move the incoming after displaced is moved
     const moveIncoming = () => {
@@ -487,6 +541,14 @@ export default function SchedulerPage() {
   function handleWarningConfirm() {
     if (!pendingMove) return
 
+    const isNewAssignment = pendingMove.assignment.id === 0
+
+    if (isNewAssignment) {
+      createMutation.mutate(buildCreateDto(pendingMove.assignment, true))
+      clearPendingMove()
+      return
+    }
+
     const targetWeek = weeks.find((w) => w.weekNumber === pendingMove.targetWeekNum)
     if (!targetWeek) return
 
@@ -521,6 +583,14 @@ export default function SchedulerPage() {
   function handleAdminOverrideConfirm() {
     if (!pendingMove) return
 
+    const isNewAssignment = pendingMove.assignment.id === 0
+
+    if (isNewAssignment) {
+      createMutation.mutate(buildCreateDto(pendingMove.assignment, true))
+      clearPendingMove()
+      return
+    }
+
     const incomingBlock = pendingMove.assignment.groupId
       ? blockGroups.get(pendingMove.assignment.groupId)
       : undefined
@@ -545,7 +615,6 @@ export default function SchedulerPage() {
       )
     }
 
-    toast.success(t('toast.overrideSuccess'))
     clearPendingMove()
   }
 

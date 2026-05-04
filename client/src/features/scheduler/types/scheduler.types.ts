@@ -162,6 +162,7 @@ export interface CreateAssignmentDto {
   studentCount?: number | null
   yearInProgram: number
   tutorName?: string | null
+  forceOverride?: boolean
 }
 
 export interface CreateBlockDto {

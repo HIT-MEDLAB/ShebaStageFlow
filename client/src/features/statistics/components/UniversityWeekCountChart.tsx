@@ -22,24 +22,28 @@ export function UniversityWeekCountChart({ data }: UniversityWeekCountChartProps
     },
   }
 
+  const chartWidth = data.length * 100
+
   return (
-    <ChartContainer config={chartConfig} className="h-[300px] w-full">
-      <BarChart data={data} accessibilityLayer>
-        <CartesianGrid vertical={false} />
-        <XAxis
-          dataKey="universityName"
-          tickLine={false}
-          tickMargin={10}
-          axisLine={false}
-        />
-        <YAxis tickLine={false} axisLine={false} allowDecimals={false} />
-        <ChartTooltip content={<ChartTooltipContent />} />
-        <Bar
-          dataKey="weekCount"
-          fill="var(--color-weekCount)"
-          radius={[4, 4, 0, 0]}
-        />
-      </BarChart>
-    </ChartContainer>
+    <div className="overflow-x-auto">
+      <ChartContainer config={chartConfig} className="h-[300px] w-full" style={{ minWidth: chartWidth }}>
+        <BarChart data={data} accessibilityLayer>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="universityName"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+          />
+          <YAxis tickLine={false} axisLine={false} allowDecimals={false} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Bar
+            dataKey="weekCount"
+            fill="var(--color-weekCount)"
+            radius={[4, 4, 0, 0]}
+          />
+        </BarChart>
+      </ChartContainer>
+    </div>
   )
 }

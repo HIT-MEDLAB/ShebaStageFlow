@@ -93,6 +93,7 @@ export interface CreateSoftConstraintData {
   name: string
   description: string
   priority?: number
+  blocksWeek?: boolean
   departmentId?: number | null
   universityId?: number | null
   startDate?: string | null
@@ -103,6 +104,7 @@ export interface UpdateSoftConstraintData {
   name?: string
   description?: string
   priority?: number
+  blocksWeek?: boolean
   departmentId?: number | null
   universityId?: number | null
   startDate?: string | null
