@@ -25,7 +25,6 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConstraintToggle } from './ConstraintToggle'
 import { SoftConstraintDialog } from './SoftConstraintDialog'
-import { HolidayToggleDialog } from './HolidayToggleDialog'
 import type { SoftConstraint, DepartmentWithConstraint, UniversityWithSemester } from '../types/constraints.types'
 import type { SoftConstraintFormValues } from '../schemas/constraints.schemas'
 
@@ -34,7 +33,7 @@ interface SoftConstraintsTableProps {
   departments: DepartmentWithConstraint[]
   universities: UniversityWithSemester[]
   isAdmin: boolean
-  onToggle: (id: number, isActive: boolean, blocksWeek?: boolean) => void
+  onToggle: (id: number, isActive: boolean) => void
   onCreate: (data: SoftConstraintFormValues) => void
   onUpdate: (id: number, data: SoftConstraintFormValues) => void
   onDelete: (id: number) => void
@@ -57,7 +56,6 @@ export function SoftConstraintsTable({
   const { t } = useTranslation('constraints')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingConstraint, setEditingConstraint] = useState<SoftConstraint | null>(null)
-  const [pendingToggle, setPendingToggle] = useState<SoftConstraint | null>(null)
 
   function handleAdd() {
     setEditingConstraint(null)
@@ -70,18 +68,7 @@ export function SoftConstraintsTable({
   }
 
   function handleToggle(constraint: SoftConstraint, checked: boolean) {
-    if (checked) {
-      setPendingToggle(constraint)
-    } else {
-      onToggle(constraint.id, false)
-    }
-  }
-
-  function handleToggleConfirm(blocksWeek: boolean) {
-    if (pendingToggle) {
-      onToggle(pendingToggle.id, true, blocksWeek)
-    }
-    setPendingToggle(null)
+    onToggle(constraint.id, checked)
   }
 
   function handleSubmit(data: SoftConstraintFormValues) {
@@ -217,12 +204,6 @@ export function SoftConstraintsTable({
         isPending={editingConstraint ? isUpdatePending : isCreatePending}
       />
 
-      <HolidayToggleDialog
-        open={!!pendingToggle}
-        onOpenChange={(open) => { if (!open) setPendingToggle(null) }}
-        constraintName={pendingToggle?.name ?? null}
-        onConfirm={handleToggleConfirm}
-      />
     </>
   )
 }

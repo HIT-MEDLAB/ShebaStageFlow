@@ -25,7 +25,8 @@ export function DepartmentCapacityPercentageChart({ data }: DepartmentCapacityPe
   const { t } = useTranslation('statistics')
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="overflow-x-auto">
+    <div className="grid grid-cols-3 gap-4" style={{ minWidth: Math.max(data.length * 40, 300) }}>
       {data.map((dept) => {
         const color = getGaugeColor(dept.percentage)
         const chartConfig: ChartConfig = {
@@ -91,6 +92,7 @@ export function DepartmentCapacityPercentageChart({ data }: DepartmentCapacityPe
           </div>
         )
       })}
+    </div>
     </div>
   )
 }

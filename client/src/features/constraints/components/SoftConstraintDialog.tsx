@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { Ban, CalendarDays } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 import { softConstraintFormSchema, type SoftConstraintFormValues } from '../schemas/constraints.schemas'
 import type { SoftConstraint, DepartmentWithConstraint, UniversityWithSemester } from '../types/constraints.types'
 
@@ -56,6 +58,7 @@ export function SoftConstraintDialog({
       name: '',
       description: '',
       priority: 0,
+      blocksWeek: true,
       departmentId: null,
       universityId: null,
       startDate: null,
@@ -69,6 +72,7 @@ export function SoftConstraintDialog({
         name: constraint.name,
         description: constraint.description,
         priority: constraint.priority,
+        blocksWeek: constraint.blocksWeek,
         departmentId: constraint.departmentId,
         universityId: constraint.universityId,
         startDate: constraint.startDate ? constraint.startDate.split('T')[0] : null,
@@ -79,6 +83,7 @@ export function SoftConstraintDialog({
         name: '',
         description: '',
         priority: 0,
+        blocksWeek: true,
         departmentId: null,
         universityId: null,
         startDate: null,
@@ -89,6 +94,7 @@ export function SoftConstraintDialog({
 
   const departmentId = watch('departmentId')
   const universityId = watch('universityId')
+  const blocksWeek = watch('blocksWeek')
 
   function handleFormSubmit(data: SoftConstraintFormValues) {
     onSubmit(data)
@@ -123,6 +129,30 @@ export function SoftConstraintDialog({
           <div className="flex flex-col gap-1.5">
             <Label>{t('form.priority')}</Label>
             <Input type="number" min={0} {...register('priority')} />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label>{t('form.weekEffect')}</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant={blocksWeek ? 'destructive' : 'outline'}
+                className={cn('justify-center', !blocksWeek && 'opacity-60')}
+                onClick={() => setValue('blocksWeek', true)}
+              >
+                <Ban className="size-4 me-2" />
+                {t('holidayToggle.blockWeek')}
+              </Button>
+              <Button
+                type="button"
+                variant={!blocksWeek ? 'default' : 'outline'}
+                className={cn('justify-center', blocksWeek && 'opacity-60')}
+                onClick={() => setValue('blocksWeek', false)}
+              >
+                <CalendarDays className="size-4 me-2" />
+                {t('holidayToggle.keepOpen')}
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

@@ -5,6 +5,7 @@ export const softConstraintFormSchema = z
     name: z.string().min(1),
     description: z.string().min(1),
     priority: z.coerce.number().int().min(0).optional(),
+    blocksWeek: z.boolean().default(true),
     departmentId: z.coerce.number().int().positive().nullable().optional(),
     universityId: z.coerce.number().int().positive().nullable().optional(),
     startDate: z.string().nullable().optional(),

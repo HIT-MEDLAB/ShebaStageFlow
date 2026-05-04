@@ -122,6 +122,7 @@ export function ConstraintsPage() {
       name: formData.name,
       description: formData.description,
       priority: formData.priority,
+      blocksWeek: formData.blocksWeek,
       departmentId: formData.departmentId,
       universityId: formData.universityId,
       startDate: formData.startDate || null,
@@ -136,6 +137,7 @@ export function ConstraintsPage() {
         name: formData.name,
         description: formData.description,
         priority: formData.priority,
+        blocksWeek: formData.blocksWeek,
         departmentId: formData.departmentId,
         universityId: formData.universityId,
         startDate: formData.startDate || null,
@@ -262,7 +264,7 @@ export function ConstraintsPage() {
             departments={data.departments}
             universities={data.universities}
             isAdmin={isAdmin}
-            onToggle={(id, isActive, blocksWeek) => softMutation.mutate({ id, isActive, blocksWeek })}
+            onToggle={(id, isActive) => softMutation.mutate({ id, isActive })}
             onCreate={handleCreateSoft}
             onUpdate={handleUpdateSoft}
             onDelete={(id) => deleteMutation.mutate(id)}
