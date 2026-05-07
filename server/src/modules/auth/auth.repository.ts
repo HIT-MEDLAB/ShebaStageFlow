@@ -25,7 +25,7 @@ export interface IAuthRepository {
 
 export class AuthRepository implements IAuthRepository {
   async findByEmail(email: string): Promise<AuthUserRecord | null> {
-    return prisma.user.findUnique({ where: { email } });
+    return prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   }
 
   async findById(id: number): Promise<AuthUserRecord | null> {

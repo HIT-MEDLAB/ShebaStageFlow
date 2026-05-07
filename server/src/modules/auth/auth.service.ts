@@ -139,7 +139,7 @@ export class AuthService {
     }
 
     // If email is changing, check uniqueness
-    if (dto.email && dto.email !== user.email) {
+    if (dto.email && dto.email.toLowerCase() !== user.email.toLowerCase()) {
       const existing = await this.repository.findByEmail(dto.email);
       if (existing && existing.isActive) {
         throw new AppError('Email is already in use', 409);
