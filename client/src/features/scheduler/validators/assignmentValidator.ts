@@ -92,32 +92,6 @@ export function validateDrop(
     }
   }
 
-  // 3. Cross-department conflict: same university + yearInProgram + same shiftType + same week but different dept
-  //    Skip for ELECTIVE assignments (they can be placed across departments freely)
-  if (assignment.type !== 'ELECTIVE') {
-    const crossDeptConflict = context.existingAssignments.find(
-      (a) =>
-        a.id !== assignment.id &&
-        a.universityId === assignment.universityId &&
-        a.yearInProgram === assignment.yearInProgram &&
-        a.shiftType === assignment.shiftType &&
-        a.departmentId !== targetDeptId &&
-        getAssignmentWeekNumber(a, context.weeks) === targetWeekNum,
-    )
-    if (crossDeptConflict) {
-      const incomingPriority =
-        context.universityPriorities.get(assignment.universityId) ?? 0
-      const displacedPriority =
-        context.universityPriorities.get(crossDeptConflict.universityId) ?? 0
-      return {
-        type: 'conflict_replaceable',
-        displacedAssignment: crossDeptConflict,
-        incomingPriority,
-        displacedPriority,
-      }
-    }
-  }
-
   // Get all assignments in the target cell (excluding self)
   const cellAssignments = context.existingAssignments.filter(
     (a) =>

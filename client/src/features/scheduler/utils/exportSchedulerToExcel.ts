@@ -28,12 +28,26 @@ export function exportSchedulerToExcel(assignments: ExportAssignment[]) {
     }
   }
 
+  // Build groupId → overall date range (first slot start, last slot end)
+  const groupDateRange = new Map<string, { startDate: string; endDate: string }>()
+  for (const a of assignments) {
+    if (a.groupId) {
+      const existing = groupDateRange.get(a.groupId)
+      if (!existing) {
+        groupDateRange.set(a.groupId, { startDate: a.startDate, endDate: a.endDate })
+      } else {
+        if (new Date(a.startDate) < new Date(existing.startDate)) existing.startDate = a.startDate
+        if (new Date(a.endDate) > new Date(existing.endDate)) existing.endDate = a.endDate
+      }
+    }
+  }
+
   // Sheet 1: שיבוצים (Assignments)
   const assignmentRows = assignments.map((a) => ({
     'מחלקה': a.department.name,
     'מוסד אקדמי': a.university.name,
-    'תאריך התחלה': formatDate(a.startDate),
-    'תאריך סיום': formatDate(a.endDate),
+    'תאריך התחלה': formatDate(a.groupId ? groupDateRange.get(a.groupId)!.startDate : a.startDate),
+    'תאריך סיום': formatDate(a.groupId ? groupDateRange.get(a.groupId)!.endDate : a.endDate),
     'כמות שבועות': a.groupId ? (groupWeekCount.get(a.groupId) ?? 1) : 1,
     'מספר סטודנטים': a.studentCount ?? '',
     'שנת לימוד': a.yearInProgram,
@@ -58,8 +72,8 @@ export function exportSchedulerToExcel(assignments: ExportAssignment[]) {
         'אימייל': s.email ?? '',
         'מוסד אקדמי': a.university.name,
         'מחלקה': a.department.name,
-        'תאריך התחלה': formatDate(a.startDate),
-        'תאריך סיום': formatDate(a.endDate),
+        'תאריך התחלה': formatDate(a.groupId ? groupDateRange.get(a.groupId)!.startDate : a.startDate),
+        'תאריך סיום': formatDate(a.groupId ? groupDateRange.get(a.groupId)!.endDate : a.endDate),
         'משמרת': mapShift(a.shiftType),
       })
     }
