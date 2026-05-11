@@ -3,14 +3,14 @@ import { z } from 'zod';
 export const createAdminSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  email: z.string().email(),
+  email: z.string().email().transform(v => v.toLowerCase()),
   phone: z.string().optional(),
 });
 
 export const updateAdminSchema = z.object({
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
-  email: z.string().email().optional(),
+  email: z.string().email().transform(v => v.toLowerCase()).optional(),
   phone: z.string().optional(),
 });
 

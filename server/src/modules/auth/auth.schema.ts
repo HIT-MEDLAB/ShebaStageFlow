@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().transform(v => v.toLowerCase()),
   password: z.string().min(1),
 });
 
@@ -16,7 +16,7 @@ export type VerifyOtpDto = z.infer<typeof verifyOtpSchema>;
 
 export const updateProfileSchema = z.object({
   name: z.string().min(1).optional(),
-  email: z.string().email().optional(),
+  email: z.string().email().transform(v => v.toLowerCase()).optional(),
   phone: z.string().optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().min(6).optional(),
@@ -28,7 +28,7 @@ export const updateProfileSchema = z.object({
 export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().transform(v => v.toLowerCase()),
 });
 
 export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;

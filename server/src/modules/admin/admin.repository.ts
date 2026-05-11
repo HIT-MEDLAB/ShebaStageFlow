@@ -13,7 +13,7 @@ export class AdminRepository {
   }
 
   async findByEmail(email: string) {
-    return prisma.user.findUnique({ where: { email } });
+    return prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   }
 
   async create(data: { name: string; email: string; phone?: string; hashPassword: string }) {
