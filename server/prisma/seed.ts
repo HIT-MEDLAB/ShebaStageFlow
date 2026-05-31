@@ -143,8 +143,8 @@ async function main() {
       update: {},
       create: {
         universityId: uni.id,
-        semesterStart: new Date('2025-10-01'),
-        semesterEnd: new Date('2026-06-30'),
+        semesterStart: new Date('2025-08-01'),
+        semesterEnd: new Date('2026-07-31'),
         year: 2026,
       },
     });
@@ -158,8 +158,8 @@ async function main() {
     update: {},
     create: {
       name: '2025-2026',
-      startDate: new Date('2025-10-01'),
-      endDate: new Date('2026-06-30'),
+      startDate: new Date('2025-08-01'),
+      endDate: new Date('2026-07-31'),
     },
   });
   console.log("Created academic year: 2025-2026");
@@ -169,8 +169,8 @@ async function main() {
     update: {},
     create: {
       name: '2024-2025',
-      startDate: new Date('2024-10-01'),
-      endDate: new Date('2025-06-30'),
+      startDate: new Date('2024-08-01'),
+      endDate: new Date('2025-07-31'),
     },
   });
   console.log("Created academic year: 2024-2025");
@@ -180,8 +180,8 @@ async function main() {
     update: {},
     create: {
       name: '2023-2024',
-      startDate: new Date('2023-10-01'),
-      endDate: new Date('2024-06-30'),
+      startDate: new Date('2023-08-01'),
+      endDate: new Date('2024-07-31'),
     },
   });
   console.log("Created academic year: 2023-2024");
