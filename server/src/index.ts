@@ -59,11 +59,14 @@ async function ensureAcademicYears() {
     const name = `${y}-${y + 1}`;
     await prisma.academicYear.upsert({
       where: { name },
-      update: {},
+      update: {
+        startDate: new Date(`${y}-08-01`),
+        endDate: new Date(`${y + 1}-07-31`),
+      },
       create: {
         name,
-        startDate: new Date(`${y}-10-01`),
-        endDate: new Date(`${y + 1}-06-30`),
+        startDate: new Date(`${y}-08-01`),
+        endDate: new Date(`${y + 1}-07-31`),
       },
     });
   }
