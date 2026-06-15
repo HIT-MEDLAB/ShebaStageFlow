@@ -2,14 +2,18 @@ import prisma from '../../lib/prisma';
 import type { Department } from '@prisma/client';
 
 export interface IDepartmentRepository {
-  findAll(): Promise<Department[]>;
+  findAll(academicYearId?: number): Promise<Department[]>;
 }
 
 export class DepartmentRepository implements IDepartmentRepository {
-  async findAll(): Promise<Department[]> {
+  async findAll(academicYearId?: number): Promise<Department[]> {
     return prisma.department.findMany({
       where: { isActive: true },
-      include: { departmentConstraints: true },
+      include: {
+        departmentConstraints: academicYearId
+          ? { where: { academicYearId }, take: 1 }
+          : { take: 1 },
+      },
       orderBy: { name: 'asc' },
     });
   }

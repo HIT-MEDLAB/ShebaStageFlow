@@ -64,7 +64,7 @@ export default function SchedulerPage() {
   const isAdmin = useIsAdmin()
   const { data: academicYears } = useAcademicYears()
   const currentYear = academicYears?.find((y) => y.id === academicYearId)
-  const { data: departments } = useDepartments()
+  const { data: departments } = useDepartments(academicYearId)
   const filteredDepartments = useMemo(() => {
     const list = departments ?? []
     const q = departmentNameFilter.trim().toLowerCase()

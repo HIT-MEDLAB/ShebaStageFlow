@@ -3,9 +3,12 @@ import type { DepartmentService } from './department.service';
 
 export function createDepartmentController(service: DepartmentService) {
   return {
-    async getAll(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
-        const departments = await service.getAll();
+        const raw = req.query['academicYearId'];
+        const parsed = raw !== undefined ? Number(raw) : NaN;
+        const academicYearId = Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+        const departments = await service.getAll(academicYearId);
         res.json(departments);
       } catch (err) {
         next(err);
