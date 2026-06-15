@@ -203,11 +203,9 @@ export default function SchedulerPage() {
         const draggedIndex = assignment.groupIndex ?? 0
         // First week of block at the target position
         const firstWeekNum = weekNumber - draggedIndex
-        const lastWeekNum = firstWeekNum + block.length - 1
-        const firstWeek = weeks.find((w) => w.weekNumber === firstWeekNum)
-        const lastWeek = weeks.find((w) => w.weekNumber === lastWeekNum)
+        const firstWeekIdx = weeks.findIndex((w) => w.weekNumber === firstWeekNum)
 
-        if (!firstWeek || !lastWeek) {
+        if (firstWeekIdx === -1) {
           toast.error(t('grid.blocked.noSpace'))
           return
         }
@@ -221,21 +219,57 @@ export default function SchedulerPage() {
           ),
         }
 
-        // Collect validation results across all block weeks
-        let hasHardBlock = false
+        // The first slot's week (drop target after offset) must not be blocked
+        const firstSlotCheck = validateDrop(
+          sorted[0],
+          departmentId,
+          firstWeekNum,
+          contextWithoutBlock,
+        )
+        if (firstSlotCheck.type === 'blocked') {
+          toast.error(t(firstSlotCheck.reasonKey, firstSlotCheck.reasonParams))
+          return
+        }
+
+        // Build target week numbers for each slot, skipping any blocked weeks
+        const targetWeekNumbers: number[] = []
+        let cursor = firstWeekIdx
+        for (let i = 0; i < sorted.length; i++) {
+          let assigned = false
+          while (cursor < weeks.length) {
+            const candidate = weeks[cursor]
+            const r = validateDrop(
+              sorted[i],
+              departmentId,
+              candidate.weekNumber,
+              contextWithoutBlock,
+            )
+            if (r.type !== 'blocked') {
+              targetWeekNumbers.push(candidate.weekNumber)
+              cursor++
+              assigned = true
+              break
+            }
+            cursor++
+          }
+          if (!assigned) {
+            toast.error(t('grid.blocked.noSpace'))
+            return
+          }
+        }
+
+        // Collect validation results at the chosen (skip-blocked) weeks
         const replaceableConflicts: Array<{ displacedAssignment: Assignment }> = []
         let adminOverrideReason: { reasonKey: string; reasonParams?: Record<string, string> } | null = null
         let warningResult: { reasonKey: string; reasonParams?: Record<string, string> } | null = null
 
         for (let i = 0; i < sorted.length; i++) {
-          const targetWeekNum = firstWeekNum + i
-          const result = validateDrop(sorted[i], departmentId, targetWeekNum, contextWithoutBlock)
-
-          if (result.type === 'blocked') {
-            toast.error(t(result.reasonKey, result.reasonParams))
-            hasHardBlock = true
-            break
-          }
+          const result = validateDrop(
+            sorted[i],
+            departmentId,
+            targetWeekNumbers[i],
+            contextWithoutBlock,
+          )
           if (result.type === 'conflict_replaceable') {
             replaceableConflicts.push({ displacedAssignment: result.displacedAssignment })
           }
@@ -249,7 +283,6 @@ export default function SchedulerPage() {
             warningResult = { reasonKey: result.reasonKey, reasonParams: result.reasonParams }
           }
         }
-        if (hasHardBlock) return
 
         // Admin override takes precedence over replaceable conflicts
         if (adminOverrideReason) {
@@ -325,12 +358,16 @@ export default function SchedulerPage() {
           return
         }
 
-        // All valid — proceed with block move
+        // All valid — proceed with block move using the chosen (skip-blocked) weeks
+        const startDates = targetWeekNumbers.map((n) => {
+          const w = weeks.find((wk) => wk.weekNumber === n)!
+          return format(w.startDate, 'yyyy-MM-dd')
+        })
         moveBlockMutation.mutate({
           groupId: assignment.groupId,
           data: {
             departmentId,
-            startDate: format(firstWeek.startDate, 'yyyy-MM-dd'),
+            startDates,
           },
         })
         return

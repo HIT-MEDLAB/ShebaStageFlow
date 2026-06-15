@@ -208,11 +208,26 @@ export const convertToBlockSchema = z.object({
   path: ['endDate'],
 });
 
-export const moveBlockSchema = z.object({
-  departmentId: z.number().int().positive(),
-  startDate: z.coerce.date().refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' }),
-  forceOverride: z.boolean().optional(),
-});
+export const moveBlockSchema = z
+  .object({
+    departmentId: z.number().int().positive(),
+    startDate: z
+      .coerce.date()
+      .refine((d) => d.getUTCDay() === 0, { message: 'Start date must be a Sunday' })
+      .optional(),
+    startDates: z
+      .array(
+        z.coerce.date().refine((d) => d.getUTCDay() === 0, {
+          message: 'Each start date must be a Sunday',
+        }),
+      )
+      .min(2)
+      .optional(),
+    forceOverride: z.boolean().optional(),
+  })
+  .refine((d) => d.startDate != null || (d.startDates != null && d.startDates.length > 0), {
+    message: 'Either startDate or startDates is required',
+  });
 
 export const findBlockPositionsSchema = z.object({
   departmentId: z.number().int().positive(),
