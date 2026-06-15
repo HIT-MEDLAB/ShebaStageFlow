@@ -81,7 +81,7 @@ export function ImportRowEditDialog({
   const { academicYearId } = useSchedulerStore()
   const { data: academicYears } = useAcademicYears()
   const currentYear = academicYears?.find((y) => y.id === academicYearId)
-  const { data: departments } = useDepartments()
+  const { data: departments } = useDepartments(academicYearId)
   const { data: universities } = useUniversities()
 
   const schema = useMemo(() => createAssignmentSchema(t), [t])

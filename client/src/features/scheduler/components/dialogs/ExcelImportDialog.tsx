@@ -162,7 +162,7 @@ export function ExcelImportDialog() {
         new Date(currentYear.endDate).getFullYear(),
       ])]
     : null
-  const { data: constraints } = useConstraints(constraintYears)
+  const { data: constraints } = useConstraints(constraintYears, academicYearId ?? undefined)
   const { data: universities } = useUniversities()
   const weeks = useAcademicYearWeeks(currentYear)
   const blockedCells = useBlockedCells(constraints, weeks)

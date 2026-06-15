@@ -65,7 +65,7 @@ export function EditAssignmentDialog() {
     enabled: !!editingAssignmentId,
   })
 
-  const { data: departments } = useDepartments()
+  const { data: departments } = useDepartments(academicYearId)
   const { data: universities } = useUniversities()
   const updateAssignment = useUpdateAssignment()
   const deleteAssignment = useDeleteAssignment()

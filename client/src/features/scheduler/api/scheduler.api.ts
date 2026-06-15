@@ -80,8 +80,10 @@ export async function fetchAssignmentById(id: number) {
   return data
 }
 
-export async function fetchDepartments() {
-  const { data } = await apiClient.get<Department[]>('/departments')
+export async function fetchDepartments(academicYearId?: number) {
+  const params: Record<string, unknown> = {}
+  if (academicYearId) params.academicYearId = academicYearId
+  const { data } = await apiClient.get<Department[]>('/departments', { params })
   return data
 }
 

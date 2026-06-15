@@ -58,7 +58,7 @@ export function ManualAssignmentDialog() {
   const isOpen = activeDialog === 'create'
   const isAdmin = useIsAdmin()
 
-  const { data: departments } = useDepartments()
+  const { data: departments } = useDepartments(academicYearId)
   const { data: universities } = useUniversities()
   const createAssignment = useCreateAssignment()
   const createBlockMutation = useCreateBlock()
@@ -76,7 +76,7 @@ export function ManualAssignmentDialog() {
         new Date(currentYear.endDate).getFullYear(),
       ])]
     : null
-  const { data: constraints } = useConstraints(constraintYears)
+  const { data: constraints } = useConstraints(constraintYears, academicYearId ?? undefined)
   const weeks = useAcademicYearWeeks(currentYear)
   const blockedCells = useBlockedCells(constraints, weeks)
 
