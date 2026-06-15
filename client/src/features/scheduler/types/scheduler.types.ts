@@ -194,7 +194,8 @@ export interface ConvertToBlockDto {
 
 export interface MoveBlockDto {
   departmentId: number
-  startDate: string
+  startDate?: string
+  startDates?: string[]
   forceOverride?: boolean
 }
 

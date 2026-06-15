@@ -669,7 +669,18 @@ export class AssignmentService {
     }
 
     const canForce = this.isAdmin(userRole) && forceOverride;
-    const weeks = this.computeBlockWeeks(dto.startDate, blockAssignments.length);
+    const weeks = dto.startDates
+      ? dto.startDates.map((d) => {
+          const start = new Date(d);
+          const end = new Date(start);
+          end.setUTCDate(end.getUTCDate() + 4);
+          return { startDate: start, endDate: end };
+        })
+      : this.computeBlockWeeks(dto.startDate!, blockAssignments.length);
+
+    if (weeks.length !== blockAssignments.length) {
+      throw new AppError('startDates length must match block size', 400);
+    }
     const excludeIds = blockAssignments.map((a) => a.id);
 
     // Validate each week against ALL constraints (holidays, date blocks, dept blocks, engine rules)
