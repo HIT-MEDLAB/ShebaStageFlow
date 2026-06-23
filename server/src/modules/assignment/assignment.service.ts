@@ -97,7 +97,8 @@ export class AssignmentService {
       academicYearId: existing.academicYearId,
     }, canForce);
 
-    const result = await this.repository.update(id, dto);
+    const { forceOverride: _ignored, ...updateData } = dto;
+    const result = await this.repository.update(id, updateData);
     return { ...result, warnings };
   }
 
