@@ -39,25 +39,30 @@ import { CalendarDropdown } from '@/components/ui/calendar-dropdown'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Separator } from '@/components/ui/separator'
 
+import { useIsAdmin } from '@/hooks/useIsAdmin'
+
 import { createAssignmentSchema, type AssignmentFormData } from '../../schemas/assignmentSchema'
 import { fetchAssignmentById } from '../../api/scheduler.api'
 import { useUpdateAssignment } from '../../hooks/useUpdateAssignment'
 import { useDeleteAssignment } from '../../hooks/useDeleteAssignment'
-import { useDepartments } from '../../hooks/useDepartments'
-import { useUniversities } from '../../hooks/useUniversities'
-import { useAcademicYears } from '../../hooks/useAcademicYears'
+import { useValidationContext } from '../../hooks/useValidationContext'
 import { useSchedulerStore } from '../../stores/schedulerStore'
 import { useDetachFromBlock, useConvertToBlock } from '../../hooks/useBlockActions'
+import { validateDrop } from '../../validators/assignmentValidator'
 import { StudentListSection } from './StudentListSection'
-import type { Student } from '../../types/scheduler.types'
+import { AdminOverrideDialog } from './AdminOverrideDialog'
+import type {
+  Assignment,
+  Student,
+  ConvertToBlockDto,
+  UpdateAssignmentDto,
+} from '../../types/scheduler.types'
 
 export function EditAssignmentDialog() {
   const { t } = useTranslation('scheduler')
-  const { activeDialog, editingAssignmentId, closeDialog, academicYearId } = useSchedulerStore()
+  const { activeDialog, editingAssignmentId, closeDialog } = useSchedulerStore()
   const isOpen = activeDialog === 'edit'
-
-  const { data: academicYears } = useAcademicYears()
-  const currentYear = academicYears?.find((y) => y.id === academicYearId)
+  const isAdmin = useIsAdmin()
 
   const { data: assignment } = useQuery({
     queryKey: ['scheduler', 'assignment', editingAssignmentId],
@@ -65,8 +70,13 @@ export function EditAssignmentDialog() {
     enabled: !!editingAssignmentId,
   })
 
-  const { data: departments } = useDepartments(academicYearId)
-  const { data: universities } = useUniversities()
+  const {
+    context: validationContext,
+    weeks,
+    currentYear,
+    universities,
+    departments,
+  } = useValidationContext()
   const updateAssignment = useUpdateAssignment()
   const deleteAssignment = useDeleteAssignment()
   const detachFromBlock = useDetachFromBlock()
@@ -76,6 +86,11 @@ export function EditAssignmentDialog() {
   const [startDateOpen, setStartDateOpen] = useState(false)
   const [endDateOpen, setEndDateOpen] = useState(false)
   const [perWeekShifts, setPerWeekShifts] = useState<('MORNING' | 'EVENING')[]>([])
+  const [pendingOverride, setPendingOverride] = useState<
+    | { kind: 'convert'; data: ConvertToBlockDto; reasonKey: string; reasonParams?: Record<string, string> }
+    | { kind: 'update'; data: UpdateAssignmentDto; reasonKey: string; reasonParams?: Record<string, string> }
+    | null
+  >(null)
 
   const schema = useMemo(() => createAssignmentSchema(t), [t])
 
@@ -134,62 +149,138 @@ export function EditAssignmentDialog() {
     closeDialog()
     setShowEditForm(false)
     setPerWeekShifts([])
+    setPendingOverride(null)
     reset()
+  }
+
+  function runConvertToBlock(dto: ConvertToBlockDto) {
+    if (!editingAssignmentId) return
+    convertToBlockMutation.mutate(
+      { assignmentId: editingAssignmentId, data: dto },
+      {
+        onSuccess: () => handleClose(),
+        onError: () => toast.error(t('toast.importFailed')),
+      },
+    )
+  }
+
+  function runUpdate(dto: UpdateAssignmentDto) {
+    if (!editingAssignmentId) return
+    updateAssignment.mutate(
+      { id: editingAssignmentId, data: dto },
+      {
+        onSuccess: () => setShowEditForm(false),
+        onError: () => toast.error(t('toast.importFailed')),
+      },
+    )
+  }
+
+  /**
+   * Validates the target week(s) for capacity/blocks before mutating. Returns
+   * the first admin-overridable reason, or null when all weeks are clear.
+   * Toasts and returns 'blocked' when a hard block is hit (non-admin path).
+   */
+  function validateTargetWeeks(
+    data: AssignmentFormData,
+    shifts: ('MORNING' | 'EVENING')[],
+  ): { status: 'ok' } | { status: 'blocked' } | { status: 'override'; reasonKey: string; reasonParams?: Record<string, string> } {
+    if (!validationContext || !editingAssignmentId) return { status: 'ok' }
+
+    const startIdx = weeks.findIndex(
+      (w) => data.startDate >= w.startDate && data.startDate <= w.endDate,
+    )
+    if (startIdx === -1) return { status: 'ok' }
+
+    const universityName = universities?.find((u) => u.id === data.universityId)?.name ?? ''
+    const departmentName = departments?.find((d) => d.id === data.departmentId)?.name ?? ''
+
+    let overrideReason: { reasonKey: string; reasonParams?: Record<string, string> } | null = null
+    for (let i = 0; i < shifts.length; i++) {
+      const week = weeks[startIdx + i]
+      if (!week) break
+      const tempAssignment: Assignment = {
+        id: editingAssignmentId, // exclude the assignment being edited
+        departmentId: data.departmentId,
+        universityId: data.universityId,
+        academicYearId: assignment?.academicYearId ?? 0,
+        startDate: format(week.startDate, 'yyyy-MM-dd'),
+        endDate: format(week.endDate, 'yyyy-MM-dd'),
+        type: data.type,
+        shiftType: shifts[i],
+        status: 'PENDING',
+        studentCount: data.studentCount ?? null,
+        yearInProgram: data.yearInProgram,
+        tutorName: data.tutorName ?? null,
+        universityName,
+        departmentName,
+      }
+      const result = validateDrop(tempAssignment, data.departmentId, week.weekNumber, validationContext)
+      if (result.type === 'blocked') {
+        toast.error(t(result.reasonKey, result.reasonParams))
+        return { status: 'blocked' }
+      }
+      if (
+        !overrideReason &&
+        (result.type === 'conflict_admin_override' || result.type === 'conflict_same_priority')
+      ) {
+        overrideReason = {
+          reasonKey: result.reasonKey,
+          reasonParams: 'reasonParams' in result ? result.reasonParams : undefined,
+        }
+      }
+    }
+
+    if (overrideReason) {
+      if (!isAdmin) {
+        toast.error(t(overrideReason.reasonKey, overrideReason.reasonParams))
+        return { status: 'blocked' }
+      }
+      return { status: 'override', ...overrideReason }
+    }
+    return { status: 'ok' }
   }
 
   async function onSubmit(data: AssignmentFormData) {
     if (!editingAssignmentId) return
 
     if (isMultiWeek) {
-      convertToBlockMutation.mutate(
-        {
-          assignmentId: editingAssignmentId,
-          data: {
-            departmentId: data.departmentId,
-            universityId: data.universityId,
-            startDate: format(data.startDate, 'yyyy-MM-dd'),
-            endDate: format(data.endDate, 'yyyy-MM-dd'),
-            type: data.type,
-            shifts: perWeekShifts,
-            studentCount: data.studentCount ?? null,
-            yearInProgram: data.yearInProgram,
-            tutorName: data.tutorName ?? null,
-          },
-        },
-        {
-          onSuccess: () => {
-            handleClose()
-          },
-          onError: () => {
-            toast.error(t('toast.importFailed'))
-          },
-        },
-      )
+      const dto: ConvertToBlockDto = {
+        departmentId: data.departmentId,
+        universityId: data.universityId,
+        startDate: format(data.startDate, 'yyyy-MM-dd'),
+        endDate: format(data.endDate, 'yyyy-MM-dd'),
+        type: data.type,
+        shifts: perWeekShifts,
+        studentCount: data.studentCount ?? null,
+        yearInProgram: data.yearInProgram,
+        tutorName: data.tutorName ?? null,
+      }
+      const verdict = validateTargetWeeks(data, perWeekShifts)
+      if (verdict.status === 'blocked') return
+      if (verdict.status === 'override') {
+        setPendingOverride({ kind: 'convert', data: dto, reasonKey: verdict.reasonKey, reasonParams: verdict.reasonParams })
+        return
+      }
+      runConvertToBlock(dto)
     } else {
-      updateAssignment.mutate(
-        {
-          id: editingAssignmentId,
-          data: {
-            departmentId: data.departmentId,
-            universityId: data.universityId,
-            startDate: format(data.startDate, 'yyyy-MM-dd'),
-            endDate: format(data.endDate, 'yyyy-MM-dd'),
-            type: data.type,
-            shiftType: data.shiftType,
-            studentCount: data.studentCount ?? null,
-            yearInProgram: data.yearInProgram,
-            tutorName: data.tutorName ?? null,
-          },
-        },
-        {
-          onSuccess: () => {
-            setShowEditForm(false)
-          },
-          onError: () => {
-            toast.error(t('toast.importFailed'))
-          },
-        },
-      )
+      const dto: UpdateAssignmentDto = {
+        departmentId: data.departmentId,
+        universityId: data.universityId,
+        startDate: format(data.startDate, 'yyyy-MM-dd'),
+        endDate: format(data.endDate, 'yyyy-MM-dd'),
+        type: data.type,
+        shiftType: data.shiftType,
+        studentCount: data.studentCount ?? null,
+        yearInProgram: data.yearInProgram,
+        tutorName: data.tutorName ?? null,
+      }
+      const verdict = validateTargetWeeks(data, [data.shiftType])
+      if (verdict.status === 'blocked') return
+      if (verdict.status === 'override') {
+        setPendingOverride({ kind: 'update', data: dto, reasonKey: verdict.reasonKey, reasonParams: verdict.reasonParams })
+        return
+      }
+      runUpdate(dto)
     }
   }
 
@@ -664,6 +755,22 @@ export function EditAssignmentDialog() {
           </AlertDialog>
         </div>
       </DialogContent>
+
+      <AdminOverrideDialog
+        open={!!pendingOverride}
+        reasonKey={pendingOverride?.reasonKey ?? ''}
+        reasonParams={pendingOverride?.reasonParams}
+        onConfirm={() => {
+          if (!pendingOverride) return
+          if (pendingOverride.kind === 'convert') {
+            runConvertToBlock({ ...pendingOverride.data, forceOverride: true })
+          } else {
+            runUpdate({ ...pendingOverride.data, forceOverride: true })
+          }
+          setPendingOverride(null)
+        }}
+        onCancel={() => setPendingOverride(null)}
+      />
     </Dialog>
   )
 }

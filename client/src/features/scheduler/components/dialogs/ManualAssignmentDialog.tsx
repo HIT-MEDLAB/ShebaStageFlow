@@ -31,17 +31,12 @@ import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { createAssignmentSchema, type AssignmentFormData } from '../../schemas/assignmentSchema'
 import { useCreateAssignment } from '../../hooks/useCreateAssignment'
 import { useCreateBlock } from '../../hooks/useBlockActions'
-import { useDepartments } from '../../hooks/useDepartments'
-import { useUniversities } from '../../hooks/useUniversities'
-import { useAssignments } from '../../hooks/useAssignments'
-import { useConstraints } from '../../hooks/useConstraints'
-import { useAcademicYears } from '../../hooks/useAcademicYears'
-import { useAcademicYearWeeks } from '../../hooks/useAcademicYearWeeks'
-import { useBlockedCells } from '../../hooks/useBlockedCells'
+import { useValidationContext } from '../../hooks/useValidationContext'
 import { useSchedulerStore } from '../../stores/schedulerStore'
 import { validateDrop } from '../../validators/assignmentValidator'
 import { findAvailableWeeks } from '../../validators/findAvailableWeeks'
-import type { Assignment } from '../../types/scheduler.types'
+import { AdminOverrideDialog } from './AdminOverrideDialog'
+import type { Assignment, CreateBlockDto } from '../../types/scheduler.types'
 
 export function ManualAssignmentDialog() {
   const { t } = useTranslation('scheduler')
@@ -49,41 +44,17 @@ export function ManualAssignmentDialog() {
     activeDialog,
     closeDialog,
     academicYearId,
-    selectedUniversities,
-    selectedShift,
-    selectedYear,
     openReplacementDialog,
     openAdminOverrideDialog,
   } = useSchedulerStore()
   const isOpen = activeDialog === 'create'
   const isAdmin = useIsAdmin()
 
-  const { data: departments } = useDepartments(academicYearId)
-  const { data: universities } = useUniversities()
   const createAssignment = useCreateAssignment()
   const createBlockMutation = useCreateBlock()
 
-  const { data: academicYears } = useAcademicYears()
-  const currentYear = academicYears?.find((y) => y.id === academicYearId)
-  const { data: assignments } = useAssignments(academicYearId, {
-    selectedUniversities,
-    selectedShift,
-    selectedYear,
-  })
-  const constraintYears = currentYear
-    ? [...new Set([
-        new Date(currentYear.startDate).getFullYear(),
-        new Date(currentYear.endDate).getFullYear(),
-      ])]
-    : null
-  const { data: constraints } = useConstraints(constraintYears, academicYearId ?? undefined)
-  const weeks = useAcademicYearWeeks(currentYear)
-  const blockedCells = useBlockedCells(constraints, weeks)
-
-  const universityPriorities = useMemo(
-    () => new Map((universities ?? []).map((u) => [u.id, u.priority])),
-    [universities],
-  )
+  const { context: validationContext, weeks, currentYear, universities, departments } =
+    useValidationContext()
 
   const schema = useMemo(() => createAssignmentSchema(t), [t])
 
@@ -103,6 +74,11 @@ export function ManualAssignmentDialog() {
   const [startDateOpen, setStartDateOpen] = useState(false)
   const [endDateOpen, setEndDateOpen] = useState(false)
   const [perWeekShifts, setPerWeekShifts] = useState<('MORNING' | 'EVENING')[]>([])
+  const [pendingBlockOverride, setPendingBlockOverride] = useState<{
+    dto: CreateBlockDto
+    reasonKey: string
+    reasonParams?: Record<string, string>
+  } | null>(null)
 
   // Watch dates and shift to compute week count
   const watchedStartDate = useWatch({ control, name: 'startDate' })
@@ -135,6 +111,7 @@ export function ManualAssignmentDialog() {
     closeDialog()
     reset()
     setPerWeekShifts([])
+    setPendingBlockOverride(null)
   }
 
   async function onSubmit(data: AssignmentFormData) {
@@ -143,13 +120,89 @@ export function ManualAssignmentDialog() {
       return
     }
 
-    // Pre-creation validation
-    if (assignments && constraints) {
+    const universityName = universities?.find((u) => u.id === data.universityId)?.name ?? ''
+    const departmentName = departments?.find((d) => d.id === data.departmentId)?.name ?? ''
+
+    // ── Multi-week (block) create ─────────────────────────────────
+    if (isMultiWeek) {
+      const blockDto: CreateBlockDto = {
+        departmentId: data.departmentId,
+        universityId: data.universityId,
+        academicYearId,
+        startDate: format(data.startDate, 'yyyy-MM-dd'),
+        endDate: format(data.endDate, 'yyyy-MM-dd'),
+        type: data.type,
+        shifts: perWeekShifts,
+        studentCount: data.studentCount ?? null,
+        yearInProgram: data.yearInProgram,
+        tutorName: data.tutorName ?? null,
+      }
+
+      // Validate each week of the block (capacity / blocks). Admins may override.
+      if (validationContext) {
+        const startIdx = weeks.findIndex(
+          (w) => data.startDate >= w.startDate && data.startDate <= w.endDate,
+        )
+        if (startIdx !== -1) {
+          let overrideReason: { reasonKey: string; reasonParams?: Record<string, string> } | null = null
+          for (let i = 0; i < perWeekShifts.length; i++) {
+            const week = weeks[startIdx + i]
+            if (!week) break
+            const tempAssignment: Assignment = {
+              id: 0,
+              departmentId: data.departmentId,
+              universityId: data.universityId,
+              academicYearId,
+              startDate: format(week.startDate, 'yyyy-MM-dd'),
+              endDate: format(week.endDate, 'yyyy-MM-dd'),
+              type: data.type,
+              shiftType: perWeekShifts[i],
+              status: 'PENDING',
+              studentCount: data.studentCount ?? null,
+              yearInProgram: data.yearInProgram,
+              tutorName: data.tutorName ?? null,
+              universityName,
+              departmentName,
+            }
+            const result = validateDrop(tempAssignment, data.departmentId, week.weekNumber, validationContext)
+            if (result.type === 'blocked') {
+              toast.error(t(result.reasonKey, result.reasonParams))
+              return
+            }
+            if (
+              !overrideReason &&
+              (result.type === 'conflict_admin_override' || result.type === 'conflict_same_priority')
+            ) {
+              overrideReason = {
+                reasonKey: result.reasonKey,
+                reasonParams: 'reasonParams' in result ? result.reasonParams : undefined,
+              }
+            }
+          }
+
+          if (overrideReason) {
+            if (isAdmin) {
+              setPendingBlockOverride({ dto: blockDto, ...overrideReason })
+            } else {
+              toast.error(t(overrideReason.reasonKey, overrideReason.reasonParams))
+            }
+            return
+          }
+        }
+      }
+
+      createBlockMutation.mutate(blockDto, {
+        onSuccess: () => {
+          handleClose()
+        },
+      })
+      return
+    }
+
+    // ── Single-week create ────────────────────────────────────────
+    if (validationContext) {
       const week = weeks.find((w) => data.startDate >= w.startDate && data.startDate <= w.endDate)
       if (week) {
-        const universityName = universities?.find((u) => u.id === data.universityId)?.name ?? ''
-        const departmentName = departments?.find((d) => d.id === data.departmentId)?.name ?? ''
-
         const tempAssignment: Assignment = {
           id: 0,
           departmentId: data.departmentId,
@@ -165,16 +218,6 @@ export function ManualAssignmentDialog() {
           tutorName: data.tutorName ?? null,
           universityName,
           departmentName,
-        }
-
-        const validationContext = {
-          blockedCells,
-          existingAssignments: assignments,
-          departmentConstraints: constraints.departmentConstraints,
-          ironConstraints: constraints.ironConstraints,
-          weeks,
-          universityPriorities,
-          isAdmin,
         }
 
         const result = validateDrop(tempAssignment, data.departmentId, week.weekNumber, validationContext)
@@ -227,50 +270,28 @@ export function ManualAssignmentDialog() {
       }
     }
 
-    if (isMultiWeek) {
-      createBlockMutation.mutate(
-        {
-          departmentId: data.departmentId,
-          universityId: data.universityId,
-          academicYearId,
-          startDate: format(data.startDate, 'yyyy-MM-dd'),
-          endDate: format(data.endDate, 'yyyy-MM-dd'),
-          type: data.type,
-          shifts: perWeekShifts,
-          studentCount: data.studentCount ?? null,
-          yearInProgram: data.yearInProgram,
-          tutorName: data.tutorName ?? null,
+    createAssignment.mutate(
+      {
+        departmentId: data.departmentId,
+        universityId: data.universityId,
+        academicYearId,
+        startDate: format(data.startDate, 'yyyy-MM-dd'),
+        endDate: format(data.endDate, 'yyyy-MM-dd'),
+        type: data.type,
+        shiftType: data.shiftType,
+        studentCount: data.studentCount ?? null,
+        yearInProgram: data.yearInProgram,
+        tutorName: data.tutorName ?? null,
+      },
+      {
+        onSuccess: () => {
+          handleClose()
         },
-        {
-          onSuccess: () => {
-            handleClose()
-          },
+        onError: () => {
+          toast.error(t('toast.importFailed'))
         },
-      )
-    } else {
-      createAssignment.mutate(
-        {
-          departmentId: data.departmentId,
-          universityId: data.universityId,
-          academicYearId,
-          startDate: format(data.startDate, 'yyyy-MM-dd'),
-          endDate: format(data.endDate, 'yyyy-MM-dd'),
-          type: data.type,
-          shiftType: data.shiftType,
-          studentCount: data.studentCount ?? null,
-          yearInProgram: data.yearInProgram,
-          tutorName: data.tutorName ?? null,
-        },
-        {
-          onSuccess: () => {
-            handleClose()
-          },
-          onError: () => {
-            toast.error(t('toast.importFailed'))
-          },
-        },
-      )
-    }
+      },
+    )
   }
 
   return (
@@ -607,6 +628,25 @@ export function ManualAssignmentDialog() {
           </DialogFooter>
         </form>
       </DialogContent>
+
+      <AdminOverrideDialog
+        open={!!pendingBlockOverride}
+        reasonKey={pendingBlockOverride?.reasonKey ?? ''}
+        reasonParams={pendingBlockOverride?.reasonParams}
+        onConfirm={() => {
+          if (!pendingBlockOverride) return
+          createBlockMutation.mutate(
+            { ...pendingBlockOverride.dto, forceOverride: true },
+            {
+              onSuccess: () => {
+                handleClose()
+              },
+            },
+          )
+          setPendingBlockOverride(null)
+        }}
+        onCancel={() => setPendingBlockOverride(null)}
+      />
     </Dialog>
   )
 }
