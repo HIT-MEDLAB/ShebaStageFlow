@@ -222,6 +222,7 @@ export interface UpdateAssignmentDto {
   studentCount?: number | null
   yearInProgram?: number
   tutorName?: string | null
+  forceOverride?: boolean
 }
 
 export interface MoveAssignmentDto {
