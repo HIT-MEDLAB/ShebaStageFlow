@@ -24,6 +24,7 @@ interface SchedulerStore {
     assignment: Assignment
     targetDeptId: number
     targetWeekNum: number
+    targetWeekNumbers?: number[] // pre-computed skip-blocked target weeks (block moves)
   } | null
   displacedAssignment: Assignment | null
   displacedBlock: Assignment[] | null

@@ -153,6 +153,14 @@ export default function SchedulerPage() {
     }
   }
 
+  // Maps skip-blocked target week numbers to their Sunday start dates (yyyy-MM-dd).
+  function weekNumbersToDates(weekNumbers: number[]): string[] {
+    return weekNumbers.map((n) => {
+      const w = weeks.find((wk) => wk.weekNumber === n)!
+      return format(w.startDate, 'yyyy-MM-dd')
+    })
+  }
+
   function executeMoveAssignment(
     assignment: Assignment,
     targetDeptId: number,
@@ -288,7 +296,7 @@ export default function SchedulerPage() {
         if (adminOverrideReason) {
           if (isAdmin) {
             openAdminOverrideDialog(
-              { assignment, targetDeptId: departmentId, targetWeekNum: firstWeekNum },
+              { assignment, targetDeptId: departmentId, targetWeekNum: firstWeekNum, targetWeekNumbers },
               adminOverrideReason.reasonKey,
               adminOverrideReason.reasonParams,
             )
@@ -351,7 +359,7 @@ export default function SchedulerPage() {
         // Warning — prompt for confirmation
         if (warningResult) {
           openWarningConfirmDialog(
-            { assignment, targetDeptId: departmentId, targetWeekNum: firstWeekNum },
+            { assignment, targetDeptId: departmentId, targetWeekNum: firstWeekNum, targetWeekNumbers },
             warningResult.reasonKey,
             warningResult.reasonParams,
           )
@@ -359,15 +367,11 @@ export default function SchedulerPage() {
         }
 
         // All valid — proceed with block move using the chosen (skip-blocked) weeks
-        const startDates = targetWeekNumbers.map((n) => {
-          const w = weeks.find((wk) => wk.weekNumber === n)!
-          return format(w.startDate, 'yyyy-MM-dd')
-        })
         moveBlockMutation.mutate({
           groupId: assignment.groupId,
           data: {
             departmentId,
-            startDates,
+            startDates: weekNumbersToDates(targetWeekNumbers),
           },
         })
         return
@@ -598,7 +602,11 @@ export default function SchedulerPage() {
         groupId: pendingMove.assignment.groupId,
         data: {
           departmentId: pendingMove.targetDeptId,
-          startDate: format(targetWeek.startDate, 'yyyy-MM-dd'),
+          // Reuse the skip-blocked weeks computed during the drag, falling back
+          // to a single consecutive start when unavailable.
+          ...(pendingMove.targetWeekNumbers?.length
+            ? { startDates: weekNumbersToDates(pendingMove.targetWeekNumbers) }
+            : { startDate: format(targetWeek.startDate, 'yyyy-MM-dd') }),
           forceOverride: true,
         },
       })
@@ -639,7 +647,11 @@ export default function SchedulerPage() {
         groupId: pendingMove.assignment.groupId,
         data: {
           departmentId: pendingMove.targetDeptId,
-          startDate: format(firstWeek.startDate, 'yyyy-MM-dd'),
+          // Reuse the skip-blocked weeks computed during the drag, falling back
+          // to a single consecutive start when unavailable.
+          ...(pendingMove.targetWeekNumbers?.length
+            ? { startDates: weekNumbersToDates(pendingMove.targetWeekNumbers) }
+            : { startDate: format(firstWeek.startDate, 'yyyy-MM-dd') }),
           forceOverride: true,
         },
       })
